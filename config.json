@@ -1,0 +1,106 @@
+{
+    "discord": "https://discord.gg/",
+    "cargos": {
+        "ceo": "【 👑 CEO 】",
+        "gerente": "【 🔥 GERENTE 】",
+        "admin": "【 🚧 ADMIN 】",
+        "mod": "【 🚧 MODERADOR 】",
+        "vips": {
+            "vip": "【 💎 Vip 】",
+            "premium": "【 🔰 Premium 】",
+            "legend": "【 🌋 Legend 】"
+        },
+        "designer": "【 🎨 Designer 】",
+        "skinmaker": "【 ☄ SkinMaker 】",
+        "doador": "【 💸 Doador 】",
+        "streamer": "【 📺 STREAMER 】",
+        "streak": {
+            "1x": "【 🏆 STREAK 1x 】",
+            "2x": "【 🏆 STREAK 2x 】",
+            "3x": "【 🏆 STREAK 3x 】",
+            "4x": "【 🏆 STREAK 4x 】",
+            "5x": "【 🏆 STREAK 5x 】",
+            "6x": "【 🏆 STREAK 6x 】",
+            "7x": "【 🏆 STREAK 7x 】",
+            "8x": "【 🏆 STREAK 8x 】",
+            "9x": "【 🏆 STREAK 9x 】",
+            "10x": "【 🏆 STREAK 10x 】",
+            "11x": "【 🏆 STREAK 11x 】",
+            "12x": "【 🏆 STREAK 12x 】",
+            "13x": "【 🏆 STREAK 13x 】",
+            "14x": "【 🏆 STREAK 14x 】",
+            "15x": "【 🏆 STREAK 15x 】",
+            "16x": "【 🏆 STREAK 16x 】",
+            "17x": "【 🏆 STREAK 17x 】",
+            "18x": "【 🏆 STREAK 18x 】",
+            "19x": "【 🏆 STREAK 19x 】",
+            "20x": "【 🏆 STREAK +20x 】"
+        },
+        "mdm": {
+            "gk": "【 🏆 TOP 1 GK DA TEMPORADA 】",
+            "vl": "【 🏆 TOP 1 VL DA TEMPORADA 】",
+            "pv": "【 🏆 TOP 1 PV DA TEMPORADA 】"
+        }
+    },
+    "ceo_password": "K39GZ19bk'LBV^5Ju.1]",
+    "gerente_password": "[}VI8_m-T]K02z,O4<=N",
+    "staffId": {
+        "ceo": "",
+        "gerente": "",
+        "admin": "",
+        "mod": ""
+    },
+    "canais": {
+        "passwordVips": "",
+        "status": "",
+        "punicoes": ""
+    },
+    "rankings": [
+        "【 🟤 Novato 】", 
+        "【 🟤 Aprendiz 】", 
+        "【 🟤 Avançado 】",
+        "【 🥉 Bronze I 】", 
+        "【 🥉🥉 Bronze II 】", 
+        "【 🥉🥉🥉 Bronze III 】",
+        "【 🥈 Prata I 】", 
+        "【 🥈🥈 Prata II 】",  
+        "【 🥈🥈🥈 Prata III 】",
+        "【 🥇 Ouro I 】", 
+        "【 🥇🥇 Ouro II 】", 
+        "【 🥇🥇🥇 Ouro III 】", 
+        "【 🥇🥇🥇🥇 Ouro IV 】", 
+        "【 💎 Diamante I 】",
+        "【 💎💎 Diamante II 】", 
+        "【 💎💎💎 Diamante III 】", 
+        "【 💎💎💎💎 Diamante IV 】", 
+        "【 💎💎💎💎💎 Diamante V 】", 
+        "【 🏆 Campeão 】", 
+        "【 🏆 Lendário 】",
+        "【 🏆 Campeão 】", 
+        "【 ⭐ Mestre 】", 
+        "【 ⭐ Lenda 】", 
+        "【 🦸 Herói 】", 
+        "【 👑 Líder 】", 
+        "【 👑 Grande Líder 】",
+        "【 🌟 Supremo 】", 
+        "【 🥇 Invencível 】",
+        "【 🔥 Imortal 】", 
+        "【 🔥 Mítico 】", 
+        "【 🔱 Soberano 】", 
+        "【 👑 Supremacia 】",
+        "【 🐐 GOAT 】"  
+    ],
+    "cargos_cores": {
+        "ceo": "0xFF0000",
+        "gerente": "0x00FFFF",
+        "admin": "0xffa500",
+        "mod": "0x993399",
+        "membro": "0xFFFFFF"
+    },
+    "webhooks": {
+        "calladmin": "",
+        "senhasAdmin": "",
+        "senhasMod": "",
+        "punicoes": ""
+    }
+}

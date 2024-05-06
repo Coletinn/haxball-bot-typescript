@@ -1,0 +1,28 @@
+{
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.44",
+    "ascii-table": "^0.0.9",
+    "axios": "^1.6.2",
+    "bcrypt": "^5.1.0",
+    "canvas": "^2.11.2",
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "figlet": "^1.7.0",
+    "form-data": "^4.0.0",
+    "fs": "^0.0.1-security",
+    "haxball.js": "^2.1.2",
+    "mysql2": "^3.6.3",
+    "node-fetch": "^3.3.0",
+    "path": "^0.12.7",
+    "sequelize": "^6.35.0",
+    "undici": "^5.27.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  },
+  "scripts": {
+    "start": "ts-node room.ts"
+  }
+}

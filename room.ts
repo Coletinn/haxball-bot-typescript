@@ -362,10 +362,10 @@ client.login(process.env.DISCORDTOKEN);
 HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: boolean; noPlayer: boolean; geo: { "code": string, "lat": number, "lon": number }; token: string; }) => any) => {
     room = HBInit({
         roomName: roomName, // Nome da Sala
-        maxPlayers: 30,
+        maxPlayers: 16,
         public: ['true', '1'].includes(process.env.public || '0'),
         noPlayer: true,
-        geo: { "lat": -19.81, "lon": -43.95, "code": "br" },
+        geo: { "lat": -19.90, "lon": -43.95, "code": "br" },
         token: String(process.env.TOKEN), // Colocar a token que se adquire aqui: https://www.haxball.com/headlesstoken
     });
 
@@ -801,7 +801,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
                         console.log(`${player.name} logou automaticamente.`);
                         room.sendAnnouncement(`🩸 Você logou automaticamente. Bem-vindo(a) de volta ${player.name}!`, player.id, 0xFF0000, "bold");
-                        room.sendAnnouncement(`🩸 Digite !help para ver todos os comandos disponíveis na sala, em caso de dúvida digite: !help <comando>\n👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
+                        room.sendAnnouncement(`🩸 Digite !help para ver todos os comandos disponíveis na sala, em caso de dúvida digite: !help <comando>`, player.id, 0xFFFFFF, "bold");
                         room.sendAnnouncement(`👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
                         // Limpar timeout.
                         if (timeoutIds[player.id]) {
@@ -2295,7 +2295,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         // Displaying the top scorers on one line
                         let announcement = `🏆⚽ Top 10 Artilheiros: `;
                         result.forEach((player, index) => {
-                            announcement += `#${index + 1} ${player.name}: ${player.goals} gols; `;
+                            announcement += `#${index + 1} ${player.name}: ${player.goals}; `;
                         });
                         room.sendAnnouncement(announcement, player.id, 0xFFFFFF, "bold");
                     }
@@ -2316,7 +2316,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         // Displaying the top scorers on one line
                         let announcement = `🏆🅰️ Top 10 em Assistências: `;
                         result.forEach((player, index) => {
-                            announcement += `#${index + 1} ${player.name}: ${player.assists} assistências; `;
+                            announcement += `#${index + 1} ${player.name}: ${player.assists}; `;
                         });
                         room.sendAnnouncement(announcement, player.id, 0xFFFFFF, "bold");
                     }
@@ -2336,7 +2336,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         // Displaying the top scorers on one line
                         let announcement = `🏆🏟️ Top 10 em Jogos: `;
                         result.forEach((player, index) => {
-                            announcement += `#${index + 1} ${player.name}: ${player.games} jogos; `;
+                            announcement += `#${index + 1} ${player.name}: ${player.games}; `;
                         });
                         room.sendAnnouncement(announcement, player.id, 0xFFFFFF, "bold");
                     }
@@ -2356,7 +2356,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         // Displaying the top scorers on one line
                         let announcement = `🏆✅ Top 10 em Vitórias: `;
                         result.forEach((player, index) => {
-                            announcement += `#${index + 1} ${player.name}: ${player.wins} vitórias; `;
+                            announcement += `#${index + 1} ${player.name}: ${player.wins}; `;
                         });
                         room.sendAnnouncement(announcement, player.id, 0xFFFFFF, "bold");
                     }
@@ -2376,7 +2376,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         // Displaying the top scorers on one line
                         let announcement = `🏆👋 Top 10 em CS: `;
                         result.forEach((player, index) => {
-                            announcement += `#${index + 1} ${player.name}: ${player.cs} CS; `;
+                            announcement += `#${index + 1} ${player.name}: ${player.cs}; `;
                         });
                         room.sendAnnouncement(announcement, player.id, 0xFFFFFF, "bold");
                     }
@@ -2631,7 +2631,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 // Comando help
             } else if (words[0] === "!help" || words[0] === "!ajuda" || words[0] === "!comandos" || words[0] === "!commands") {
                 if (words.length === 1) {
-                    const commands = ["!mudarsenha", "!afk", "!discord", "!stats", "t", "!gk", "!streak", "!topstreak", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs"];
+                    const commands = ["!mudarsenha", "!afk", "!discord", "!stats", "t", "!streak", "!topstreak", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists"];
                     const adminCommands = ["!ban", "!mute", "!rr2", "!setvip <1, 2 ou 3>"]
 
                     room.sendAnnouncement(`📃 Comandos: ${commands.join(", ")}`, player.id, 0xFF0000, "bold");

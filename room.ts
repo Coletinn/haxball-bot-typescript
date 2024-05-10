@@ -43,7 +43,7 @@ import { chooseUni } from './src/Room/Functions/ChooseUni';
 export let goalName: string | null = null;
 export let passName: string | null = null;
 export let discord = config.discord;
-export let roomName = process.env.SERVERNAME ?? 'BORE | 3v3'; // Dps tu altera o nome da sala
+export let roomName = process.env.SERVERNAME ?? '🩸BORE ARENE 🩸 | X3 | FUTSAL'; // Dps tu altera o nome da sala
 
 export var teamR: Player[] = [];
 export var teamB: Player[] = [];
@@ -109,7 +109,7 @@ export const setRoomStatusChannel = (status: string) => {
 
 export function createChannelMessage(channelName: string, channelId: string | null): string {
     return channelId ?
-        `✅ - Canal de ${channelName} **(<#${channelId}>)**\n` :
+        `🩸 - Canal de ${channelName} **(<#${channelId}>)**\n` :
         `❌ - Canal de ${channelName}\n`;
 }
 
@@ -271,10 +271,10 @@ var vipTag = config.cargos.vips.vip;
 var premiumTag = config.cargos.vips.premium;
 var legendTag = config.cargos.vips.legend;
 
-var palavrasRacismo = ["macaco", "preto", "primata", "negro", "negrinho", "negrinha", "mascaico", "makako", "makaka", "makakinho", "makakinha"],
+var palavrasRacismo = ["macaco", "primata", "negrinho", "negrinha", "mascaico", "makako", "makaka", "makakinho", "makakinha"],
     regexRacismo = new RegExp(palavrasRacismo.join("|"), 'gi');
 
-var palavrasSuicidio = ["se mata", "morra", "morram", "morre", "si mata", "ce mata", "ci mata"],
+var palavrasSuicidio = ["se suicida", "se corta"],
     regexSuicidio = new RegExp(palavrasSuicidio.join("|"), 'gi');
 
 export var passwordVip = getRandomInt2(10000, 97999);
@@ -294,7 +294,7 @@ const commandExplanations: any = {
     "help": "Exibe a lista de comandos disponíveis.",
     "registrar": "Digite !registrar seguido pela sua senha (ex. !registrar 1234 )",
     "login": "Digite !login seguido pela sua senha (ex. !login 1234 )",
-    "changepw": "Digite !changepw seguido da sua senha antiga e depois a senha nova (ex. !changepw 1234 senha123 )",
+    "mudarsenha": "Digite !mudarsenha seguido da sua senha antiga e depois a senha nova (ex. !mudarsenha 1234 senha123 )",
     "afk": "Digite uma vez para ficar afk, digite novamente para remover o status de afk.",
     "about": "Mostra as informações da sala.",
     "discord": "Veja o link do discord oficial da sala.",
@@ -308,7 +308,12 @@ const commandExplanations: any = {
     "sub": "É substituído caso esteja nos primeiros 5 segundos da partida.",
     "prev": "Veja a previsão de vitória para o jogo atual.",
     "#": "Envia mensagem privada para o jogador através do ID. (Ex: #50 teste)",
-    "bb": "Faz logout da sala."
+    "bb": "Faz logout da sala.",
+    "cs": "Mostra o top 10 cs da sala.",
+    "gols": "Mostra o top 10 artilheiros da sala.",
+    "vitorias": "Mostra o top 10 com mais vitórias na sala.",
+    "jogos": "Mostra o top 10 jogadores com mais jogos da sala.",
+    "uniformes": "Mostra a lista de uniformes disponíveis."
 };
 
 var room: any;
@@ -480,7 +485,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             if (err) throw err;
                         });
                         executed = true;
-                        room.sendAnnouncement(`🏆 O GK ${gk[0].name} não tomou nenhum gol, parabéns!`, null, 0x00FF00, "bold", 0);
+                        room.sendAnnouncement(`🏆 O GK ${gk[0].name} não tomou nenhum gol, parabéns!`, null, 0xFFFFFF, "bold", 0);
                     }
                 } else if (room.getScores().red === 0) {
                     if (gk[1].position != null && gk[1].name && !executed) {
@@ -490,7 +495,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             if (err) throw err;
                         });
                         executed = true;
-                        room.sendAnnouncement(`🏆 O GK ${gk[1].name} não tomou nenhum gol, parabéns!`, null, 0x00FF00, "bold", 0);
+                        room.sendAnnouncement(`🏆 O GK ${gk[1].name} não tomou nenhum gol, parabéns!`, null, 0xFFFFFF, "bold", 0);
                     }
                 }
                 // Ganhar
@@ -511,10 +516,10 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         }
         // Um bocado óbvio o que isto faz :)
         if (room.getScores().red > room.getScores().blue) {
-            room.sendAnnouncement(`🔴 Equipe vermelha ganhou por ${room.getScores().red} a ${room.getScores().blue}!`, null, 0x00FF00, "bold");
+            room.sendAnnouncement(`🔴 Equipe vermelha ganhou por ${room.getScores().red} a ${room.getScores().blue}!`, null, 0xFF0000, "bold");
             console.log(`Equipe vermelha ganhou por ${room.getScores().red} a ${room.getScores().blue}.`);
         } else {
-            room.sendAnnouncement(`🔵 Equipe azul ganhou por ${room.getScores().blue} a ${room.getScores().red}!`, null, 0x00FF00, "bold");
+            room.sendAnnouncement(`🔵 Equipe azul ganhou por ${room.getScores().blue} a ${room.getScores().red}!`, null, 0x035FFF, "bold");
             console.log(`Equipe azul ganhou por ${room.getScores().blue} a ${room.getScores().red}.`);
         }
     }
@@ -534,7 +539,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
     // Mensagem de 5 em 5 minutos
     setInterval(() => {
-        room.sendAnnouncement(`📢 Faça parte da nossa comunidade no discord: ${discord}\n📢 Visite o nosso website:`, null, 0xbbb7fc, "bold", 0);
+        room.sendAnnouncement(`📢 Faça parte da nossa comunidade no discord: ${discord}\n📢 Nosso website está em construção!`, null, 0xbbb7fc, "bold", 0);
     }, 300000); // 5 minutos
 
     function handleRanks(player: Player) { // Código que trata dos avatars.
@@ -699,7 +704,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         });
                         const now = Date.now();
                         if (now < new Date(banEndTime).getTime()) {
-                            room.kickPlayer(player.id, `🚫 Você está banido até ${formattedBanEndTime}. Motivo: ${ban.reason}`);
+                            room.kickPlayer(player.id, `🩸 Você está banido até ${formattedBanEndTime}. Motivo: ${ban.reason}`);
                             console.log(`${player.name} Levou kick porque está banido.`);
                             break;
                         }
@@ -739,12 +744,14 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     // Timer para kick se não fizer login.
                     timeoutIds[player.id] = setTimeout(() => {
                         // Se o timer acabar leva kick.
-                        room.kickPlayer(player.id, "🚫 Tempo esgotado para login.");
+                        room.kickPlayer(player.id, "🩸 Tempo esgotado para login.");
                         // Mostrar a razão na consola.
                         // console.log(`${player.name} Foi expulso da sala porque excedeu o limite de tempo para registro/login.`); // Isto por vezes aparece erróneamente porém eu não tenho pachorra para limpar este cadito de código :)
                     }, 45000); // 45 segundos
                 } else { //Caso exista player mas não tenha senha
-                    room.sendAnnouncement(`😃 Bem-vindo, ${player.name}! Se registre usando o seguinte comando: !registrar <senha>\n❓ Digite !help para ver todos os comandos disponíveis na sala, em caso de dúvida digite: !help <comando>\n👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
+                    room.sendAnnouncement(`🩸 Bem-vindo, ${player.name}! Se registre usando o seguinte comando: !registrar <senha>`, player.id, 0xFF0000, "bold");
+                    room.sendAnnouncement(`🩸 Digite !help para ver todos os comandos disponíveis na sala, em caso de dúvida digite: !help <comando>`, player.id, 0xFFFFFF, "bold");
+                    room.sendAnnouncement(`👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
                 }
 
                 const playerId = player.id;
@@ -760,40 +767,42 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
                         if (result[0].ceo === 1) {
                             room.setPlayerAdmin(player.id, true);
-                            room.sendAnnouncement(`👑 ${player.name} Você recebeu o cargo de CEO automaticamente.`, player.id, 0xFFBF00, "bold");
+                            room.sendAnnouncement(`👑 ${player.name} Você recebeu o cargo de CEO automaticamente.`, player.id, 0xFFA500, "bold");
                             superadmin[player.id] = 1;
                         }
                         if (result[0].gerente === 1) {
                             room.setPlayerAdmin(player.id, true);
-                            room.sendAnnouncement(`🔥 ${player.name} Você recebeu o cargo de Gerente automaticamente.`, player.id, 0xFFBF00, "bold");
+                            room.sendAnnouncement(`🔥 ${player.name} Você recebeu o cargo de Gerente automaticamente.`, player.id, 0xFFA500, "bold");
                             gerentes[player.id] = 1;
                         }
                         if (result[0].admin === 1) {
                             room.setPlayerAdmin(player.id, true);
-                            room.sendAnnouncement(`🚧 ${player.name} Você recebeu o cargo de administrador automaticamente.`, player.id, 0xFFBF00, "bold");
+                            room.sendAnnouncement(`🚧 ${player.name} Você recebeu o cargo de administrador automaticamente.`, player.id, 0xFFA500, "bold");
                             admins[player.id] = 1;
                         }
                         if (result[0].mod === 1) {
                             room.setPlayerAdmin(player.id, true);
-                            room.sendAnnouncement(`🚧 ${player.name} Você recebeu o cargo de moderador automaticamente.`, player.id, 0xFFBF00, "bold");
+                            room.sendAnnouncement(`🚧 ${player.name} Você recebeu o cargo de moderador automaticamente.`, player.id, 0xFFA500, "bold");
                             mods[player.id] = 1;
                         }
 
                         if (result[0].vip === 1) {
-                            room.sendAnnouncement(`💎 [${player.name}] Jogador Vip acabou de entrar!`, player.id, cores.ciano, "bold");
+                            room.sendAnnouncement(`💎 O VIP ${player.name} acabou de entrar!`, player.id, cores.ciano, "bold");
                             vips[player.id] = 1;
                         }
                         if (result[0].vip === 2) {
-                            room.sendAnnouncement(`🔰 [${player.name}] Jogador Premium acabou de entrar!`, player.id, cores.coral, "bold");
+                            room.sendAnnouncement(`🔰 O jogador PREMIUM ${player.name} acabou de entrar!`, player.id, cores.coral, "bold");
                             premiums[player.id] = 1;
                         }
                         if (result[0].vip === 3) {
-                            room.sendAnnouncement(`🌋 [${player.name}] Jogador Legend acabou de entrar!`, player.id, cores.violeta, "bold");
+                            room.sendAnnouncement(`🌋 O jogador Legend ${player.name} acabou de entrar!`, player.id, cores.violeta, "bold");
                             legends[player.id] = 1;
                         }
 
                         console.log(`${player.name} logou automaticamente.`);
-                        room.sendAnnouncement(`✅ Você logou automaticamente. Bem-vindo(a) de volta ${player.name}!\n❓ Digite !help para ver todos os comandos disponíveis na sala, em caso de dúvida digite: !help <comando>\n👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
+                        room.sendAnnouncement(`🩸 Você logou automaticamente. Bem-vindo(a) de volta ${player.name}!`, player.id, 0xFF0000, "bold");
+                        room.sendAnnouncement(`🩸 Digite !help para ver todos os comandos disponíveis na sala, em caso de dúvida digite: !help <comando>\n👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
+                        room.sendAnnouncement(`👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
                         // Limpar timeout.
                         if (timeoutIds[player.id]) {
                             clearTimeout(timeoutIds[player.id]);
@@ -801,13 +810,17 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         }
                     } else {
                         if (result[0].password) {
-                            room.sendAnnouncement(`😃 Olá ${player.name}, para ter acesso aos outros comandos digite: !login seguido pela sua senha (Ex: !login 1234).\n❓ Digite !help para ver todos os comandos disponíveis na sala, em caso de dúvida digite: !help <comando>\n👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
+                            room.sendAnnouncement(`🩸 Olá ${player.name}, para ter acesso aos outros comandos digite: !login seguido pela sua senha (Ex: !login 1234).`, player.id, 0xFF0000, "bold");
+                            room.sendAnnouncement(`🩸 Digite !help para ver todos os comandos disponíveis na sala, em caso de dúvida digite: !help <comando>`, player.id, 0xFFFFFF, "bold");
+                            room.sendAnnouncement(`👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
                         }
                     }
                 });
             } else {
                 // O nome não está registado, pedir ao usuário para se registar.
-                room.sendAnnouncement(`😃 Bem-vindo, ${player.name}! Se registre usando o seguinte comando: !registrar <senha>\n❓ Digite !help para ver todos os comandos disponíveis na sala, em caso de dúvida digite: !help <comando>\n👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
+                room.sendAnnouncement(`🩸 Bem-vindo, ${player.name}! Se registre usando o seguinte comando: !registrar <senha>`, player.id, 0xFF0000, "bold");
+                room.sendAnnouncement(`🩸 Digite !help para ver todos os comandos disponíveis na sala, em caso de dúvida digite: !help <comando>`, player.id, 0xFFFFFF, "bold");
+                room.sendAnnouncement(`👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
                 const auth = playerAuth.get(player.id);
                 const sql = `INSERT INTO players (game_id, name, password, loggedIn, conn, ipv4, auth) VALUES (?,?,?,?,?,?,?)`;
                 const values = [player.id, player.name, null, 1, conn, ipv4, auth];
@@ -826,9 +839,9 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             if (result.length === 0) {
                 // Usuário não registado, deixar entrar, pois é impossível estar com login feito, se o mesmo não existe.
             }
-            else if (result[0].game_id !== 0 && !process.env.debug) {
-                room.kickPlayer(player.id, "🚫 Você já está conectado em outra conta.");
-            }
+            // else if (result[0].game_id !== 0 && !process.env.debug) {
+            //     room.kickPlayer(player.id, "🩸 Você já está conectado em outra conta.");
+            // }
         });
 
         const sql3 = `SELECT * FROM stats WHERE player_id = (SELECT id FROM players WHERE LOWER(name) = LOWER(?)) AND room_id = ?`;
@@ -885,7 +898,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 return;
             }
             if (teamS.length > 0 && Math.abs(teamR.length - teamB.length) == teamS.length) {
-                room.sendAnnouncement("Sem opções restantes, deixa que eu escolho...");
+                room.sendAnnouncement("Sem opções restantes, deixa que eu escolho...", 0xFF0000, 'bold');
                 deactivateChooseMode();
                 resumeGame();
                 var b = teamS.length;
@@ -906,7 +919,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             }
             if (winstreak == 0 && room.getScores() == null) {
                 if (Math.abs(teamR.length - teamB.length) == 2) { // if someone left a team has 2 more players than the other one, put the last ESCOLHEUn guy back in his place so it's fair
-                    room.sendAnnouncement("Equilibrando times...", null, 0xedc021, 'bold');
+                    room.sendAnnouncement("Equilibrando times...", null, 0xFF0000, 'bold');
                     teamR.length > teamB.length ? room.setPlayerTeam(teamR[teamR.length - 1].id, Team.SPECTATORS) : room.setPlayerTeam(teamB[teamB.length - 1].id, Team.SPECTATORS);
                 }
             }
@@ -943,10 +956,10 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             gambiarrabug(2);
             return;
         }
-        var cstm = "[PV] Jogadores : ";
+        var cstm = "Jogadores: ";
         for (var i = 0; i < teamS.length; i++) {
             if (140 - cstm.length < (teamS[i].name + "[" + (i + 1) + "], ").length) {
-                room.sendAnnouncement(cstm, player.id);
+                room.sendAnnouncement(cstm, player.id, 0xFFFFFF, 'bold');
                 cstm = "... ";
             }
             cstm += teamS[i].name + "[" + (i + 1) + "], ";
@@ -954,7 +967,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
         cstm = cstm.substring(0, cstm.length - 2);
         cstm += ".";
-        room.sendAnnouncement(cstm, player.id);
+        room.sendAnnouncement(cstm, player.id, 0xFFFFFF, 'bold');
     }
 
     function balanceTeams() {
@@ -1014,19 +1027,19 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     function choosePlayer() {
         clearTimeout(timeOutCap);
         if (teamR.length <= teamB.length && teamR.length != 0) {
-            room.sendAnnouncement("[PV] Para escolher um player, insira seu número da lista ou use 'top', 'random' ou 'bottom'.", teamR[0].id, 0xedc021, 'bold');
+            room.sendAnnouncement("Para escolher um player, insira seu número da lista ou use 'top', 'random' ou 'bottom'.", teamR[0].id, 0xFF0000, 'bold');
             timeOutCap = setTimeout(function (player) {
-                room.sendAnnouncement("[PV] Vai rápido @" + player.name + ", apenas " + chooseTime / 2 + " segundos restantes para escolher !", player.id);
+                room.sendAnnouncement("Vai rápido @" + player.name + ", apenas " + chooseTime / 2 + " segundos restantes para escolher!", player.id, 0xFFA500, 'bold');
                 timeOutCap = setTimeout(function (player) {
-                    room.kickPlayer(player.id, "Você não escolheu a tempo !", false);
+                    room.kickPlayer(player.id, "Você não escolheu a tempo!", false);
                 }, chooseTime * 500, teamR[0]);
             }, chooseTime * 1000, teamR[0]);
         } else if (teamB.length < teamR.length && teamB.length != 0) {
-            room.sendAnnouncement("[PV] Para escolher um jogador, insira seu número da lista ou use 'top', 'random' ou 'bottom'.", teamB[0].id, 0xedc021, 'bold');
+            room.sendAnnouncement("Para escolher um jogador, insira seu número da lista ou use 'top', 'random' ou 'bottom'.", teamB[0].id, 0xFF0000, 'bold');
             timeOutCap = setTimeout(function (player) {
-                room.sendAnnouncement("[PV] Vai rápido @" + player.name + ", apenas " + chooseTime / 2 + " segundos restantes para escolher !", player.id);
+                room.sendAnnouncement("Vai rápido @" + player.name + ", apenas " + chooseTime / 2 + " segundos restantes para escolher!", player.id, 0xFFA500, 'bold');
                 timeOutCap = setTimeout(function (player) {
-                    room.kickPlayer(player.id, "Você não escolheu a tempo !", false);
+                    room.kickPlayer(player.id, "Você não escolheu a tempo!", false);
                 }, chooseTime * 500, teamB[0]);
             }, chooseTime * 1000, teamB[0]);
         }
@@ -1133,7 +1146,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     function activateChooseMode() {
         inChooseMode = true;
         slowMode = 2;
-        room.sendAnnouncement("Modo lento ativado (2 segundos)!");
+        room.sendAnnouncement("Modo lento ativado de 2 segundos!", 0xFF0000, 'bold');
     }
 
     function deactivateChooseMode() {
@@ -1141,7 +1154,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         clearTimeout(timeOutCap);
         if (slowMode != 0) {
             slowMode = 0;
-            room.sendAnnouncement("Fim do modo lento.");
+            room.sendAnnouncement("Fim do modo lento", 0xFF0000, 'bold');
         }
         redCaptainChoice = "";
         blueCaptainChoice = "";
@@ -1185,11 +1198,11 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             for (const p of activePlayers) {
                 if (p.team !== 0) {
                     if (Date.now() - activities[p.id] > AFKTimeout) {
-                        room.kickPlayer(p.id, "🚫 Inatividade detectada!");
+                        room.kickPlayer(p.id, "🩸 Inatividade detectada!");
 
                     } else if (Date.now() - activities[p.id] > AFKTimeout - 6000) {
                         if (Date.now() - lastWarningTime > 2000) {
-                            room.sendAnnouncement("🚫 Você vai ser kickado por inatividade, se mova ou escreve algo para evitar ser kickado.", p.id, 0xFF0000, "bold", 2);
+                            room.sendAnnouncement("🩸 Você vai ser kickado por inatividade, se mova ou escreva algo para evitar ser kickado.", p.id, 0xFFA500, "bold", 2);
                             lastWarningTime = Date.now();
                         }
                     }
@@ -1304,7 +1317,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                     banDuration = duration * 1000;
                                     break;
                                 default:
-                                    room.sendAnnouncement("🚫 Formato de tempo inválido. Use um número seguido de d (Dias), h (Horas), m (Minutos), ou s (Segundos)", player.id, 0xFF0000, "bold", 2);
+                                    room.sendAnnouncement("🩸 Formato de tempo inválido. Use um número seguido de d (Dias), h (Horas), m (Minutos), ou s (Segundos)", player.id, 0xFF0000, "bold", 2);
                                     return;
                             }
 
@@ -1332,8 +1345,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                 const values = [name, banEndTimeFormatted, motivo, autoModBot, conn, ipv4, auth];
                                 con.query(sql, values, (err: any, result: any) => {
                                     if (err) throw err;
-                                    room.kickPlayer(targetPlayer.id, `🚫 Você foi banido. Motivo: ${motivo} até ${formattedBanEndTime}.`);
-                                    room.sendAnnouncement(`【 🤖 AUTOMOD 】 ${player.name} Foi banido !`, null, cores.vermelho, "bold", 2);
+                                    room.kickPlayer(targetPlayer.id, `🩸 Você foi banido. Motivo: ${motivo} até ${formattedBanEndTime}.`);
+                                    room.sendAnnouncement(`[🤖 AUTOMOD] ${player.name} Foi banido!`, null, cores.vermelho, "bold", 2);
                                 });
 
                                 if (config.canais.punicoes && config.canais.punicoes !== "") {
@@ -1341,7 +1354,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         .setTitle(`O jogador **${player.name} foi banido!**`)
                                         .setDescription(`🚧 Informações do banimento:`)
                                         .addFields(
-                                            { name: 'Banido por', value: `【 🤖 AUTOMOD 】` },
+                                            { name: 'Banido por', value: `[🤖 AUTOMOD]` },
                                             { name: 'Nick/ID', value: `${player.name}#${player.id}` },
                                             { name: 'Motivo', value: `${motivo}` },
                                             { name: 'Tempo de banimento', value: `Até ${formattedBanEndTime}` },
@@ -1357,14 +1370,14 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                 const values = [name, banEndTimeFormatted, motivo, autoModBot, conn2, ipv4, auth2];
                                 con.query(sql, values, (err: any, result: any) => {
                                     if (err) throw err;
-                                    room.sendAnnouncement(`【 🤖 AUTOMOD 】 ${player.name} Foi banido !`, null, cores.vermelho, "bold", 2);
+                                    room.sendAnnouncement(`[🤖 AUTOMOD] ${player.name} Foi banido!`, null, cores.vermelho, "bold", 2);
 
                                     if (config.canais.punicoes && config.canais.punicoes !== "") {
                                         var embedPunicao = new EmbedBuilder()
                                             .setTitle(`O jogador **${player.name} foi banido!**`)
                                             .setDescription(`🚧 Informações do banimento:`)
                                             .addFields(
-                                                { name: 'Banido por', value: `【 🤖 AUTOMOD 】` },
+                                                { name: 'Banido por', value: `[🤖 AUTOMOD]` },
                                                 { name: 'Nick/ID', value: `${player.name}#${player.id}` },
                                                 { name: 'Motivo', value: `${motivo}` },
                                                 { name: 'Tempo de banimento', value: `Até ${formattedBanEndTime}` },
@@ -1435,17 +1448,17 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             // Comando de registro
             if (words[0] === "!registrar" || words[0] === "!register") {
                 if (loggedInPlayers[player.id]) { //Não tem porque executar selects se a variável indica que ele esta logado é porque tem registro.
-                    room.sendAnnouncement(`🚫 ${player.name} Você já está logado.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} Você já está logado.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
                 const password = words[1];
                 if (!password) {
-                    room.sendAnnouncement(`🚫 ${player.name}, você precisa colocar uma senha depois do !registrar. (Ex: !registrar 1234)`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name}, você precisa colocar uma senha depois do !registrar. (Ex: !registrar 1234)`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
                 if (password.length < 3) {
-                    room.sendAnnouncement(`🚫 ${player.name} A senha deve ter pelo menos 3 caracteres.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} A senha deve ter pelo menos 3 caracteres.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
                 const conn = playerConnections.get(player.id);
@@ -1460,7 +1473,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 con.query(sql, values, (err: any, result: any) => {
                     if (err) throw err;
                     if (result[0].count >= 1) {
-                        room.sendAnnouncement(`🚫 ${player.name} Você já tem uma conta registrada.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`🩸 ${player.name} Você já tem uma conta registrada.`, player.id, 0xFF0000, "bold", 2);
                         console.log(`O usuário ${player.name} tentou se registrar, porém já tem 2 contas. CONN: ${conn}`);
                     } else {
                         const sql = `SELECT * FROM players WHERE LOWER(name) = LOWER(?) AND password IS NOT NULL`;
@@ -1469,7 +1482,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             if (err) throw err;
                             if (result.length > 0) {
                                 // Nome do jogador já está na database :(
-                                room.sendAnnouncement(`🚫 ${player.name} Já existe uma conta com este nome registrada. Por favor troque o seu nome no haxball ou faça login com o seguinte comando: !login seguido pela sua senha.`, player.id, 0xFF0000, "bold", 2);
+                                room.sendAnnouncement(`🩸 ${player.name} Já existe uma conta com este nome registrada. Por favor troque o seu nome no haxball ou faça login com o seguinte comando: !login seguido pela sua senha.`, player.id, 0xFF0000, "bold", 2);
                             } else {
                                 // O nome do jogador não está na database, siga siga registar :D
                                 bcrypt.hash(password, 10, (err: any, hashedPassword: any) => {
@@ -1479,7 +1492,9 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                     con.query(sql, values, (err: any) => {
                                         if (err) throw err;
                                         console.log(`Novo registro: ${player.name}`);
-                                        room.sendAnnouncement(`✅ ${player.name} O seu registro foi concluído com sucesso!\n❓ Digite !help para ver os comandos disponíveis na sala, em caso de dúvida com algum comando digite: !help <comando>\n👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
+                                        room.sendAnnouncement(`🩸 ${player.name} o seu registro foi concluído com sucesso!`, player.id, 0xFF0000, "bold");
+                                        room.sendAnnouncement(`🩸 Digite !help para ver os comandos disponíveis na sala, em caso de dúvida com algum comando digite: !help <comando>`, player.id, 0xFFFFFF, "bold");
+                                        room.sendAnnouncement(`👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
                                         loggedInPlayers[player.id] = true;
                                     });
                                 });
@@ -1513,7 +1528,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         if (result[0].vip === 3) tagFurar = "Legend";
 
                                         room.reorderPlayers([player.id], true);
-                                        room.sendAnnouncement(`O jogador ${tagFurar} ${player.name} furou a fila!`, null, cores.laranja, 'bold', 2);
+                                        room.sendAnnouncement(`O jogador ${tagFurar} ${player.name} furou a fila!`, null, 0xFFA500, 'bold', 2);
 
                                         let x = tipoVip == 1 ? 30 : tipoVip == 2 ? 20 : 10
 
@@ -1580,7 +1595,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         setTimeout(() => {
                                             if (State.PAUSE) {
                                                 room.pauseGame(false);
-                                                room.sendAnnouncement(`[🤖] Jogo despausado!`, null, cores.verdeLimao, 'bold', 2);
+                                                room.sendAnnouncement(`Jogo despausado!`, null, 0xFF0000, 'bold', 2);
                                             }
                                             vipPausou.splice(vipPausou.indexOf(player.name), 1)
                                         }, tipoVip == 1 ? 10000 : (tipoVip == 2 ? 15000 : 30000));
@@ -1595,29 +1610,29 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         }, tipoVip == 1 ? 30 * 60 * 1000 : 5 * 60 * 1000)
 
                                         if (tipoVip == 3) {
-                                            room.sendAnnouncement(`[🤖] Jogo pausado 30 segundos pelo ${tagPause}: ${player.name}`, null, cores.verdeLimao, 'bold', 2);
+                                            room.sendAnnouncement(`Jogo pausado 30 segundos pelo ${tagPause}: ${player.name}`, null, 0xFF0000, 'bold', 2);
                                             return false;
                                         }
 
-                                        room.sendAnnouncement(`[🤖] Jogo pausado por 15 segundos pelo ${tagPause}: ${player.name}`, null, cores.verdeLimao, 'bold', 2);
+                                        room.sendAnnouncement(`Jogo pausado por 15 segundos pelo ${tagPause}: ${player.name}`, null, 0xFF0000, 'bold', 2);
                                         return false;
                                     } else {
                                         if (tipoVip == 1) {
-                                            room.sendAnnouncement(`[🤖] Você só pode usar o comando pause a cada 30 minutos. Aguarde...`, player.id, cores.vermelho, 'bold', 2);
+                                            room.sendAnnouncement(`Você só pode usar o comando pause a cada 30 minutos. Aguarde...`, player.id, cores.vermelho, 'bold', 2);
                                             return false;
                                         } else if (tipoVip == 2) {
-                                            room.sendAnnouncement(`[🤖] Você só pode usar o comando pause a cada 15 minutos. Aguarde...`, player.id, cores.vermelho, 'bold', 2);
+                                            room.sendAnnouncement(`Você só pode usar o comando pause a cada 15 minutos. Aguarde...`, player.id, cores.vermelho, 'bold', 2);
                                             return false;
                                         } else {
-                                            room.sendAnnouncement(`[🤖] Você só pode usar o comando pause a cada 5 minutos. Aguarde...`, player.id, cores.vermelho, 'bold', 2);
+                                            room.sendAnnouncement(`Você só pode usar o comando pause a cada 5 minutos. Aguarde...`, player.id, cores.vermelho, 'bold', 2);
                                             return false;
                                         }
                                     }
                                 } else if (gameState == State.STOP) {
-                                    room.sendAnnouncement(`🤖 [PV] Você só pode pausar enquanto o jogo está em andamento.`, player.id, cores.vermelho, 'bold', 2);
+                                    room.sendAnnouncement(`🤖 Você só pode pausar enquanto o jogo está em andamento.`, player.id, cores.vermelho, 'bold', 2);
                                     return false;
                                 } else {
-                                    room.sendAnnouncement(`🤖 [PV] O jogo já está pausado.`, player.id, cores.vermelho, 'bold', 2);
+                                    room.sendAnnouncement(`🤖 O jogo já está pausado.`, player.id, cores.vermelho, 'bold', 2);
                                     return false;
                                 }
                             } else {
@@ -1657,16 +1672,16 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                     vipPausou.splice(vipPausou.indexOf(player.name), 1);
 
                                     room.pauseGame(false);
-                                    room.sendAnnouncement(`[🤖] Jogo despausado pelo ${tagUnPause}: ${player.name}`, null, cores.verdeLimao, 'bold', 2);
+                                    room.sendAnnouncement(`Jogo despausado pelo ${tagUnPause}: ${player.name}`, null, 0xFF0000, 'bold', 2);
 
                                     return false;
                                     //}
                                 } else if (gameState == State.STOP) {
-                                    room.sendAnnouncement(`[🤖] Você só pode despausar quando o jogo estiver em andamento.`, player.id, cores.vermelho, 'bold', 2);
+                                    room.sendAnnouncement(`Você só pode despausar quando o jogo estiver em andamento.`, player.id, cores.vermelho, 'bold', 2);
                                     return false;
                                 }
                             } else {
-                                room.sendAnnouncement(`[🤖] Você precisa estar jogando para despausar o jogo`, player.id, cores.vermelho, 'bold', 2);
+                                room.sendAnnouncement(`Você precisa estar jogando para despausar o jogo`, player.id, cores.vermelho, 'bold', 2);
                                 return false
                             }
                         }
@@ -1674,17 +1689,17 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 }
             } else if (words[0] === "!login") {
                 if (loggedInPlayers[player.id]) { //Não tem porque executar selects se a variável indica que ele esta logado é porque tem registro.
-                    room.sendAnnouncement(`🚫 ${player.name} Você já está logado.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} Você já está logado.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
                 const password = words[1];
                 if (!password) {
-                    room.sendAnnouncement(`🚫 ${player.name} Você não digitou a senha corretamente.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} Você não digitou a senha corretamente.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
                 if (password.length < 1) {
-                    room.sendAnnouncement(`🚫 ${player.name} Você precisa colocar a senha depois do !login.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} Você precisa colocar a senha depois do !login.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
                 // Checkar a database por alguém com o mesmo nome da pessoa em questão.
@@ -1695,7 +1710,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
                     if (result.length > 0) { // Um jogador com o mesmo nome foi encontrado.
                         if (false/*result[0].loggedIn === 1*/) { // O jogador já está logado.
-                            room.sendAnnouncement(`🚫 Você já está logado.`, player.id, 0xFF0000, "bold", 2);
+                            room.sendAnnouncement(`🩸 Você já está logado.`, player.id, 0xFF0000, "bold", 2);
                         } else {
                             // O jogador não está logado ainda, então prosseguir.
                             bcrypt.compare(password, result[0].password, (err: any, isMatch: boolean) => {
@@ -1718,27 +1733,29 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
                                         if (result[0].ceo === 1) { // O usuário é super admin como tal dar admin ao mesmo.
                                             room.setPlayerAdmin(player.id, true);
-                                            room.sendAnnouncement(`👑 ${player.name}, Você recebeu o cargo de CEO automaticamente.`, player.id, 0xFFBF00, "bold");
+                                            room.sendAnnouncement(`👑 ${player.name}, você recebeu o cargo de CEO automaticamente.`, player.id, 0xFFA500, "bold");
                                             superadmin[player.id] = 1;
                                         }
                                         if (result[0].gerente === 1) {
                                             room.setPlayerAdmin(player.id, true);
-                                            room.sendAnnouncement(`🔥 ${player.name} Você recebeu o cargo de Gerente automaticamente.`, player.id, 0xFFBF00, "bold");
+                                            room.sendAnnouncement(`🔥 ${player.name} você recebeu o cargo de Gerente automaticamente.`, player.id, 0xFFA500, "bold");
                                             gerentes[player.id] = 1;
                                         }
                                         if (result[0].admin === 1) {
                                             room.setPlayerAdmin(player.id, true);
-                                            room.sendAnnouncement(`🚧 ${player.name} Você recebeu o cargo de administrador automaticamente.`, player.id, 0xFFBF00, "bold");
+                                            room.sendAnnouncement(`🚧 ${player.name} você recebeu o cargo de administrador automaticamente.`, player.id, 0xFFA500, "bold");
                                             admins[player.id] = 1;
                                         }
                                         if (result[0].mod === 1) {
                                             room.setPlayerAdmin(player.id, true);
-                                            room.sendAnnouncement(`🚧 ${player.name} Você recebeu o cargo de moderador automaticamente.`, player.id, 0xFFBF00, "bold");
+                                            room.sendAnnouncement(`🚧 ${player.name} você recebeu o cargo de moderador automaticamente.`, player.id, 0xFFA500, "bold");
                                             mods[player.id] = 1;
                                         }
 
                                         console.log(`${player.name} logou.`);
-                                        room.sendAnnouncement(`✅ Bem-vindo de volta ${player.name}!\n❓ Digite !help para ver os comandos disponíveis na sala, em caso de dúvida com algum comando digite: !help <comando>\n👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
+                                        room.sendAnnouncement(`🩸 Bem-vindo de volta ${player.name}!`, player.id, 0xFF0000, "bold");
+                                        room.sendAnnouncement(`🩸 Digite !help para ver os comandos disponíveis na sala, em caso de dúvida com algum comando digite: !help <comando>`, player.id, 0xFFFFFF, "bold");
+                                        room.sendAnnouncement(`👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
                                         // room.sendAnnouncement(`🚧 Faça !login para poder jogar as partidas!`, player.id, 0xFFFFFF, "bold");
                                         // Limpar timeout.
                                         if (timeoutIds[player.id]) {
@@ -1748,13 +1765,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                     });
                                 } else {
                                     // Password errada e kick no homem, lá pra fora!
-                                    room.kickPlayer(player.id, `🚫 ${player.name} Senha incorreta!`);
+                                    room.kickPlayer(player.id, `🩸 ${player.name} Senha incorreta!`);
                                     console.log(`${player.name} foi expulso por digitar a senha errada ao tentar fazer login.`);
                                 }
                             });
                         }
                     } else { // Não foi encontrada uma conta o jogador tem de se registar primeiro.
-                        room.sendAnnouncement(`🚫 ${player.name} Você ainda não se registrou. Por favor, digite: !registrar seguido pela sua senha.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`🩸 ${player.name} Você ainda não se registrou. Por favor, digite: !registrar seguido pela sua senha.`, player.id, 0xFF0000, "bold", 2);
                     }
                 });
                 // CallAdmin:
@@ -1784,7 +1801,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
 
                     room.pauseGame(false);
-                    room.sendAnnouncement(`🚧 [${player.name}] Localização resetada ✔`, null, cores.verde, 'bold', 2);
+                    room.sendAnnouncement(`🚧 ${player.name} resetou a localização da bola!`, null, 0xFFA500, 'bold', 2);
 
                     return false;
                 }
@@ -1799,16 +1816,18 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
                     if (uniformesPorPais.length > 0) {
                         const listaUniformes = uniformesPorPais.map(u => `${u.shortName} (${u.longName})`).join(', ');
-                        room.sendAnnouncement(`Uniformes ${country}:\n${listaUniformes}`, player.id, cores.verde, "bold");
-                        room.sendAnnouncement(`Para usar um uniforme digite !uni [codigo]`, player.id, 0xFFFFFF, "bold");
+                        room.sendAnnouncement(`Uniformes ${country}:`, player.id, 0xFF0000, "bold");
+                        room.sendAnnouncement(`${listaUniformes}`, player.id, 0xFFFFFF, "bold");
+                        room.sendAnnouncement(`Para usar um uniforme digite !uni [codigo]`, player.id, 0xFF0000, "bold");
                     } else {
                         room.sendAnnouncement(`Não foram encontrados uniformes ${country}.`, player.id, cores.vermelho, "bold", 2);
                     }
                 } else {
                     // Listar todos os países
                     const paises = [...new Set(uniformes.map(u => u.country))].join(', ');
-                    room.sendAnnouncement(`Países disponíveis:\n${paises}`, player.id, cores.verde, "bold");
-                    room.sendAnnouncement(`Para ver os uniformes do país digite !uniformes [pais]`, player.id, 0xFFFFFF, "bold");
+                    room.sendAnnouncement(`Países disponíveis:`, player.id, 0xFF0000, "bold");
+                    room.sendAnnouncement(`${paises}`, player.id, 0xFFFFFF, "bold");
+                    room.sendAnnouncement(`Para ver os uniformes do país digite !uniformes [pais]`, player.id, 0xFF0000, "bold");
                 }
                 return false;
             } else if (words[0] === "!ceo") {
@@ -1816,12 +1835,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 const password = input[1];
 
                 if (!password) {
-                    room.sendAnnouncement(`🚫 ${player.name} Você precisa colocar uma senha.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} Você precisa colocar uma senha.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
                 if (password.length < 3) {
-                    room.sendAnnouncement(`🚫 ${player.name} A senha deve conter mais de 3 caracteres.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} A senha deve conter mais de 3 caracteres.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
@@ -1838,7 +1857,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                     }
 
                                     if (result2.affectedRows > 0) {
-                                        room.sendAnnouncement(`👑 ${player.name} Logou como CEO!`, null, cores.verde, "bold", 2);
+                                        room.sendAnnouncement(`👑 ${player.name} logou como CEO!`, null, 0xFFA500, "bold", 2);
                                         superadmin[player.id] = 1;
                                     } else {
                                         return false;
@@ -1849,11 +1868,11 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                 return false;
                             }
                         } else {
-                            room.sendAnnouncement(`🚫 ${player.name} Você já é um CEO!`, player.id, 0xFF0000, "bold", 2);
+                            room.sendAnnouncement(`🩸 ${player.name} você já é um CEO!`, player.id, 0xFF0000, "bold", 2);
                             return false;
                         }
                     } else {
-                        room.sendAnnouncement(`🚫 ${player.name} A sua conta não está registrada.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`🩸 ${player.name} a sua conta não está registrada.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
                 });
@@ -1862,12 +1881,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 const password = input[1];
 
                 if (!password) {
-                    room.sendAnnouncement(`🚫 ${player.name} Você precisa colocar uma senha.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} você precisa colocar uma senha.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
                 if (password.length < 3) {
-                    room.sendAnnouncement(`🚫 ${player.name} A senha deve conter mais de 3 caracteres.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} a senha deve conter mais de 3 caracteres.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
@@ -1884,7 +1903,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                     }
 
                                     if (result2.affectedRows > 0) {
-                                        room.sendAnnouncement(`🔥 ${player.name} Agora é um Gerente!`, null, cores.verde, "bold", 2);
+                                        room.sendAnnouncement(`🔥 ${player.name} agora é um Gerente!`, null, 0xFFA500, "bold", 2);
                                         gerentes[player.id] = 1;
                                     } else {
                                         return false;
@@ -1895,11 +1914,11 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                 return false;
                             }
                         } else {
-                            room.sendAnnouncement(`🚫 ${player.name} Você já é um gerente!`, player.id, 0xFF0000, "bold", 2);
+                            room.sendAnnouncement(`🩸 ${player.name} você já é um gerente!`, player.id, 0xFF0000, "bold", 2);
                             return false;
                         }
                     } else {
-                        room.sendAnnouncement(`🚫 ${player.name} A sua conta não está registrada.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`🩸 ${player.name} a sua conta não está registrada.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
                 });
@@ -1918,21 +1937,21 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             userId = playerSet[0].id;
                             userName = playerSet[0].name;
                         } else {
-                            room.sendAnnouncement(`🚫 Não consegui encontrar nenhum jogador com o ID ${id}!`, player.id, cores.vermelho, "bold", 2);
+                            room.sendAnnouncement(`🩸 Não consegui encontrar nenhum jogador com o ID ${id}!`, player.id, cores.vermelho, "bold", 2);
                             return false;
                         }
                     } else {
-                        room.sendAnnouncement(`🚫 ${player.name} Você não digitou o comando corretamente. (Ex: !setvip #id 1-3)`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`🩸 ${player.name} você não digitou o comando corretamente. (Ex: !setvip #id 1-3)`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
 
                     if (!userId || !userName) {
-                        room.sendAnnouncement(`🚫 Não consegui encontrar nenhum jogador com esse ID!`, player.id, cores.vermelho, "bold", 2);
+                        room.sendAnnouncement(`🩸 Não consegui encontrar nenhum jogador com esse ID!`, player.id, cores.vermelho, "bold", 2);
                         return false;
                     }
 
                     if (!vipType || isNaN(vipType) || vipType > 3 || vipType < 1) {
-                        room.sendAnnouncement(`🚫 Você não digitou o vip corretamente. (Ex: !setvip #id 1-3)`, player.id, cores.vermelho, "bold", 2);
+                        room.sendAnnouncement(`🩸 Você não digitou o vip corretamente. (Ex: !setvip #id 1-3)`, player.id, cores.vermelho, "bold", 2);
                         return false;
                     }
 
@@ -1949,8 +1968,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         }
 
                                         if (result.affectedRows > 0) {
-                                            room.sendAnnouncement(`💎 [🤖] 【${player.name}】 ${userName} Agora é um jogador VIP!`, null, cores.verde, "bold", 2);
-                                            room.sendAnnouncement(`[PV] Parabéns ${userName}! Você recebeu o cargo "Vip" pelo Admin ${player.name}`, userId, cores.cinza, "bold", 2);
+                                            room.sendAnnouncement(`💎 [${player.name}] ${userName} Agora é um jogador VIP!`, null, 0xFFA500, "bold", 2);
+                                            room.sendAnnouncement(`Parabéns ${userName}! Você recebeu o cargo "Vip" pelo Admin ${player.name}`, userId, cores.cinza, "bold", 2);
                                             vips[userId] = 1;
                                         } else {
                                             return false;
@@ -1971,8 +1990,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         }
 
                                         if (result.affectedRows > 0) {
-                                            room.sendAnnouncement(`🔰 [🤖] 【${player.name}】 ${userName} Agora é um jogador PREMIUM!`, null, cores.verde, "bold", 2);
-                                            room.sendAnnouncement(`[PV] Parabéns ${userName}! Você recebeu o cargo "Premium" pelo Admin ${player.name}`, userId, cores.cinza, "bold", 2);
+                                            room.sendAnnouncement(`🔰 [${player.name}] ${userName} Agora é um jogador PREMIUM!`, null, 0xFFA500, "bold", 2);
+                                            room.sendAnnouncement(`Parabéns ${userName}! Você recebeu o cargo "Premium" pelo Admin ${player.name}`, userId, cores.cinza, "bold", 2);
                                             premiums[userId] = 1;
                                         } else {
                                             return false;
@@ -1993,8 +2012,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         }
 
                                         if (result.affectedRows > 0) {
-                                            room.sendAnnouncement(`🌋 [🤖] 【${player.name}】 ${userName} Agora é um jogador LEGEND!`, null, cores.verde, "bold", 2);
-                                            room.sendAnnouncement(`[PV] Parabéns ${userName}! Você recebeu o cargo "Legend" pelo Admin ${player.name}`, userId, cores.cinza, "bold", 2);
+                                            room.sendAnnouncement(`🌋 [${player.name}] ${userName} Agora é um jogador LEGEND!`, null, 0xFFA500, "bold", 2);
+                                            room.sendAnnouncement(`Parabéns ${userName}! Você recebeu o cargo "Legend" pelo Admin ${player.name}`, userId, cores.cinza, "bold", 2);
                                             legends[userId] = 1;
                                         } else {
                                             return false;
@@ -2006,7 +2025,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                 }
                             }
                         } else {
-                            room.sendAnnouncement(`🚫 ${player.name} Não encontrei um jogador com esse nome/id.`, player.id, 0xFF0000, "bold", 2);
+                            room.sendAnnouncement(`🩸 ${player.name} Não encontrei um jogador com esse nome/id.`, player.id, 0xFF0000, "bold", 2);
                             return false;
                         }
                     });
@@ -2025,21 +2044,21 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         userId = playerSet.id;
                         userName = playerSet.name;
                     } else {
-                        room.sendAnnouncement(`🚫 Não consegui encontrar nenhum jogador com o ID ${id}!`, player.id, cores.vermelho, "bold", 2);
+                        room.sendAnnouncement(`🩸 Não consegui encontrar nenhum jogador com o ID ${id}!`, player.id, cores.vermelho, "bold", 2);
                         return false;
                     }
                 } else {
-                    room.sendAnnouncement(`🚫 ${player.name} Você não digitou o comando corretamente. (Ex: !setadmin #id 1-4)`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} Você não digitou o comando corretamente. (Ex: !setadmin #id 1-4)`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
                 if (!userId || !userName) {
-                    room.sendAnnouncement(`🚫 Não consegui encontrar nenhum jogador com esse ID!`, player.id, cores.vermelho, "bold", 2);
+                    room.sendAnnouncement(`🩸 Não consegui encontrar nenhum jogador com esse ID!`, player.id, cores.vermelho, "bold", 2);
                     return false;
                 }
 
                 if (!adminType || isNaN(adminType)) {
-                    room.sendAnnouncement(`🚫 Você não digitou o cargo corretamente. (Ex: !setadmin #id 1-4)`, player.id, cores.vermelho, "bold", 2);
+                    room.sendAnnouncement(`🩸 Você não digitou o cargo corretamente. (Ex: !setadmin #id 1-4)`, player.id, cores.vermelho, "bold", 2);
                     return false;
                 }
 
@@ -2056,7 +2075,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                     }
 
                                     if (result.affectedRows > 0) {
-                                        room.sendAnnouncement(`👑 ${userName} Agora é um CEO!`, null, cores.verde, "bold", 2);
+                                        room.sendAnnouncement(`👑 ${userName} Agora é um CEO!`, null, 0xFFA500, "bold", 2);
                                         superadmin[userId] = 1;
                                     } else {
                                         return false;
@@ -2068,7 +2087,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             }
                         }
                     } else {
-                        room.sendAnnouncement(`🚫 ${player.name} Não encontrei um jogador com esse nome/id.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`🩸 ${player.name} não encontrei um jogador com esse nome/id.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
                 });
@@ -2076,20 +2095,20 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 let resposta = getStaffOnlineInfo();
 
                 room.sendAnnouncement(resposta, player.id, cores.coral, "bold");
-            } else if (words[0] === "!changepw") {
+            } else if (words[0] === "!mudarsenha") {
                 const input = words;
                 if (input.length < 3) {
-                    room.sendAnnouncement(`🚫 ${player.name} Utilize o seguinte formato: !changepw antiga_senha nova_senha`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} utilize o seguinte formato: !mudarsenha antiga_senha nova_senha`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
                 const oldPassword = input[1];
                 const newPassword = input[2];
                 if (!oldPassword || !newPassword) {
-                    room.sendAnnouncement(`🚫 ${player.name} Você precisa colocar uma senha antiga e uma nova senha depois do comando !changepw`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} você precisa colocar uma senha antiga e uma nova senha depois do comando !mudarsenha`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
                 if (oldPassword.length < 3 || newPassword.length < 3) {
-                    room.sendAnnouncement(`🚫 ${player.name} A senha deve ter pelo menos 3 caracteres.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} a senha deve ter pelo menos 3 caracteres.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
@@ -2111,17 +2130,17 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                     const values = [newHashedPassword, player.name];
                                     con.query(sql, values, (err: any) => {
                                         if (err) throw err;
-                                        room.sendAnnouncement(`✅ ${player.name} A sua senha foi alterada com sucesso!`, player.id, 0x00FF00, "bold");
+                                        room.sendAnnouncement(`🩸 ${player.name} A sua senha foi alterada com sucesso!`, player.id, 0xFFFFFF, "bold");
                                         console.log(`${player.name} alterou a senha.`);
                                     });
                                 });
                             } else {
-                                room.sendAnnouncement(`🚫 ${player.name} A sua senha antiga está incorreta.`, player.id, 0xFF0000, "bold", 2);
+                                room.sendAnnouncement(`🩸 ${player.name} A sua senha antiga está incorreta.`, player.id, 0xFF0000, "bold", 2);
                                 console.log(`${player.name} tentou mudar a senha mas errou a senha antiga.`);
                             }
                         });
                     } else {
-                        room.sendAnnouncement(`🚫 ${player.name} A sua conta não está registrada.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`🩸 ${player.name} A sua conta não está registrada.`, player.id, 0xFF0000, "bold", 2);
                     }
                 });
                 // Comando AFK
@@ -2129,12 +2148,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 if (loggedInPlayers[player.id]) {
                     let playersGaming = room.getPlayerList().filter((p: Player) => p.team > 0);
                     if (playersGaming.length >= getMaxTeamSize() * 2 && (player.team === 1 || player.team === 2)) {
-                        room.sendAnnouncement(`🚫 ${player.name} Você não pode ficar AFK pois está no meio de uma partida.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`🩸 ${player.name} Você não pode ficar AFK pois está no meio de uma partida.`, player.id, 0xFF0000, "bold", 2);
                     }
                     // Está logado, logo proceder com o comando.
                     else if (afkStatus[player.id] === 1) {
                         afkStatus[player.id] = 0;
-                        room.sendAnnouncement(`😃 ${player.name} não está mais AFK!`, null, 0x00FF00, "bold", 0);
+                        room.sendAnnouncement(`💤 ${player.name} não está mais AFK!`, null, 0xFFA500, "bold", 0);
                         if (timeoutIds[player.id]) {
                             clearTimeout(timeoutIds[player.id]);
                             delete timeoutIds[player.id];
@@ -2143,13 +2162,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     } else {
                         room.setPlayerTeam(player.id, Team.SPECTATORS);
                         afkStatus[player.id] = 1;
-                        room.sendAnnouncement(`💤 ${player.name} agora está AFK!`, null, 0x00FF00, "bold", 0);
+                        room.sendAnnouncement(`💤 ${player.name} agora está AFK!`, null, 0xFFA500, "bold", 0);
                         // Levar kick por AFK +10 minutos se não for superAdmin
                         if (superadmin[player.id] !== 1 || gerentes[player.id] !== 1 || admins[player.id] !== 1 || mods[player.id] !== 1) {
                             setTimeout(() => {
                                 if (afkStatus[player.id] === 1) {
                                     afkStatus[player.id] = 0;
-                                    // room.kickPlayer(player.id, `🚫 ${player.name} Você ficou AFK por muito tempo.`);
+                                    // room.kickPlayer(player.id, `🩸 ${player.name} Você ficou AFK por muito tempo.`);
                                 }
                             }, 10 * 60 * 1000); // 10 minutos = 600000 ms
                         }
@@ -2160,7 +2179,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     afkStatus[player.id] ? updateRoleOnPlayerOut() : updateRoleOnPlayerIn();
                 } else {
                     // Jogador não está logado, logo não pode ir AFK
-                    room.sendAnnouncement(`🚫 ${player.name} Você precisa estar logado para usar este comando.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} você precisa estar logado para usar este comando.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
             } else if (words[0] === "!lista") {
@@ -2171,107 +2190,31 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 if (playerNames.length > 0) {
                     room.sendAnnouncement(`💤 Lista de jogadores AFK: ${playerNames.join(", ")}`, player.id, 0xFFFFFF, "bold");
                 } else {
-                    room.sendAnnouncement(`🚫 Não há jogadores AFK no momento.`, player.id, 0xFF0000, "bold");
+                    room.sendAnnouncement(`🩸 Não há jogadores AFK no momento.`, player.id, 0xFF0000, "bold");
                 }
                 // Comando Streak
             } else if (words[0] === "!streak") {
-                room.sendAnnouncement(`🏆 ${player.name} A streak atual da sala é de ${winstreak} jogos para a equipe 🔴!`, player.id, 0xFFFFFF, "bold");
+                room.sendAnnouncement(`🏆 ${player.name} a streak atual da sala é de ${winstreak} jogos para a equipe 🔴!`, player.id, 0xFFFFFF, "bold");
                 // Comando Top Streak
             } else if (words[0] === "!topstreak") {
                 const sql = `SELECT * FROM streak`;
                 con.query(sql, (err: any, result: any) => {
                     if (err) throw err;
                     if (result.length == 0) {
-                        room.sendAnnouncement(`🚫 ${player.name} Não há nenhuma streak registrada.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`🩸 ${player.name} não há nenhuma streak registrada.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
-                    room.sendAnnouncement(`🏆 ${player.name} A top streak atual é de ${result[0].games} jogos e foi conquistada pelos jogadores ${result[0].player1}, ${result[0].player2} e ${result[0].player3}!`, player.id, 0xFFFFFF, "bold");
+                    room.sendAnnouncement(`🏆 ${player.name} a top streak atual é de ${result[0].games} jogos e foi conquistada pelos jogadores ${result[0].player1}, ${result[0].player2} e ${result[0].player3}!`, player.id, 0xFFFFFF, "bold");
                 });
-                // Comando GK
-            } else if (words[0] === "!gk") {
-                // Está nos spectators.
-                if (player.team == 0) {
-                    room.sendAnnouncement(`🚫 ${player.name} Você precisa estar em uma equipe para usar este comando!`, player.id, 0xFF0000, "bold", 2);
-                }
-                else if (gk[0] && gk[0].id === player.id) {
-                    room.sendAnnouncement(`🚫 ${player.name} Você já é o GK da equipe 🔴!`, player.id, 0xFF0000, "bold", 2);
-                } else if (gk[1] && gk[1].id === player.id) {
-                    room.sendAnnouncement(`🚫 ${player.name} Você já é o GK da equipe 🔵!`, player.id, 0xFF0000, "bold", 2);
-                    // Se estiverem à menos de 1 minuto em jogo.
-                } else if (room.getScores().time < 60) {
-                    // Equipe red
-                    if (player.team == 1) {
-                        gk[0] = player;
-                        room.sendAnnouncement(`🔴 ${player.name} Usou o comando !gk e agora é o novo GK da equipe 🔴`, null, 0xFFFFFF, "bold");
-                    }
-                    // Equipe blue
-                    else if (player.team == 2) {
-                        gk[1] = player;
-                        room.sendAnnouncement(`🔵 ${player.name} Usou o comando !gk e agora é o novo GK da equipe 🔵`, null, 0xFFFFFF, "bold");
-                    }
-                    // Se tiver mais de 10 segundos de jogo.
-                } else if (room.getScores().time > 10) {
-                    if (player.team == 1 || player.team == 2) {
-                        room.sendAnnouncement(`🚫 ${player.name} Já se passou 10 segundos de jogo, não pode utilizar esse comando agora.`, player.id, 0xFF0000, "bold", 2);
-                    }
-                }
-                // Comando !sub
-            } else if (words[0] === "!sub") {
-                // Definir spectators.
-                const spectatorPlayers = activePlayers.filter((p: { team: number; }) => p.team === 0);
-                // Se está nos spectators.
-                if (player.team == 0) {
-                    room.sendAnnouncement(`🚫 ${player.name} Você não está em nenhuma equipe para usar este comando!`, player.id, 0xFF0000, "bold", 2);
-                }
-                else if (spectatorPlayers.length === 0) {
-                    room.sendAnnouncement(`🚫 ${player.name} Não tem nenhum jogador ativo no spec para entrar no seu lugar!`, player.id, 0xFF0000, "bold", 2);
-                }
-                else if (room.getScores().time <= 5) {
-                    // Equipe red
-                    if (player.team == 1) {
-                        if (spectatorPlayers.length >= 1) {
-                            room.setPlayerTeam(player.id, 0)
-                            room.sendAnnouncement(`📖🔴 ${player.name} Usou o comando !sub para ser substituído.`, null, 0xFFFFFF, "bold");
-                            for (let i = 0; i < 1; i++) {
-                                if (spectatorPlayers[i]) {
-                                    room.setPlayerTeam(spectatorPlayers[i].id, 1)
-                                }
-                            }
-                        }
-                    }
-                    else if (player.team == 2) {
-                        if (spectatorPlayers.length >= 1) {
-                            room.setPlayerTeam(player.id, 0)
-                            room.sendAnnouncement(`📖🔵 ${player.name} Usou o comando !sub para ser substituído.`, null, 0xFFFFFF, "bold");
-                            for (let i = 0; i < 1; i++) {
-                                if (spectatorPlayers[i]) {
-                                    room.setPlayerTeam(spectatorPlayers[i].id, 2)
-                                }
-                            }
-                        }
-                    }
-                }
-                // Se estiverem à mais de 1 minuto em jogo.
-                else if (room.getScores().time > 5) {
-                    if (player.team == 1 || player.team == 2) {
-                        room.sendAnnouncement(`🚫 ${player.name} Já se passou muito tempo (pré-jogo + 5 segundos). Você não pode sair do jogo agora, caso contrário será prejudicado.`, player.id, 0xFF0000, "bold", 2);
-                    }
-                }
                 // Logout bem básico.
             } else if (words[0] === "!bb") {
-                room.kickPlayer(player.id, `👋 Adeus ${player.name}, até a próxima! (!bb)`);
-                // Comando About
-            } else if (words[0] === "!about" || words[0] === "!info" || words[0] === "!infos" || words[0] === "!informações") {
-                room.sendAnnouncement(`⚡ União Brasileira de HaxBall\n🧑🏽 Sala desenvolvida por OBL & Junplid\n🖌 SkinMaker: G. Vareta\n🎨 Designer: Andx\n💢 Editor do mapa: 🦆Patola\n👥 Entre no nosso Discord para mais informações: ${discord}`, player.id, 0xFFFFFF, "bold");
+                room.kickPlayer(player.id, `👋 Adeus ${player.name}, até a próxima!`);         
                 // Comando para mostrar o link do meu discord.
             } else if (words[0] === "!discord" || words[0] === "!disc") {
-                room.sendAnnouncement(`👥 Discord: ${discord}`, player.id, 0xFFFFFF, "bold");
-                // Mostrar os ranks
-            } else if (words[0] === "!rank" || words[0] === "!ranks") {
-                const organizedRanks = organizeRanks(ranks);
-                room.sendAnnouncement(organizedRanks, player.id, 0xFFFFFF, "bold");
+                room.sendAnnouncement(`👥 Discord: ${discord}`, player.id, 0x094480, "bold");
                 // Comando das estatísticas
-            } else if (words[0] === "!stats" || words[0] === "!me" || words[0] === "!status") {
+            } 
+            else if (words[0] === "!stats" || words[0] === "!me" || words[0] === "!status") {
                 // Checkar se o jogador está registado
                 const sql = `SELECT * FROM players WHERE name = ?`;
                 const values = [player.name];
@@ -2286,7 +2229,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         const values = [result[0].id, process.env.room_id];
                         con.query(sql, values, (err: any, result: any) => {
                             if (err) throw err;
-                            room.sendAnnouncement(`📊 O seu ELO: ${result[0].elo}`, player.id, 0xFFFFFF, "bold");
+                            room.sendAnnouncement(`📊 O seu ELO: ${result[0].elo}`, player.id, 0xFF0000, "bold");
                             room.sendAnnouncement(`📊 As suas estatísticas: Jogos: ${result[0].games}, Vitórias: ${result[0].wins}, Derrotas: ${result[0].losses}, Gols: ${result[0].goals}, Assistências: ${result[0].assists}, Gols contras: ${result[0].ag}, CS: ${result[0].cs}`, player.id, 0xFFFFFF, "bold", 0);
                         });
                         // Médias
@@ -2311,9 +2254,9 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         con.query(sql, values, (err: any, result: any) => {
                             if (err) throw err;
                             if (result.length === 0) {
-                                room.sendAnnouncement(`🚫 Jogador ${targetPlayer} não encontrado.`, player.id, 0xFF0000, "bold", 2);
+                                room.sendAnnouncement(`🩸 Jogador ${targetPlayer} não encontrado.`, player.id, 0xFF0000, "bold", 2);
                             } else {
-                                room.sendAnnouncement(`📊 O ELO de ${targetPlayer}: ${result[0].elo}`, player.id, 0xFFFFFF, "bold");
+                                room.sendAnnouncement(`📊 O ELO de ${targetPlayer}: ${result[0].elo}`, player.id, 0xFF0000, "bold");
                                 room.sendAnnouncement(`📊 Estatísticas de ${targetPlayer}: Jogos: ${result[0].games}, Vitórias: ${result[0].wins}, Derrotas: ${result[0].losses}, Gols: ${result[0].goals}, Assistências: ${result[0].assists}, Gols Contras: ${result[0].ag}, CS: ${result[0].cs}`, player.id, 0xFFFFFF, "bold", 0);
                                 // Médias
                                 con.query(`SELECT wins as wins, goals as goals, games as games, assists as assists FROM players WHERE name = ?`, [targetPlayer], (err: any, result: string | any[]) => {
@@ -2331,14 +2274,117 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                             averageAssistsPerGame = totalAssists / totalGames;
                                             winRate = (totalWins / totalGames) * 100;
                                         }
-                                        room.sendAnnouncement(`📊 O jogador ${targetPlayer} tem uma média de ${averageGoalsPerGame.toFixed(1)} gols e ${averageAssistsPerGame.toFixed(1)} assistências por jogo e um percentual de vitória de ${winRate.toFixed(2)}%.`, player.id, 0xFFFFFF, "bold", 0);
+                                        // room.sendAnnouncement(`📊 O jogador ${targetPlayer} tem uma média de ${averageGoalsPerGame.toFixed(1)} gols e ${averageAssistsPerGame.toFixed(1)} assistências por jogo e um percentual de vitória de ${winRate.toFixed(2)}%.`, player.id, 0xFFFFFF, "bold", 0);
                                     }
                                 });
                             }
                         });
                     }
                 });
-            } else if (words[0] === "!unmute") {
+            } 
+            
+            else if (words[0] === "!gols" || words[0] === "!goals") {
+                // Retrieve the top 10 goal scorers in the room
+                const sql = `SELECT p.name, s.goals FROM stats s JOIN players p ON s.player_id = p.id WHERE s.room_id = ? ORDER BY s.goals DESC LIMIT 10`;
+                const values = [process.env.room_id];
+                con.query(sql, values, (err: Error | null, result: any[]) => {
+                    if (err) throw err;
+                    if (result.length === 0) {
+                        room.sendAnnouncement(`🩸 Não há dados suficientes para exibir os artilheiros.`, player.id, 0xFF0000, "bold", 2);
+                    } else {
+                        // Displaying the top scorers on one line
+                        let announcement = `🏆⚽ Top 10 Artilheiros: `;
+                        result.forEach((player, index) => {
+                            announcement += `#${index + 1} ${player.name}: ${player.goals} gols; `;
+                        });
+                        room.sendAnnouncement(announcement, player.id, 0xFFFFFF, "bold");
+                    }
+                });
+            }
+            
+
+
+            else if (words[0] === "!assists" || words[0] === "!assistencias") {
+                // Retrieve the top 10 goal scorers in the room
+                const sql = `SELECT p.name, s.assists FROM stats s JOIN players p ON s.player_id = p.id WHERE s.room_id = ? ORDER BY s.assists DESC LIMIT 10`;
+                const values = [process.env.room_id];
+                con.query(sql, values, (err: Error | null, result: any[]) => {
+                    if (err) throw err;
+                    if (result.length === 0) {
+                        room.sendAnnouncement(`🩸 Não há dados suficientes para exibir os assistentes.`, player.id, 0xFF0000, "bold", 2);
+                    } else {
+                        // Displaying the top scorers on one line
+                        let announcement = `🏆🅰️ Top 10 em Assistências: `;
+                        result.forEach((player, index) => {
+                            announcement += `#${index + 1} ${player.name}: ${player.assists} assistências; `;
+                        });
+                        room.sendAnnouncement(announcement, player.id, 0xFFFFFF, "bold");
+                    }
+                });
+            }
+
+
+            else if (words[0] === "!jogos" || words[0] === "!games") {
+                // Retrieve the top 10 goal scorers in the room
+                const sql = `SELECT p.name, s.games FROM stats s JOIN players p ON s.player_id = p.id WHERE s.room_id = ? ORDER BY s.games DESC LIMIT 10`;
+                const values = [process.env.room_id];
+                con.query(sql, values, (err: Error | null, result: any[]) => {
+                    if (err) throw err;
+                    if (result.length === 0) {
+                        room.sendAnnouncement(`🩸 Não há dados suficientes para exibir os jogos.`, player.id, 0xFF0000, "bold", 2);
+                    } else {
+                        // Displaying the top scorers on one line
+                        let announcement = `🏆🏟️ Top 10 em Jogos: `;
+                        result.forEach((player, index) => {
+                            announcement += `#${index + 1} ${player.name}: ${player.games} jogos; `;
+                        });
+                        room.sendAnnouncement(announcement, player.id, 0xFFFFFF, "bold");
+                    }
+                });
+            }
+
+
+            else if (words[0] === "!vitorias" || words[0] === "!wins") {
+                // Retrieve the top 10 goal scorers in the room
+                const sql = `SELECT p.name, s.wins FROM stats s JOIN players p ON s.player_id = p.id WHERE s.room_id = ? ORDER BY s.wins DESC LIMIT 10`;
+                const values = [process.env.room_id];
+                con.query(sql, values, (err: Error | null, result: any[]) => {
+                    if (err) throw err;
+                    if (result.length === 0) {
+                        room.sendAnnouncement(`🩸 Não há dados suficientes para exibir as vitórias.`, player.id, 0xFF0000, "bold", 2);
+                    } else {
+                        // Displaying the top scorers on one line
+                        let announcement = `🏆✅ Top 10 em Vitórias: `;
+                        result.forEach((player, index) => {
+                            announcement += `#${index + 1} ${player.name}: ${player.wins} vitórias; `;
+                        });
+                        room.sendAnnouncement(announcement, player.id, 0xFFFFFF, "bold");
+                    }
+                });
+            }
+
+
+            else if (words[0] === "!cs") {
+                // Retrieve the top 10 goal scorers in the room
+                const sql = `SELECT p.name, s.cs FROM stats s JOIN players p ON s.player_id = p.id WHERE s.room_id = ? ORDER BY s.cs DESC LIMIT 10`;
+                const values = [process.env.room_id];
+                con.query(sql, values, (err: Error | null, result: any[]) => {
+                    if (err) throw err;
+                    if (result.length === 0) {
+                        room.sendAnnouncement(`🩸 Não há dados suficientes para exibir os dados de CS.`, player.id, 0xFF0000, "bold", 2);
+                    } else {
+                        // Displaying the top scorers on one line
+                        let announcement = `🏆👋 Top 10 em CS: `;
+                        result.forEach((player, index) => {
+                            announcement += `#${index + 1} ${player.name}: ${player.cs} CS; `;
+                        });
+                        room.sendAnnouncement(announcement, player.id, 0xFFFFFF, "bold");
+                    }
+                });
+            }
+                        
+            
+            else if (words[0] === "!unmute") {
                 // Checkar a database por alguém com o mesmo nome da pessoa em questão.
                 const sql = `SELECT * FROM players WHERE LOWER(name) = LOWER(?)`;
                 const values = [player.name];
@@ -2346,7 +2392,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     if (err) throw err;
                     if (result.length > 0) {
                         if (!loggedInPlayers[player.id] || result[0].ceo !== 1 || result[0].gerente !== 1 || result[0].admin !== 1 || result[0].mod !== 1) {
-                            room.sendAnnouncement("🚫 Você não tem autorização para usar esse comando!", player.id, 0xFF0000, "bold", 2);
+                            room.sendAnnouncement("🩸 Você não tem autorização para usar esse comando!", player.id, 0xFF0000, "bold", 2);
                         } else {
                             const currentDate = new Date();
                             const name = words.slice(1).join(" ");
@@ -2355,12 +2401,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             con.query(`DELETE FROM mutes WHERE name = ? and time > ?`, [name, currentDate], (err: any, result: any) => {
                                 if (err) throw err;
                                 if (result.affectedRows > 0) {
-                                    room.sendAnnouncement(`✅ O jogador foi desmutado com sucesso!`, player.id, 0x00FF00, "bold");
+                                    room.sendAnnouncement(`🩸 O jogador foi desmutado com sucesso!`, player.id, 0xFFA500, "bold");
                                     if (targetPlayer) {
                                         isMuted[targetPlayer.id] = false;
                                     }
                                 } else {
-                                    room.sendAnnouncement(`🚫 O jogador não está mutado.`, player.id, 0xFF0000, "bold", 2);
+                                    room.sendAnnouncement(`🩸 O jogador não está mutado.`, player.id, 0xFF0000, "bold", 2);
                                 }
                             });
                         }
@@ -2374,7 +2420,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     if (err) throw err;
                     if (result.length > 0) {
                         if (!loggedInPlayers[player.id] || result[0].ceo !== 1) {
-                            room.sendAnnouncement("🚫 Você não tem autorização para usar este comando!", player.id, 0xFF0000, "bold", 2);
+                            room.sendAnnouncement("🩸 Você não tem autorização para usar este comando!", player.id, 0xFF0000, "bold", 2);
                         } else {
                             const currentDate = new Date();
                             const name = words.slice(1).join(" ");
@@ -2383,12 +2429,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             con.query(`DELETE FROM bans WHERE name = ? and time > ?`, [name, currentDate], (err: any, result: any) => {
                                 if (err) throw err;
                                 if (result.affectedRows > 0) {
-                                    room.sendAnnouncement(`✅ O jogador foi desbanido com sucesso!`, player.id, 0x00FF00, "bold");
+                                    room.sendAnnouncement(`🩸 O jogador foi desbanido com sucesso!`, player.id, 0xFFA500, "bold");
                                     if (targetPlayer) {
                                         isMuted[targetPlayer.id] = false;
                                     }
                                 } else {
-                                    room.sendAnnouncement(`🚫 O jogador não está banido.`, player.id, 0xFF0000, "bold", 2);
+                                    room.sendAnnouncement(`🩸 O jogador não está banido.`, player.id, 0xFF0000, "bold", 2);
                                 }
                             });
                         }
@@ -2402,10 +2448,10 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     if (err) throw err;
                     if (result.length > 0) {
                         if (!loggedInPlayers[player.id] || result[0].ceo !== 1 || result[0].gerente !== 1 || result[0].admin !== 1 || result[0].mod !== 1) {
-                            room.sendAnnouncement("🚫 Você não tem autorização para usar este comando!", player.id, 0xFF0000, "bold", 2);
+                            room.sendAnnouncement("🩸 Você não tem autorização para usar este comando!", player.id, 0xFF0000, "bold", 2);
                         } else {
                             if (words.length <= 2 || !words.slice(3).join(" ")) {
-                                room.sendAnnouncement("🚫 Digite a razão, tempo, e nome (sem vírgulas).", player.id, 0xFF0000, "bold", 2);
+                                room.sendAnnouncement("🩸 Digite a razão, tempo, e nome (sem vírgulas).", player.id, 0xFF0000, "bold", 2);
                             }
                         }
                     }
@@ -2443,7 +2489,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         banDuration = duration * 1000;
                                         break;
                                     default:
-                                        room.sendAnnouncement("🚫 Formato de tempo inválido. Use um número seguido de d (Dias), h (Horas), m (Minutos), ou s (Segundos)", player.id, 0xFF0000, "bold", 2);
+                                        room.sendAnnouncement("🩸 Formato de tempo inválido. Use um número seguido de d (Dias), h (Horas), m (Minutos), ou s (Segundos)", player.id, 0xFF0000, "bold", 2);
                                         return;
                                 }
                                 const name = words.slice(3).join(" ");
@@ -2460,10 +2506,10 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         const values = [name, banEndTimeFormatted, reason, player.name, conn, auth];
                                         con.query(sql, values, (err: any, result: any) => {
                                             if (err) throw err;
-                                            room.sendAnnouncement(`✅ Banido com sucesso!`, player.id, 0x00FF00, "bold");
+                                            room.sendAnnouncement(`🩸 Banido com sucesso!`, player.id, 0xFFA500, "bold");
                                             // Kickar com a razão e o tempo do ban.
                                             if (targetPlayer) {
-                                                room.kickPlayer(targetPlayer.id, `🚫 Você foi banido. Motivo: ${reason} até ${banEndTime}.`);
+                                                room.kickPlayer(targetPlayer.id, `🩸 Você foi banido. Motivo: ${reason} até ${banEndTime}.`);
                                             }
                                         });
                                         // Se não estiver on.
@@ -2472,7 +2518,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         const values = [name, banEndTimeFormatted, reason, player.name];
                                         con.query(sql, values, (err: any, result: any) => {
                                             if (err) throw err;
-                                            room.sendAnnouncement(`✅ Banido com sucesso!`, player.id, 0x00FF00, "bold");
+                                            room.sendAnnouncement(`🩸 Banido com sucesso!`, player.id, 0xFFA500, "bold");
                                         });
                                     }
                                 }
@@ -2488,10 +2534,10 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     if (err) throw err;
                     if (result.length > 0) {
                         if (!loggedInPlayers[player.id] || result[0].ceo !== 1 || result[0].gerente !== 1 || result[0].admin !== 1 || result[0].mod !== 1) {
-                            room.sendAnnouncement("🚫 Você não tem autorização para usar este comando!", player.id, 0xFF0000, "bold", 2);
+                            room.sendAnnouncement("🩸 Você não tem autorização para usar este comando!", player.id, 0xFF0000, "bold", 2);
                         } else {
                             if (words.length <= 2 || !words.slice(3).join(" ")) {
-                                room.sendAnnouncement("🚫 Digite a razão, tempo, e nome (sem vírgulas).", player.id, 0xFF0000, "bold", 2);
+                                room.sendAnnouncement("🩸 Digite a razão, tempo, e nome (sem vírgulas).", player.id, 0xFF0000, "bold", 2);
                             }
                         }
                     }
@@ -2529,7 +2575,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         muteDuration = duration * 1000;
                                         break;
                                     default:
-                                        room.sendAnnouncement("🚫 Formato de tempo inválido. Use um número seguido de d (Dias), h (Horas), m (Minutos), ou s (Segundos)", player.id, 0xFF0000, "bold", 2);
+                                        room.sendAnnouncement("🩸 Formato de tempo inválido. Use um número seguido de d (Dias), h (Horas), m (Minutos), ou s (Segundos)", player.id, 0xFF0000, "bold", 2);
                                         return;
                                 }
                                 const name = words.slice(3).join(" ");
@@ -2546,7 +2592,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         const values = [name, muteEndTimeFormatted, reason, player.name, conn, auth];
                                         con.query(sql, values, (err: any, result: any) => {
                                             if (err) throw err;
-                                            room.sendAnnouncement(`✅ Mutado com sucesso!`, player.id, 0x00FF00, "bold");
+                                            room.sendAnnouncement(`🩸 Mutado com sucesso!`, player.id, 0xFFA500, "bold");
                                             isMuted[targetPlayer.id] = true;
                                         });
                                         // Se não estiver on.
@@ -2555,7 +2601,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         const values = [name, muteEndTimeFormatted, reason, player.name];
                                         con.query(sql, values, (err: any, result: any) => {
                                             if (err) throw err;
-                                            room.sendAnnouncement(`✅ Mutado com sucesso!`, player.id, 0x00FF00, "bold");
+                                            room.sendAnnouncement(`🩸 Mutado com sucesso!`, player.id, 0xFFA500, "bold");
                                         });
                                     }
                                 }
@@ -2571,7 +2617,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 const blueTeam = activePlayers.filter((p: { team: number; }) => p.team === 2);
                 // Jogadores insuficientes para previsão
                 if ((redTeam.length === 0 || redTeam.length === 1) && blueTeam.length === 0) {
-                    room.sendAnnouncement(`🚫 Não há jogadores suficientes para gerar uma previsão.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 Não há jogadores suficientes para gerar uma previsão.`, player.id, 0xFF0000, "bold", 2);
                 }
                 // Previsão de vitória
                 if (redTeam.length >= 1 && blueTeam.length >= 1) {
@@ -2585,25 +2631,25 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 // Comando help
             } else if (words[0] === "!help" || words[0] === "!ajuda" || words[0] === "!comandos" || words[0] === "!commands") {
                 if (words.length === 1) {
-                    const commands = ["!help", "!registrar", "!login", "!changepw", "!afk", "!about", "!discord", "!stats", "!rank", "t", "!gk", "!afks", "!streak", "!topstreak", "!sub", "!prev", "#", "!bb"];
-                    const adminCommands = ["!ban", "!mute", "!rr2"]
+                    const commands = ["!mudarsenha", "!afk", "!discord", "!stats", "t", "!gk", "!streak", "!topstreak", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs"];
+                    const adminCommands = ["!ban", "!mute", "!rr2", "!setvip <1, 2 ou 3>"]
 
-                    room.sendAnnouncement(`❓ Comandos: ${commands.join(", ")}`, player.id, 0xFFFFFF, "bold");
+                    room.sendAnnouncement(`📃 Comandos: ${commands.join(", ")}`, player.id, 0xFF0000, "bold");
 
                     if (superadmin[player.id] === 1 || gerentes[player.id] === 1 || admins[player.id] === 1 || mods[player.id] === 1) {
-                        room.sendAnnouncement(`❓ [🚧] Comandos Staff: ${adminCommands.join(", ")}`, player.id, 0xFFFFFF, "bold");
+                        room.sendAnnouncement(`🚧 Comandos Staff: ${adminCommands.join(", ")}`, player.id, 0xFFA500, "bold");
                     }
                 } else {
                     // Exibe explicação de comando
                     const command = words[1];
                     if (commandExplanations.hasOwnProperty(command)) {
-                        room.sendAnnouncement(`❓ ${command}: ${commandExplanations[command]}`, player.id, 0xFFFFFF, "bold");
+                        room.sendAnnouncement(`🩸 ${command}: ${commandExplanations[command]}`, player.id, 0xFFFFFF, "bold");
                     } else {
-                        room.sendAnnouncement(`🚫 Comando "${command}" não encontrado.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`🩸 Comando "${command}" não encontrado.`, player.id, 0xFF0000, "bold", 2);
                     }
                 }
             } else {
-                room.sendAnnouncement(`🚫 ${player.name} Esse comando não existe, digite !help para ver a lista de comandos disponíveis.`, player.id, 0xFF0000, "bold", 2);
+                room.sendAnnouncement(`🩸 ${player.name} esse comando não existe, digite !help para ver a lista de comandos disponíveis.`, player.id, 0xFF0000, "bold", 2);
             }
             return false; // Não enviar comandos para o chat geral.
         }
@@ -2616,28 +2662,28 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         room.setPlayerTeam(teamS[0].id, Team.RED);
                         redCaptainChoice = "top";
                         clearTimeout(timeOutCap);
-                        room.sendAnnouncement(player.name + " escolheu Top !");
+                        room.sendAnnouncement(player.name + " escolheu Top!", 0xFF0000, 'bold');
                         return false;
                     } else if (["random", "rand"].includes(words[0].toLowerCase())) {
                         var r = getRandomInt(teamS.length);
                         room.setPlayerTeam(teamS[r].id, Team.RED);
                         redCaptainChoice = "random";
                         clearTimeout(timeOutCap);
-                        room.sendAnnouncement(player.name + " escolheu Random !");
+                        room.sendAnnouncement(player.name + " escolheu Random!", 0xFF0000, 'bold');
                         return false;
                     } else if (["bottom", "bot"].includes(words[0].toLowerCase())) {
                         room.setPlayerTeam(teamS[teamS.length - 1].id, Team.RED);
                         redCaptainChoice = "bottom";
                         clearTimeout(timeOutCap);
-                        room.sendAnnouncement(player.name + " escolheu Bottom !");
+                        room.sendAnnouncement(player.name + " escolheu Bottom!", 0xFF0000, 'bold');
                         return false;
                     } else if (!Number.isNaN(Number.parseInt(words[0]))) {
                         if (Number.parseInt(words[0]) > teamS.length || Number.parseInt(words[0]) < 1) {
-                            room.sendAnnouncement("[PV] O número que escolheu é inválido !", player.id);
+                            room.sendAnnouncement("O número que escolheu é inválido!", player.id, 0xFF0000, 'bold');
                             return false;
                         } else {
                             room.setPlayerTeam(teamS[Number.parseInt(words[0]) - 1].id, Team.RED);
-                            room.sendAnnouncement(player.name + " escolheu " + teamS[Number.parseInt(words[0]) - 1].name + " !");
+                            room.sendAnnouncement(player.name + " escolheu " + teamS[Number.parseInt(words[0]) - 1].name + "!", 0xFF0000, 'bold');
                             return false;
                         }
                     }
@@ -2647,27 +2693,27 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         room.setPlayerTeam(teamS[0].id, Team.BLUE);
                         blueCaptainChoice = "top";
                         clearTimeout(timeOutCap);
-                        room.sendAnnouncement(player.name + " escolheu Top !");
+                        room.sendAnnouncement(player.name + " escolheu Top!", 0xFF0000, 'bold');
                         return false;
                     } else if (["random", "rand"].includes(words[0].toLowerCase())) {
                         room.setPlayerTeam(teamS[getRandomInt(teamS.length)].id, Team.BLUE);
                         blueCaptainChoice = "random";
                         clearTimeout(timeOutCap);
-                        room.sendAnnouncement(player.name + " escolheu Random !");
+                        room.sendAnnouncement(player.name + " escolheu Random!", 0xFF0000, 'bold');
                         return false;
                     } else if (["bottom", "bot"].includes(words[0].toLowerCase())) {
                         room.setPlayerTeam(teamS[teamS.length - 1].id, Team.BLUE);
                         blueCaptainChoice = "bottom";
                         clearTimeout(timeOutCap);
-                        room.sendAnnouncement(player.name + " escolheu Bottom !");
+                        room.sendAnnouncement(player.name + " escolheu Bottom!", 0xFF0000, 'bold');
                         return false;
                     } else if (!Number.isNaN(Number.parseInt(words[0]))) {
                         if (Number.parseInt(words[0]) > teamS.length || Number.parseInt(words[0]) < 1) {
-                            room.sendAnnouncement("[PV] O número que escolheu é inválido !", player.id);
+                            room.sendAnnouncement("O número que escolheu é inválido!", player.id, 0xFF0000, 'bold');
                             return false;
                         } else {
                             room.setPlayerTeam(teamS[Number.parseInt(words[0]) - 1].id, Team.BLUE);
-                            room.sendAnnouncement(player.name + " escolheu " + teamS[Number.parseInt(words[0]) - 1].name + " !");
+                            room.sendAnnouncement(player.name + "  " + teamS[Number.parseInt(words[0]) - 1].name + "!", 0xFF0000, 'bold');
                             return false;
                         }
                     }
@@ -2682,39 +2728,39 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             const recipient = room.getPlayer(player_id);
             // O usuário está mute
             if (isMuted[player.id] === true) {
-                room.sendAnnouncement(`🚫 Você não pode enviar mensagens privadas, aguarde o tempo de mute acabar.`, player.id, 0xFF0000, "bold", 2); // Enviar aviso.
+                room.sendAnnouncement(`🩸 Você não pode enviar mensagens privadas, aguarde o tempo de mute acabar.`, player.id, 0xFF0000, "bold", 2); // Enviar aviso.
                 return false;
                 // Usuário não está logado.
             } else if (!loggedInPlayers[player.id] === true) {
-                room.sendAnnouncement(`🚫 ${player.name} Você precisa fazer login para enviar mensagens.`, player.id, 0xFF0000, "bold", 2);
+                room.sendAnnouncement(`🩸 ${player.name} você precisa fazer login para enviar mensagens.`, player.id, 0xFF0000, "bold", 2);
                 return false;
                 // ID não inserida.
             } else if (!player_id || isNaN(player_id)) {
-                room.sendAnnouncement(`🚫 Você não digitou o ID, para enviar uma msg privada digite #ID <mensagem>`, player.id, 0xff0000, "bold", 2);
+                room.sendAnnouncement(`🩸 Você não digitou o ID, para enviar uma msg privada digite #ID <mensagem>`, player.id, 0xff0000, "bold", 2);
                 return false;
                 // ID não está associada a nenhum jogador.
             } else if (!recipient) {
-                room.sendAnnouncement(`🚫 A ID inserida não está associada a nenhum jogador!`, player.id, 0xFF0000, "bold", 2);
+                room.sendAnnouncement(`🩸 A ID inserida não está associada a nenhum jogador!`, player.id, 0xFF0000, "bold", 2);
                 return false;
                 // Não permitir enviar mensagem a si mesmo.
             } else if (recipient.id === player.id) {
-                room.sendAnnouncement("🚫 Você não pode enviar mensagens para você mesmo!", player.id, 0xFF0000, "bold", 2);
+                room.sendAnnouncement("🩸 Você não pode enviar mensagens para você mesmo!", player.id, 0xFF0000, "bold", 2);
                 return false;
                 // Tudo bate certo, enviar a DM.
             } else if (recipient) {
                 const sender = player.name;
                 const formatted_message = `[📩 DM de ${sender}]: ${message.substring(message.indexOf(" ") + 1)}`;
                 // Mensagem que o jogador que envia recebe
-                room.sendAnnouncement(`[✉️ DM Enviada para ${recipient.name}]: ${message.substring(message.indexOf(" ") + 1)}`, player.id, 0xFFFFFF, "bold", 1);
+                room.sendAnnouncement(`[✉️ DM Enviada para ${recipient.name}]: ${message.substring(message.indexOf(" ") + 1)}`, player.id, 0xFFFF00, "bold", 1);
                 // Mensagem que o jogador para quem a mensagem foi enviada recebe
-                room.sendAnnouncement(formatted_message, recipient.id, 0xFFFFFF, "bold", 2);
+                room.sendAnnouncement(formatted_message, recipient.id, 0xFFFF00, "bold", 2);
                 return false;
             }
         }
         // Chat staff
         if (words[0] === ".") {
             if (!loggedInPlayers[player.id] === true) {
-                room.sendAnnouncement(`🚫 ${player.name} Você precisa fazer login para enviar mensagens.`, player.id, 0xFF0000, "bold", 2);
+                room.sendAnnouncement(`🩸 ${player.name} Você precisa fazer login para enviar mensagens.`, player.id, 0xFF0000, "bold", 2);
                 return false;
                 // É um staff = sim
             } else if (superadmin[player.id] === 1 || gerentes[player.id] === 1 || admins[player.id] === 1 || mods[player.id] === 1) {
@@ -2730,7 +2776,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 return false; // Não enviar mensagem normal.
                 // Se não for staff.
             } else {
-                room.sendAnnouncement("🚫 Você não tem permissão para usar esse comando!", player.id, 0xFF0000, "bold", 2);
+                room.sendAnnouncement("🩸 Você não tem permissão para usar esse comando!", player.id, 0xFF0000, "bold", 2);
                 return false; // Não enviar mensagem normal.
             }
         }
@@ -2739,10 +2785,10 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             // Checkar se o usuário está na Equipe 1 ou 2 ou se está mute.
             // O usuário está mute
             if (isMuted[player.id] === true) {
-                room.sendAnnouncement(`🚫 Você não pode falar no chat da equipe, aguarde o tempo de mute acabar.`, player.id, 0xFF0000, "bold", 2); // Enviar aviso.
+                room.sendAnnouncement(`🩸 Você não pode falar no chat da equipe, aguarde o tempo de mute acabar.`, player.id, 0xFF0000, "bold", 2); // Enviar aviso.
                 return false; // Não enviar msg.
             } /* else if (!loggedInPlayers[player.id] === true) {
-                room.sendAnnouncement(`🚫 ${player.name} Você precisa fazer login para enviar mensagens.`, player.id, 0xFF0000, "bold", 2);
+                room.sendAnnouncement(`🩸 ${player.name} Você precisa fazer login para enviar mensagens.`, player.id, 0xFF0000, "bold", 2);
                 return false;
                 // Equipe Red
             } */ else if (player.team === 1) {
@@ -2886,7 +2932,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
         // Checkar se o jogador está logado para enviar msgs.
         /* if (!loggedInPlayers[player.id] === true) {
-            room.sendAnnouncement(`🚫 ${player.name} Você precisa fazer login para enviar mensagens.`, player.id, 0xFF0000, "bold", 2);
+            room.sendAnnouncement(`🩸 ${player.name} Você precisa fazer login para enviar mensagens.`, player.id, 0xFF0000, "bold", 2);
         } */
         // Tive de fazer desta maneira pq o return false; em cima n tava a funcionar sabe-se lá porque xd, eu sou nabo em typescript, não julguem...
         /* if (!loggedInPlayers[player.id] === true)
@@ -2911,7 +2957,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     const now = Date.now();
                     if (now < new Date(muteEndTime).getTime()) {
                         isMuted[player.id] = true
-                        room.sendAnnouncement(`🚫 ${player.name} Você está mutado até ${formattedMuteEndTime}, motivo: ${result[0].reason}.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`🩸 ${player.name} Você está mutado até ${formattedMuteEndTime}, motivo: ${result[0].reason}.`, player.id, 0xFF0000, "bold", 2);
                     } else {
                         isMuted[player.id] = false
                         room.sendChat(message);
@@ -3018,7 +3064,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     room.sendAnnouncement(`📊 Previsão de Vitória: 🔴 ${team1Chance.toFixed(2)}% chance de vencer contra 🔵 ${team2Chance.toFixed(2)}% chance de vencer.`, null, 0xFFFFFF, "bold", 0);
                     if (redTeam.length >= 2 && blueTeam.length >= 2) {
                         gk = isGk();
-                        room.sendAnnouncement("🔴 GK: " + gk[0].name + ", 🔵 GK: " + gk[1].name + ", se for necessário trocar faz !gk", null, 0xFFFFFF, "bold", 0);
+                        //room.sendAnnouncement("🔴 GK: " + gk[0].name + ", 🔵 GK: " + gk[1].name + ", se for necessário trocar faz !gk", null, 0xFFFFFF, "bold", 0);
                     }
                 }
             }
@@ -3077,67 +3123,75 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     }
 
     room.onTeamGoal = function (team: any) {
-        let OG = Goal.scorer?.team != team; // OG = true, se houver um auto-golo.
-        // Definir ActivePlayers
-        activePlayers = room.getPlayerList().filter((p: Player) => {
+        let OG = Goal.scorer?.team != team; // OG = true if it’s an own goal.
+        // Define ActivePlayers
+        let activePlayers = room.getPlayerList().filter((p: Player) => {
             return !afkStatus[p.id];
         });
-        if (activePlayers.length >= 2 && activePlayers.length < 6) {
-            // 2v2 | 1v1 | No-Goal.
-            var ballSpeed: number = getBallSpeed();
+    
+        // Random celebration message for goals
+        const frasesGOL = [
+            "BALAÇO COSMICO! De que planeta veio? Gol de",
+            "GOOOOOOOOOOL! APARECENDO QUANDO MAIS SE NECESSITA!!! EU AMO ESSE CARA! Gol de",
+            "BALAÇO COSMICO! De que planeta veio? joga y joga",
+            "GOOOOOOOOOOOLLLLLLLLLLLLLLL! TOCA A MUSICA QUE FOI GOL DA LENDA! Gol de",
+            "Que loucura de gol acaba de fazer o",
+            "GOOOOOOOOOOL! APARECENDO QUANDO MAIS SE NECESSITA",
+            "MINHA NOSSA SENHORA!!!! O IMPOSSÍVEL ACONTECEU MEU DEUS DO CÉU!!! Gol de",
+            "QUE GOLAÇOOOOO de",
+            "IMPRESSIONANTE O CHUTE DO",
+            "🔥🔥🔥 TÁ ON FIRE O"
+       ];
+    
+        // Random celebration message for assists
+        const frasesASS = [
+            "E QUEM BOTOU A BOLA NO PÉ DELE FOI O",
+            "EU AMO ESSE CARA!",
+            "PASSE COM A MÃO DE",
+            "Assistência fenomenal de"
+       ];
 
+        const golcontra = [
+            " TROLA Y TROLLA",
+            " Pette faz pior...",
+            " Animal demais o",
+            " INCRIVEL O QUE ESSA LENDA FAZ, MAS SERIA MELHOR SE FOSSE PARA O OUTRO LADO NÉ",
+            " PARABÉNS!! AGORA TENTA DO OUTRO LADO...",
+            " ERROU O LADO! RUIM DEMAIS,"
+       ]
+    
+        let randomPhraseGol = frasesGOL[Math.floor(Math.random() * frasesGOL.length)];
+        let randomPhraseAss = frasesASS[Math.floor(Math.random() * frasesASS.length)];
+        let randomOwnGoalPhrase = golcontra[Math.floor(Math.random() * golcontra.length)];
+    
+        if (activePlayers.length >= 2) {
+            var ballSpeed = getBallSpeed();
+            let color = team === 1 ? 0xEE3A3A : 0x035FFF; // Red for team 1, blue for team 2
+    
             if (OG && Goal.scorer !== null) {
-                goalName = Goal.scorer.name;
-                //createGoalImage(`${goalName} Marcou um gol contra!`, null);
                 updatePlayerStatistic("ag", Goal.scorer.id.toString(), 1);
-                room.sendAnnouncement(`⚽ ${Goal.scorer.name} Marcou um gol contra (${ballSpeed.toPrecision(4).toString()} km/h), que vergonha 🤣!`, null, 0x00FF00, "bold");
-                console.log(`${Goal.scorer.name}, marcou um gol contra.`);
+                room.sendAnnouncement(`⚽ ${randomOwnGoalPhrase} ${Goal.scorer.name}!!`, null, color, "bold");
+                console.log(`${Goal.scorer.name}, scored an own goal.`);
             } else if (Goal.scorer !== null) {
                 updatePlayerStatistic("goals", Goal.scorer.id.toString(), 1);
                 if (Goal.assist !== null && Goal.assist.team == team) {
-                    goalName = Goal.scorer.name;
-                    passName = Goal.assist.name;
-                    //createGoalImage(goalName, `Assistência de: ${passName}`);
                     updatePlayerStatistic("assists", Goal.assist.id.toString(), 1);
-                    room.sendAnnouncement(`⚽ ${Goal.scorer.name} Marcou um gol (${ballSpeed.toPrecision(4).toString()} km/h) com assistência de ${Goal.assist.name}!`, null, 0x00FF00, "bold");
-                    console.log(`${Goal.scorer.name} Marcou um gol com assistência de ${Goal.assist.name}.`);
+                    room.sendAnnouncement(`⚽ ${randomPhraseGol} ${Goal.scorer.name}!! ${randomPhraseAss} ${Goal.assist.name}!`, null, color, "bold");
+                    console.log(`${Goal.scorer.name} scored a goal with assistance from ${Goal.assist.name}.`);
                 } else {
-                    goalName = Goal.scorer.name;
-                    //createGoalImage(goalName, null);
-                    room.sendAnnouncement(`⚽ ${Goal.scorer.name} Marcou um gol (${ballSpeed.toPrecision(4).toString()} Km/h)!`, null, 0x00FF00, "bold");
-                    console.log(`${Goal.scorer.name} Marcou um gol.`);
-                }
-            }
-        } else if (activePlayers.length >= 6) {
-            // 3v3
-            var ballSpeed: number = getBallSpeed();
-
-            if (OG && Goal.scorer !== null) {
-                updatePlayerStatistic("ag", Goal.scorer.id.toString(), 1);
-                room.sendAnnouncement(`⚽ ${Goal.scorer.name} Marcou um gol contra (${ballSpeed.toPrecision(4).toString()} km/h), que vergonha 🤣!`, null, 0x00FF00, "bold");
-                console.log(`${Goal.scorer.name}, marcou um autogolo.`);
-            } else if (Goal.scorer !== null) {
-                updatePlayerStatistic("goals", Goal.scorer.id.toString(), 1);
-                if (Goal.assist !== null && Goal.assist.team == team) {
-                    updatePlayerStatistic("assists", Goal.assist.id.toString(), 1);
-                    room.sendAnnouncement(`⚽ ${Goal.scorer.name} Marcou um gol (${ballSpeed.toPrecision(4).toString()} km/h) com assistência de ${Goal.assist.name}!`, null, 0x00FF00, "bold");
-                    console.log(`${Goal.scorer.name} Marcou um gol com assistência de ${Goal.assist.name}.`);
-                } else {
-                    room.sendAnnouncement(`⚽ ${Goal.scorer.name} Marcou um gol (${ballSpeed.toPrecision(4).toString()} Km/h)!`, null, 0x00FF00, "bold");
-                    console.log(`${Goal.scorer.name} Marcou um gol.`);
+                    room.sendAnnouncement(`⚽ ${randomPhraseGol} ${Goal.scorer.name} (${ballSpeed.toPrecision(4).toString()} km/h)!`, null, color, "bold");
+                    console.log(`${Goal.scorer.name} scored a goal.`);
                 }
             }
         }
-
-        if ((teamR.length === 1 && teamB.length === 0)) {
-            room.stopGame();
-            setTimeout(() => {
-                teamR.length === 1 && teamB.length === 0 ? quickRestart() : room.stopGame()
-            }, 1000);
-        }
-        // Resetar golos
+    
+        // Additional game logic here
+        // Reset goals
         Goal.reset();
     }
+    
+    
+    
 
     function getBallSpeed() {
         var ballProp = room.getDiscProperties(0);
@@ -3174,7 +3228,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
         // Se estiverem 6 jogadores em jogo (3 em cada equipe mandar esta mensagem)
         if (team1Players.length === getMaxTeamSize() && team2Players.length === getMaxTeamSize()) {
-            room.sendAnnouncement(`📊 Tem ${getMaxTeamSize() * 2} jogadores em campo, o resultado irá contar para as estatísticas/status!`, null, 0x00FF00, "bold", 0);
+            // room.sendAnnouncement(`📊 Tem ${getMaxTeamSize() * 2} jogadores em campo, o resultado irá contar para as estatísticas/status!`, null, 0x00FF00, "bold", 0);
             room.pauseGame(true);
             setTimeout(() => { //Só pra garantir
                 room.pauseGame(false);
@@ -3412,7 +3466,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             console.error(err);
                         } else if (!TopStreakBatida) {
                             TopStreakBatida = true;
-                            room.sendAnnouncement(`🏆 O recorde de streak da sala foi batido! Parabéns a equipe 🔴!`, null, 0x00FF00, "bold", 2);
+                            room.sendAnnouncement(`🏆 O recorde de streak da sala foi batido! Parabéns a equipe 🔴!`, null, 0xFF0000, "bold", 2);
                             console.log("Um novo recorde foi batido, tabela Streak atualizada.");
                         }
                     });
@@ -3581,7 +3635,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         if (player.team !== 0) {
                             // Adicionar 1 minuto de ban.
                             const sql = `INSERT INTO bans (name, time, reason, banned_by) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 MINUTE), ?, ?)`;
-                            const values = [player.name, "🚫 Abandonou no meio do jogo (1m)", "Sistema"];
+                            const values = [player.name, "🩸 Abandonou no meio do jogo (1m)", "Sistema"];
                             con.query(sql, values, (err: any, result: any) => {
                                 if (err) {
                                     console.log(err);

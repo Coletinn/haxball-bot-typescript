@@ -46,7 +46,7 @@
 - !help: Exibe a lista de comandos disponíveis.
 - !registo: Faz !registo seguido pela tua password `(ex. !registrar password )`
 - !login: Faz !login na sala seguido pela tua password `(ex. !login password )`
-- !changepw: Faz !changepw seguido de passwordantiga passwordnova `(ex. !changepw senha senha123 )`
+- !mudarsenha: Faz !changepw seguido de passwordantiga passwordnova `(ex. !changepw senha senha123 )`
 - !afk: Coloca-te e tira-te de AFK.
 - !about: Mostra-te informações sobre a sala.
 - !discord: Dá-te o discord oficial da HaxRooms.
@@ -55,10 +55,15 @@
 - t: Faz t Mensagem para enviar uma mensagem para a tua equipa (Red ou Blue).
 - !streak: Mostra-te a streak atual da sala.
 - !topstreak: Mostra-te o recorde de streak da sala.
-- !sub: És substituído caso estejas nos primeiros 5 segundos de um jogo.
 - !prev: Dá-te a previsão de vitória para o jogo atual.
 - #: Envia mensagem privada para o jogador à tua escolha através da sua ID. `(ex. #50 teste)`
 - !bb: Faz logout da sala ( é o mesmo que simplesmente sair ).
+- !gols: Mostra o TOP 10 artilheiros da sala.
+- !assists: Mostra o TOP 10 jogadores com mais assistência.
+- !jogos: Mostra o TOP 10 jogadores com mais jogos.
+- !cs: Mostra o TOP 10 melhores goleiros da sala.
+- !vitorias: Mostra o TOP 10 jogadores com mais vitórias.
+- !listafks: Mostra a lista dos jogadores que estão AFKS.
 
 ## Comandos de SuperAdmin
 
@@ -67,3 +72,11 @@
 - !mute: Faz !mute razão tempo nome | `(ex: !mute teste 7d OBL)` | tempo: 1d = 1 dia | 1h = 1 hora | 1m = 1 minuto | 1s = 1 segundo.
 - !unmute: Se o jogador estiver mutado tira-lhe o mute | `(ex: !unmute OBL)`
 - . : Comando para falares no chat da staff `(ex: . Sou lindo)` (É necessário colocar sempre um espaço entre o . e a mensagem)
+- !setvip: Faz !setvip #id 1, 2 ou 3 | `(ex: !setvip #1 1)`
+- !rr2: Reseta a posição da bola para o meio de campo.
+
+## Comandos de usuário VIP
+
+- !furar: Fura a fila.
+- !p: Pausa o jogo por até 90 segundos.
+- !pp: Despausa o jogo.

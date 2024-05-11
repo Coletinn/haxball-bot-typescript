@@ -2091,10 +2091,6 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         return false;
                     }
                 });
-            } else if (words[0] === "!adminson") {
-                let resposta = getStaffOnlineInfo();
-
-                room.sendAnnouncement(resposta, player.id, cores.coral, "bold");
             } else if (words[0] === "!mudarsenha") {
                 const input = words;
                 if (input.length < 3) {

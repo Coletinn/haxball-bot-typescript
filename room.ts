@@ -3152,12 +3152,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
        ];
 
         const golcontra = [
-            " TROLA Y TROLLA",
-            " Pette faz pior...",
-            " Animal demais o",
-            " INCRIVEL O QUE ESSA LENDA FAZ, MAS SERIA MELHOR SE FOSSE PARA O OUTRO LADO NÉ",
-            " PARABÉNS!! AGORA TENTA DO OUTRO LADO...",
-            " ERROU O LADO! RUIM DEMAIS,"
+            "TROLA Y TROLLA",
+            "Pette faz pior...",
+            "Animal demais o",
+            "INCRIVEL O QUE ESSA LENDA FAZ, MAS SERIA MELHOR SE FOSSE PARA O OUTRO LADO NÉ",
+            "PARABÉNS!! AGORA TENTA DO OUTRO LADO...",
+            "ERROU O LADO! RUIM DEMAIS,"
        ]
     
         let randomPhraseGol = frasesGOL[Math.floor(Math.random() * frasesGOL.length)];

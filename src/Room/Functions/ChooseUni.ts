@@ -14,7 +14,7 @@ export async function chooseUni(player: any, words: any) {
                     return false;
                 }
                 room.setTeamColors(player.team, uni.uniform[n].angle, uni.uniform[n].avatarColor, uni.uniform[n].mainColor);
-                room.sendAnnouncement(`${player.name} Escolheu o uniforme ${uni.longName} ${n+1}!`, player.id, cores.verde, "bold");
+                room.sendAnnouncement(`${player.name} Escolheu o uniforme ${uni.longName} ${n+1}!`, player.id, cores.vermelho, "bold");
                 return false
             } else {
                 room.sendAnnouncement(`${player.name} Não encontrei nenhum uniforme com esse nome. Digite "!uniformes" para ver todos os uniformes!`, player.id, cores.vermelho, "bold", 2);

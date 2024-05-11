@@ -918,7 +918,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 return;
             }
             if (winstreak == 0 && room.getScores() == null) {
-                if (Math.abs(teamR.length - teamB.length) == 2) { // if someone left a team has 2 more players than the other one, put the last ESCOLHEUn guy back in his place so it's fair
+                if (Math.abs(teamR.length - teamB.length) == 2) { //se alguém saiu de um time com 2 jogadores a mais que o outro, coloca o último jogador de volta em seu lugar para que seja justo
                     room.sendAnnouncement("Equilibrando times...", null, 0xFF0000, 'bold');
                     teamR.length > teamB.length ? room.setPlayerTeam(teamR[teamR.length - 1].id, Team.SPECTATORS) : room.setPlayerTeam(teamB[teamB.length - 1].id, Team.SPECTATORS);
                 }

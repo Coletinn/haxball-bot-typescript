@@ -91,10 +91,10 @@
         "[🐐 GOAT]"  
     ],
     "cargos_cores": {
-        "ceo": "0xFF0000",
+        "ceo": "0x1259FF",
         "gerente": "0x00FFFF",
         "admin": "0xffa500",
-        "mod": "0x993399",
+        "mod": "0xD146D1",
         "membro": "0xFFFFFF"
     },
     "webhooks": {

@@ -3678,4 +3678,4 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     }
 });
 
-export { room };
+export { room }; 

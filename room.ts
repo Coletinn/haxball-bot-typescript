@@ -1968,7 +1968,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         }
 
                                         if (result.affectedRows > 0) {
-                                            room.sendAnnouncement(`💎 [${player.name}] ${userName} Agora é um jogador VIP!`, null, 0xFFA500, "bold", 2);
+                                            room.sendAnnouncement(`💎 O ${player.name} concedeu o cargo de VIP para o ${userName}!`, null, 0xFFA500, "bold", 2);
                                             room.sendAnnouncement(`Parabéns ${userName}! Você recebeu o cargo "Vip" pelo Admin ${player.name}`, userId, cores.cinza, "bold", 2);
                                             vips[userId] = 1;
                                         } else {
@@ -1990,7 +1990,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         }
 
                                         if (result.affectedRows > 0) {
-                                            room.sendAnnouncement(`🔰 [${player.name}] ${userName} Agora é um jogador PREMIUM!`, null, 0xFFA500, "bold", 2);
+                                            room.sendAnnouncement(`O ${player.name} concedeu o cargo de PREMIUM para o ${userName}!`, null, 0xFFA500, "bold", 2);
                                             room.sendAnnouncement(`Parabéns ${userName}! Você recebeu o cargo "Premium" pelo Admin ${player.name}`, userId, cores.cinza, "bold", 2);
                                             premiums[userId] = 1;
                                         } else {
@@ -2012,7 +2012,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         }
 
                                         if (result.affectedRows > 0) {
-                                            room.sendAnnouncement(`🌋 [${player.name}] ${userName} Agora é um jogador LEGEND!`, null, 0xFFA500, "bold", 2);
+                                            room.sendAnnouncement(`🌋 O ${player.name} concedeu o cargo de LEGEND para o ${userName}!`, null, 0xFFA500, "bold", 2);
                                             room.sendAnnouncement(`Parabéns ${userName}! Você recebeu o cargo "Legend" pelo Admin ${player.name}`, userId, cores.cinza, "bold", 2);
                                             legends[userId] = 1;
                                         } else {
@@ -2182,7 +2182,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     room.sendAnnouncement(`🩸 ${player.name} você precisa estar logado para usar este comando.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-            } else if (words[0] === "!lista") {
+            } else if (words[0] === "!listafks") {
                 const afkPlayers = room.getPlayerList().filter((p: { id: number; }) => afkStatus[p.id] === 1);
                 let playerNames = afkPlayers.map((p: { id: any; }) => {
                     return room.getPlayer(p.id).name;
@@ -2631,7 +2631,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 // Comando help
             } else if (words[0] === "!help" || words[0] === "!ajuda" || words[0] === "!comandos" || words[0] === "!commands") {
                 if (words.length === 1) {
-                    const commands = ["!mudarsenha", "!afk", "!discord", "!stats", "t", "!streak", "!topstreak", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists"];
+                    const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!streak", "!topstreak", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists"];
                     const adminCommands = ["!ban", "!mute", "!rr2", "!setvip <1, 2 ou 3>"]
 
                     room.sendAnnouncement(`📃 Comandos: ${commands.join(", ")}`, player.id, 0xFF0000, "bold");

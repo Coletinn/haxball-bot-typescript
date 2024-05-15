@@ -2446,16 +2446,29 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 const values = [player.name];
                 con.query(sql, values, (err: any, result: any) => {
                     if (err) throw err;
-                    if (result.length === 0 || !loggedInPlayers[player.id] || !(result[0].ceo === 1 || !(result[0].gerente === 1 || !(result[0].admin === 1 || !(result[0].mod === 1))))) {
+                    if (result.length === 0 || !loggedInPlayers[player.id] || !(result[0].ceo || result[0].gerente || result[0].admin || result[0].mod)) {
                         room.sendAnnouncement("🩸 Você não tem autorização para usar este comando!", player.id, 0xFF0000, "bold", 2);
                         return;
                     }
             
-                    const reason = words.length > 3 ? words.slice(3).join(" ") : "Sem motivo";
-                    const timeStr = words.length > 2 ? words[2] : "6h";  // Padrão para 5 minutos.
-                    const name = words.length > 1 ? words[1] : "Unknown";
+                    // Parsing the command for name, time and reason
+                    let name = words[1];
+                    let timeStr = "6h";  // Default time
+                    let reason = "Sem motivo";  // Default reason
+                    let nameEndIndex = 1;
             
+                    // Check if each word might be a time indication
                     const timeRegex = /^(\d+)([a-zA-Z]+)$/;
+                    for (let i = 2; i < words.length; i++) {
+                        if (words[i].match(timeRegex)) {
+                            timeStr = words[i];
+                            reason = words.slice(i + 1).join(" ");
+                            break;
+                        }
+                        nameEndIndex = i;  // Extend the name to this word
+                        name = words.slice(1, nameEndIndex + 1).join(" ");
+                    }
+            
                     const match = timeStr.match(timeRegex);
                     if (!match) {
                         room.sendAnnouncement("🩸 Formato de tempo inválido. Use um número seguido de d (Dias), h (Horas), m (Minutos), ou s (Segundos)", player.id, 0xFF0000, "bold", 2);
@@ -2484,8 +2497,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     const localBanEndTime = new Date(banEndTime.getTime() - timezoneOffsetMs);
                     const banEndTimeFormatted = localBanEndTime.toISOString().slice(0, 19).replace('T', ' ')
             
-                    // Tenta pegar o jogador alvo e mutar se existir.
-                    const targetPlayer = room.getPlayerList().find((p: { name: string }) => p.name === name);
+                    // Attempt to find the target player and apply ban if exists.
+                    const targetPlayer = room.getPlayerList().find((p: Player) => p.name.toLowerCase() === name.toLowerCase());
                     if (targetPlayer) {
                         const conn = playerConnections.get(targetPlayer.id);
                         const auth = playerAuth.get(targetPlayer.id);
@@ -2494,32 +2507,44 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         con.query(sqlInsert, valuesInsert, (err: any, result: any) => {
                             if (err) throw err;
                             room.sendAnnouncement(`🩸 Banido com sucesso!`, player.id, 0xFFA500, "bold");
-                            // Kickar com a razão e o tempo do ban.
-                            if (targetPlayer) {
-                                room.kickPlayer(targetPlayer.id, `🩸 Você foi banido. Motivo: ${reason} até ${banEndTime}.`);
-                            }
+                            // Kick player with reason and duration of ban.
+                            room.kickPlayer(targetPlayer.id, `🩸 Você foi banido. Motivo: ${reason} até ${banEndTimeFormatted}.`);
                         });
                     } else {
                         room.sendAnnouncement("🩸 Jogador não encontrado.", player.id, 0xFF0000, "bold", 2);
                     }
                 });
-            } 
+            }
+            
             
             else if (words[0] === "!mute") {
                 const sql = `SELECT * FROM players WHERE LOWER(name) = LOWER(?)`;
                 const values = [player.name];
                 con.query(sql, values, (err: any, result: any) => {
                     if (err) throw err;
-                    if (result.length === 0 || !loggedInPlayers[player.id] || !(result[0].ceo === 1 || !(result[0].gerente === 1 || !(result[0].admin === 1 || !(result[0].mod === 1))))) {
+                    if (result.length === 0 || !loggedInPlayers[player.id] || !(result[0].ceo || result[0].gerente || result[0].admin || result[0].mod)) {
                         room.sendAnnouncement("🩸 Você não tem autorização para usar este comando!", player.id, 0xFF0000, "bold", 2);
                         return;
                     }
             
-                    const reason = words.length > 3 ? words.slice(3).join(" ") : "Sem motivo";
-                    const timeStr = words.length > 2 ? words[2] : "5m";  // Padrão para 5 minutos
-                    const name = words.length > 1 ? words[1] : "Unknown";
+                    // Parsing the command for name, time and reason
+                    let name = words[1];
+                    let timeStr = "5m";  // Default time is 5 minutes
+                    let reason = "Sem motivo";  // Default reason
+                    let nameEndIndex = 1;
             
+                    // Check if each word might be a time indication
                     const timeRegex = /^(\d+)([a-zA-Z]+)$/;
+                    for (let i = 2; i < words.length; i++) {
+                        if (words[i].match(timeRegex)) {
+                            timeStr = words[i];
+                            reason = words.slice(i + 1).join(" ");
+                            break;
+                        }
+                        nameEndIndex = i;  // Extend the name to this word
+                        name = words.slice(1, nameEndIndex + 1).join(" ");
+                    }
+            
                     const match = timeStr.match(timeRegex);
                     if (!match) {
                         room.sendAnnouncement("🩸 Formato de tempo inválido. Use um número seguido de d (Dias), h (Horas), m (Minutos), ou s (Segundos)", player.id, 0xFF0000, "bold", 2);
@@ -2548,8 +2573,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     const localMuteEndTime = new Date(muteEndTime.getTime() - timezoneOffsetMs);
                     const muteEndTimeFormatted = localMuteEndTime.toISOString().slice(0, 19).replace('T', ' ')
             
-                    // Tenta pegar o jogador alvo e mutar se existir.
-                    const targetPlayer = room.getPlayerList().find((p: { name: string }) => p.name === name);
+                    // Attempt to find the target player and apply mute if exists.
+                    const targetPlayer = room.getPlayerList().find((p: Player) => p.name.toLowerCase() === name.toLowerCase());
                     if (targetPlayer) {
                         const conn = playerConnections.get(targetPlayer.id);
                         const auth = playerAuth.get(targetPlayer.id);
@@ -2558,13 +2583,14 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         con.query(sqlInsert, valuesInsert, (err: any, result: any) => {
                             if (err) throw err;
                             room.sendAnnouncement(`🩸 Mutado com sucesso!`, player.id, 0xFFA500, "bold");
+                            // Assuming isMuted is a dictionary to track muted status.
                             isMuted[targetPlayer.id] = true;
                         });
                     } else {
                         room.sendAnnouncement("🩸 Jogador não encontrado.", player.id, 0xFF0000, "bold", 2);
                     }
                 });
-            }
+            }            
             
             
             else if (words[0] === "!prev") {

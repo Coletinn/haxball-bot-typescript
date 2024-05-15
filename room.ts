@@ -2189,11 +2189,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     room.sendAnnouncement(`🩸 Não há jogadores AFK no momento.`, player.id, 0xFF0000, "bold");
                 }
                 // Comando Streak
-            } else if (words[0] === "!streak") {
+            } 
+            else if (words[0] === "!streak") {
                 room.sendAnnouncement(`🏆 ${player.name} a streak atual da sala é de ${winstreak} jogos para a equipe 🔴!`, player.id, 0xFFFFFF, "bold");
                 // Comando Top Streak
-            } else if (words[0] === "!topstreak") {
-                const sql = `SELECT * FROM streak`;
+            } 
+            else if (words[0] === "!topstreak") {
+                const sql = `SELECT * FROM streak ORDER BY games DESC LIMIT 1`;
                 con.query(sql, (err: any, result: any) => {
                     if (err) throw err;
                     if (result.length == 0) {
@@ -2203,81 +2205,54 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     room.sendAnnouncement(`🏆 ${player.name} a top streak atual é de ${result[0].games} jogos e foi conquistada pelos jogadores ${result[0].player1}, ${result[0].player2} e ${result[0].player3}!`, player.id, 0xFFFFFF, "bold");
                 });
                 // Logout bem básico.
-            } else if (words[0] === "!bb") {
+            } 
+            else if (words[0] === "!bb") {
                 room.kickPlayer(player.id, `👋 Adeus ${player.name}, até a próxima!`);         
                 // Comando para mostrar o link do meu discord.
-            } else if (words[0] === "!discord" || words[0] === "!disc") {
+            } 
+            else if (words[0] === "!discord" || words[0] === "!disc") {
                 room.sendAnnouncement(`👥 Discord: ${discord}`, player.id, 0x094480, "bold");
                 // Comando das estatísticas
             } 
             else if (words[0] === "!stats" || words[0] === "!me" || words[0] === "!status") {
-                // Checkar se o jogador está registado
-                const sql = `SELECT * FROM players WHERE name = ?`;
+                const sql = `SELECT * FROM players WHERE LOWER(name) = LOWER(?)`;
                 const values = [player.name];
-                con.query(sql, values, (err: any, result: any) => {
+                con.query(sql, values, (err: any, playersResult: any) => {
                     if (err) throw err;
-                    if (result.length === 0) {
-                        // Não está registado
+                    if (playersResult.length === 0) {
                         room.sendAnnouncement(`Você não está registrado! Digite: !registrar <senha> para se registrar.`, player.id, 0xFF0000, "bold", 2);
-                    } else if (words.length === 1) {
-                        // Ver as próprias estatísticas
-                        const sql = `SELECT * FROM stats WHERE player_id = ? AND room_id = ?`;
-                        const values = [result[0].id, process.env.room_id];
-                        con.query(sql, values, (err: any, result: any) => {
-                            if (err) throw err;
-                            room.sendAnnouncement(`📊 O seu ELO: ${result[0].elo}`, player.id, 0xFF0000, "bold");
-                            room.sendAnnouncement(`📊 As suas estatísticas: Jogos: ${result[0].games}, Vitórias: ${result[0].wins}, Derrotas: ${result[0].losses}, Gols: ${result[0].goals}, Assistências: ${result[0].assists}, Gols contras: ${result[0].ag}, CS: ${result[0].cs}`, player.id, 0xFFFFFF, "bold", 0);
-                        });
-                        // Médias
-                        const totalGoals = result[0].goals;
-                        const totalAssists = result[0].assists;
-                        const totalGames = result[0].games;
-                        const totalWins = result[0].wins;
-                        let averageGoalsPerGame = 0;
-                        let averageAssistsPerGame = 0;
-                        let winRate = 0;
-                        if (totalGames != 0) {
-                            averageGoalsPerGame = totalGoals / totalGames;
-                            averageAssistsPerGame = totalAssists / totalGames;
-                            winRate = (totalWins / totalGames) * 100;
-                        }
-                        room.sendAnnouncement(`📊 Você tem uma média de ${averageGoalsPerGame.toFixed(1)} gols e ${averageAssistsPerGame.toFixed(1)} assistências por jogo e um percentual de vitória de ${winRate.toFixed(2)}%.`, player.id, 0xFFFFFF, "bold", 0);
                     } else {
-                        // Ver as stats de outro jogador
-                        const targetPlayer = words.slice(1).join(" ");
-                        const sql = `SELECT * FROM stats WHERE player_id = (SELECT id FROM players WHERE LOWER(name) = LOWER(?)) AND room_id = ?`;
-                        const values = [targetPlayer, process.env.room_id];
-                        con.query(sql, values, (err: any, result: any) => {
+                        const playerID = playersResult[0].id;
+                        const sqlStats = `SELECT * FROM stats WHERE player_id = ? AND room_id = ?`;
+                        const statsValues = [playerID, process.env.room_id];
+                        con.query(sqlStats, statsValues, (err: any, statsResult: any) => {
                             if (err) throw err;
-                            if (result.length === 0) {
-                                room.sendAnnouncement(`🩸 Jogador ${targetPlayer} não encontrado.`, player.id, 0xFF0000, "bold", 2);
+                            if (statsResult.length === 0) {
+                                room.sendAnnouncement(`Não há estatísticas disponíveis para você.`, player.id, 0xFF0000, "bold", 2);
                             } else {
-                                room.sendAnnouncement(`📊 O ELO de ${targetPlayer}: ${result[0].elo}`, player.id, 0xFF0000, "bold");
-                                room.sendAnnouncement(`📊 Estatísticas de ${targetPlayer}: Jogos: ${result[0].games}, Vitórias: ${result[0].wins}, Derrotas: ${result[0].losses}, Gols: ${result[0].goals}, Assistências: ${result[0].assists}, Gols Contras: ${result[0].ag}, CS: ${result[0].cs}`, player.id, 0xFFFFFF, "bold", 0);
-                                // Médias
-                                con.query(`SELECT wins as wins, goals as goals, games as games, assists as assists FROM players WHERE name = ?`, [targetPlayer], (err: any, result: string | any[]) => {
-                                    if (err) throw err;
-                                    if (result.length > 0) {
-                                        const totalGoals = result[0].goals;
-                                        const totalAssists = result[0].assists;
-                                        const totalGames = result[0].games;
-                                        const totalWins = result[0].wins;
-                                        let averageGoalsPerGame = 0;
-                                        let averageAssistsPerGame = 0;
-                                        let winRate = 0;
-                                        if (totalGames != 0) {
-                                            averageGoalsPerGame = totalGoals / totalGames;
-                                            averageAssistsPerGame = totalAssists / totalGames;
-                                            winRate = (totalWins / totalGames) * 100;
-                                        }
-                                        // room.sendAnnouncement(`📊 O jogador ${targetPlayer} tem uma média de ${averageGoalsPerGame.toFixed(1)} gols e ${averageAssistsPerGame.toFixed(1)} assistências por jogo e um percentual de vitória de ${winRate.toFixed(2)}%.`, player.id, 0xFFFFFF, "bold", 0);
-                                    }
-                                });
+                                const stats = statsResult[0];
+                                
+                                const totalGoals = Number(stats.goals) || 0;
+                                const totalAssists = Number(stats.assists) || 0;
+                                const totalGames = Number(stats.games) || 0;
+                                const totalWins = Number(stats.wins) || 0;
+                                let averageGoalsPerGame = 0;
+                                let averageAssistsPerGame = 0;
+                                let winRate = 0;
+                                if (totalGames > 0) {
+                                    averageGoalsPerGame = totalGoals / totalGames;
+                                    averageAssistsPerGame = totalAssists / totalGames;
+                                    winRate = (totalWins / totalGames) * 100;
+                                }
+                                room.sendAnnouncement(`📊 Você tem uma média de ${averageGoalsPerGame.toFixed(2)} gols e ${averageAssistsPerGame.toFixed(2)} assistências por jogo e um percentual de vitória de ${winRate.toFixed(2)}%.`, player.id, 0xFFFFFF, "bold", 0);
+                                room.sendAnnouncement(`📊 O seu ELO: ${stats.elo}`, player.id, 0xFF0000, "bold");
+                                room.sendAnnouncement(`📊 As suas estatísticas: Jogos: ${stats.games}, Vitórias: ${stats.wins}, Derrotas: ${stats.losses}, Gols: ${stats.goals}, Assistências: ${stats.assists}, Gols contras: ${stats.ag}, CS: ${stats.cs}`, player.id, 0xFFFFFF, "bold", 0);
                             }
                         });
                     }
                 });
-            } 
+            }
+             
             
             else if (words[0] === "!gols" || words[0] === "!goals") {
                 // Retrieve the top 10 goal scorers in the room

@@ -2356,35 +2356,77 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         
             
             else if (words[0] === "!unmute") {
-                // Checkar a database por alguém com o mesmo nome da pessoa em questão.
+                // Verifica se o jogador tem permissão para usar o comando
                 const sql = `SELECT * FROM players WHERE LOWER(name) = LOWER(?)`;
                 const values = [player.name];
                 con.query(sql, values, (err: any, result: any) => {
-                    if (err) throw err;
-                    if (result.length > 0) {
-                        if (!loggedInPlayers[player.id] || !(result[0].ceo || result[0].gerente || result[0].admin || result[0].mod)) {
-                            room.sendAnnouncement("🩸 Você não tem autorização para usar este comando!", player.id, 0xFF0000, "bold", 2);
-                        }                        
-                        else {
-                            const currentDate = new Date();
-                            const name = words.slice(1).join(" ");
-                            const targetPlayer = room.getPlayerList().find((p: Player) => p.name === name);
-                            // Remover o mute se o mute ainda estiver ativo.
-                            con.query(`DELETE FROM mutes WHERE name = ? and time > ?`, [name, currentDate], (err: any, result: any) => {
-                                if (err) throw err;
-                                if (result.affectedRows > 0) {
-                                    room.sendAnnouncement(`🩸 Desmutado com sucesso!`, player.id, 0xFFA500, "bold");
-                                    if (targetPlayer) {
-                                        isMuted[targetPlayer.id] = false;
-                                    }
-                                } else {
-                                    room.sendAnnouncement(`🩸 O jogador não está mutado.`, player.id, 0xFF0000, "bold", 2);
-                                }
-                            });
-                        }
+                    if (err) {
+                        room.sendAnnouncement(`🩸 Erro no banco de dados: ${err.message}`, player.id, 0xFF0000, "bold", 2);
+                        console.error(err);
+                        return;
                     }
+                    if (result.length === 0 || !loggedInPlayers[player.id] || !(result[0].ceo || result[0].gerente || result[0].admin || result[0].mod)) {
+                        room.sendAnnouncement("🩸 Você não tem autorização para usar este comando!", player.id, 0xFF0000, "bold", 2);
+                        return;
+                    }
+            
+                    // Espera uma menção com "@" e manipulação de formato incorreto
+                    if (words.length < 2 || !words[1].startsWith('@')) {
+                        room.sendAnnouncement("🩸 Por favor, mencione um jogador com '@nomeDoJogador' para desmutar.", player.id, 0xFF0000, "bold", 2);
+                        return;
+                    }
+            
+                    // Parseia o nome do jogador mencionado removendo o prefixo "@" e substituindo underscores por espaços
+                    const targetPlayerName = words[1].substring(1).replace(/_/g, ' ').toLowerCase(); // Transforma para minúsculo
+                    console.log(`Attempting to unmute: ${targetPlayerName}`);  // Debug: Mostra o nome do jogador mencionado
+            
+                    // Find the mentioned player in the room.
+                    const targetPlayer = room.getPlayerList().find((p: Player) => p.name.toLowerCase() === targetPlayerName);
+                    if (!targetPlayer) {
+                        room.sendAnnouncement("🩸 Jogador não encontrado.", player.id, 0xFF0000, "bold", 2);
+                        return;
+                    }
+            
+                    // Query para verificar se um mute está ativo e ainda não expirou
+                    con.query(`SELECT * FROM mutes WHERE LOWER(name) = LOWER(?)`, [targetPlayer.name], (err: any, result: any) => {
+                        if (err) {
+                            room.sendAnnouncement(`🩸 Erro ao acessar registros de mute: ${err.message}`, player.id, 0xFF0000, "bold", 2);
+                            console.error(err);
+                            return;
+                        }
+            
+                        if (result.length === 0) {
+                            room.sendAnnouncement(`🩸 O jogador não está mutado ou o mute já expirou.`, player.id, 0xFF0000, "bold", 2);
+                            console.log('No mute records found');  // Debug: Confirma que não há registros de mute
+                        } else {
+                            const muteRecord = result[0];
+                            console.log(`Found mute record expiring at ${muteRecord.time}`);
+                            // Checa se o mute ainda está ativo
+                            const muteExpiration = new Date(muteRecord.time);
+                            const currentTime = new Date();
+                            if (currentTime < muteExpiration) {
+                                // Se o mute ainda está ativo, deleta o registro de mute
+                                con.query(`DELETE FROM mutes WHERE id = ?`, [muteRecord.id], (err: any, result: any) => {
+                                    if (err) {
+                                        room.sendAnnouncement(`🩸 Erro ao desmutar: ${err.message}`, player.id, 0xFF0000, "bold", 2);
+                                        console.error(err);
+                                        return;
+                                    }
+                                    if (result.affectedRows > 0) {
+                                        room.sendAnnouncement(`🩸 ${targetPlayer.name} desmutado com sucesso!`, null, 0xFFA500, "bold");
+                                        isMuted[targetPlayer.id] = false;
+                                    } else {
+                                        room.sendAnnouncement(`🩸 Falha ao desmutar, por favor tente novamente.`, player.id, 0xFF0000, "bold", 2);
+                                    }
+                                });
+                            } else {
+                                room.sendAnnouncement(`🩸 O mute para ${targetPlayer.name} já expirou.`, player.id, 0xFFA500, "bold");
+                            }
+                        }
+                    });
                 });
-            }
+            }                        
+            
 
             else if (words[0] === "!unban") {
                 // Checkar a database por alguém com o mesmo nome da pessoa em questão.
@@ -2403,7 +2445,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             con.query(`DELETE FROM bans WHERE name = ? and time > ?`, [name, currentDate], (err: any, result: any) => {
                                 if (err) throw err;
                                 if (result.affectedRows > 0) {
-                                    room.sendAnnouncement(`🩸 Desbanido com sucesso!`, player.id, 0xFFA500, "bold");
+                                    room.sendAnnouncement(`🩸 Desbanido com sucesso!`, null, 0xFFA500, "bold");
                                     if (targetPlayer) {
                                         isMuted[targetPlayer.id] = false;
                                     }
@@ -2426,23 +2468,23 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         return;
                     }
             
-                    // Parsing the command for name, time and reason
-                    let name = words[1];
-                    let timeStr = "6h";  // Default time
-                    let reason = "Sem motivo";  // Default reason
-                    let nameEndIndex = 1;
-            
-                    // Check if each word might be a time indication
-                    const timeRegex = /^(\d+)([a-zA-Z]+)$/;
-                    for (let i = 2; i < words.length; i++) {
-                        if (words[i].match(timeRegex)) {
-                            timeStr = words[i];
-                            reason = words.slice(i + 1).join(" ");
-                            break;
-                        }
-                        nameEndIndex = i;  // Extend the name to this word
-                        name = words.slice(1, nameEndIndex + 1).join(" ");
+                    if (words.length < 2 || !words[1].startsWith('@')) {
+                        room.sendAnnouncement("🩸 Por favor, mencione um jogador com '@nomeDoJogador'.", player.id, 0xFF0000, "bold", 2);
+                        return;
                     }
+            
+                    let targetPlayerName = words[1].substring(1).replace(/_/g, ' '); // Remove '@' e substitui underscores por espaços
+                    let reason = words.slice(2).join(" ") || "Sem motivo";
+                    let timeStr = "6h"; // Padrão para 6 horas
+            
+                    const timeRegex = /^(\d+)([a-zA-Z]+)$/;
+                    words.slice(2).some(word => {
+                        if (word.match(timeRegex)) {
+                            timeStr = word;
+                            reason = words.slice(words.indexOf(word) + 1).join(" ");
+                            return true;
+                        }
+                    });
             
                     const match = timeStr.match(timeRegex);
                     if (!match) {
@@ -2454,14 +2496,10 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     const unit = match[2];
                     let banDuration = 0;
                     switch (unit) {
-                        case "d":
-                            banDuration = duration * 24 * 60 * 60 * 1000; break;
-                        case "h":
-                            banDuration = duration * 60 * 60 * 1000; break;
-                        case "m":
-                            banDuration = duration * 60 * 1000; break;
-                        case "s":
-                            banDuration = duration * 1000; break;
+                        case "d": banDuration = duration * 24 * 60 * 60 * 1000; break;
+                        case "h": banDuration = duration * 60 * 60 * 1000; break;
+                        case "m": banDuration = duration * 60 * 1000; break;
+                        case "s": banDuration = duration * 1000; break;
                         default:
                             room.sendAnnouncement("🩸 Formato de tempo inválido.", player.id, 0xFF0000, "bold", 2);
                             return;
@@ -2472,17 +2510,17 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     const localBanEndTime = new Date(banEndTime.getTime() - timezoneOffsetMs);
                     const banEndTimeFormatted = localBanEndTime.toISOString().slice(0, 19).replace('T', ' ')
             
-                    // Attempt to find the target player and apply ban if exists.
-                    const targetPlayer = room.getPlayerList().find((p: Player) => p.name.toLowerCase() === name.toLowerCase());
+                    // Tenta achar o jogador alvo por menção e aplicar o ban se existir
+                    const targetPlayer = room.getPlayerList().find((p: Player) => p.name.toLowerCase() === targetPlayerName.toLowerCase());
                     if (targetPlayer) {
                         const conn = playerConnections.get(targetPlayer.id);
                         const auth = playerAuth.get(targetPlayer.id);
                         const sqlInsert = `INSERT INTO bans (name, time, reason, banned_by, conn, auth) VALUES (?, ?, ?, ?, ?, ?)`;
-                        const valuesInsert = [name, banEndTimeFormatted, reason, player.name, conn, auth];
+                        const valuesInsert = [targetPlayer.name, banEndTimeFormatted, reason, player.name, conn, auth];
                         con.query(sqlInsert, valuesInsert, (err: any, result: any) => {
                             if (err) throw err;
-                            room.sendAnnouncement(`🩸 Banido com sucesso!`, player.id, 0xFFA500, "bold");
-                            // Kick player with reason and duration of ban.
+                            room.sendAnnouncement(`🩸 ${targetPlayer.name} banido com sucesso!`, null, 0xFFA500, "bold");
+                            // Bane o jogador alvo
                             room.kickPlayer(targetPlayer.id, `🩸 Você foi banido. Motivo: ${reason} até ${banEndTimeFormatted}.`);
                         });
                     } else {
@@ -2490,6 +2528,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     }
                 });
             }
+
             
             
             else if (words[0] === "!mute") {
@@ -2502,23 +2541,23 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         return;
                     }
             
-                    // Parsing the command for name, time and reason
-                    let name = words[1];
-                    let timeStr = "5m";  // Default time is 5 minutes
-                    let reason = "Sem motivo";  // Default reason
-                    let nameEndIndex = 1;
-            
-                    // Check if each word might be a time indication
-                    const timeRegex = /^(\d+)([a-zA-Z]+)$/;
-                    for (let i = 2; i < words.length; i++) {
-                        if (words[i].match(timeRegex)) {
-                            timeStr = words[i];
-                            reason = words.slice(i + 1).join(" ");
-                            break;
-                        }
-                        nameEndIndex = i;  // Extend the name to this word
-                        name = words.slice(1, nameEndIndex + 1).join(" ");
+                    if (words.length < 2 || !words[1].startsWith('@')) {
+                        room.sendAnnouncement("🩸 Por favor, mencione um jogador com '@nomeDoJogador'.", player.id, 0xFF0000, "bold", 2);
+                        return;
                     }
+            
+                    let targetPlayerName = words[1].substring(1).replace(/_/g, ' '); // Remove '@' e substitui underscores por espaços
+                    let reason = words.slice(2).join(" ") || "Sem motivo";
+                    let timeStr = "5m"; // Padrão para 5 minutos	
+            
+                    const timeRegex = /^(\d+)([a-zA-Z]+)$/;
+                    words.slice(2).some(word => {
+                        if (word.match(timeRegex)) {
+                            timeStr = word;
+                            reason = words.slice(words.indexOf(word) + 1).join(" ");
+                            return true; 
+                        }
+                    });
             
                     const match = timeStr.match(timeRegex);
                     if (!match) {
@@ -2530,14 +2569,10 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     const unit = match[2];
                     let muteDuration = 0;
                     switch (unit) {
-                        case "d":
-                            muteDuration = duration * 24 * 60 * 60 * 1000; break;
-                        case "h":
-                            muteDuration = duration * 60 * 60 * 1000; break;
-                        case "m":
-                            muteDuration = duration * 60 * 1000; break;
-                        case "s":
-                            muteDuration = duration * 1000; break;
+                        case "d": muteDuration = duration * 24 * 60 * 60 * 1000; break;
+                        case "h": muteDuration = duration * 60 * 60 * 1000; break;
+                        case "m": muteDuration = duration * 60 * 1000; break;
+                        case "s": muteDuration = duration * 1000; break;
                         default:
                             room.sendAnnouncement("🩸 Formato de tempo inválido.", player.id, 0xFF0000, "bold", 2);
                             return;
@@ -2548,24 +2583,59 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     const localMuteEndTime = new Date(muteEndTime.getTime() - timezoneOffsetMs);
                     const muteEndTimeFormatted = localMuteEndTime.toISOString().slice(0, 19).replace('T', ' ')
             
-                    // Attempt to find the target player and apply mute if exists.
-                    const targetPlayer = room.getPlayerList().find((p: Player) => p.name.toLowerCase() === name.toLowerCase());
+                    // Tenta achar o jogador alvo por menção e aplicar o mute se existir
+                    const targetPlayer = room.getPlayerList().find((p: Player) => p.name.toLowerCase() === targetPlayerName.toLowerCase());
                     if (targetPlayer) {
                         const conn = playerConnections.get(targetPlayer.id);
                         const auth = playerAuth.get(targetPlayer.id);
                         const sqlInsert = `INSERT INTO mutes (name, time, reason, muted_by, conn, auth) VALUES (?, ?, ?, ?, ?, ?)`;
-                        const valuesInsert = [name, muteEndTimeFormatted, reason, player.name, conn, auth];
+                        const valuesInsert = [targetPlayer.name, muteEndTimeFormatted, reason, player.name, conn, auth];
                         con.query(sqlInsert, valuesInsert, (err: any, result: any) => {
                             if (err) throw err;
-                            room.sendAnnouncement(`🩸 Mutado com sucesso!`, player.id, 0xFFA500, "bold");
-                            // Assuming isMuted is a dictionary to track muted status.
+                            room.sendAnnouncement(`🩸 ${targetPlayer.name} mutado com sucesso!`, null, 0xFFA500, "bold");
                             isMuted[targetPlayer.id] = true;
                         });
                     } else {
-                        room.sendAnnouncement("🩸 Jogador não encontrado.", player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement("🩸 Jogador não encontrado.", null, 0xFF0000, "bold", 2);
                     }
                 });
-            }            
+            }
+
+            else if (words[0] === "!clearmutes") {
+                const sql = `SELECT * FROM players WHERE LOWER(name) = LOWER(?)`;
+                const values = [player.name];
+                con.query(sql, values, (err: any, result: any) => {
+                    if (err) throw err;
+                    if (result.length === 0 || !loggedInPlayers[player.id] || !(result[0].ceo || result[0].gerente || result[0].admin || result[0].mod)) {
+                        room.sendAnnouncement("🩸 Você não tem autorização para usar este comando!", player.id, 0xFF0000, "bold", 2);
+                        return;
+                    }
+            
+                    // Execute o comando para limpar a tabela de mutes
+                    con.query(`DELETE FROM mutes`, (err: any, result: any) => {
+                        if (err) throw err;
+                        room.sendAnnouncement(`🩸 Todos os mutes foram limpos com sucesso!`, null, 0xFFA500, "bold");
+                    });
+                });
+            }
+
+            else if (words[0] === "!clearbans") {
+                const sql = `SELECT * FROM players WHERE LOWER(name) = LOWER(?)`;
+                const values = [player.name];
+                con.query(sql, values, (err: any, result: any) => {
+                    if (err) throw err;
+                    if (result.length === 0 || !loggedInPlayers[player.id] || !(result[0].ceo || result[0].gerente || result[0].admin || result[0].mod)) {
+                        room.sendAnnouncement("🩸 Você não tem autorização para usar este comando!", player.id, 0xFF0000, "bold", 2);
+                        return;
+                    }
+            
+                    // Executa o comando para limpar a tabela de bans
+                    con.query(`DELETE FROM bans`, (err: any, result: any) => {
+                        if (err) throw err;
+                        room.sendAnnouncement(`🩸 Todos os bans foram limpos com sucesso!`, player.id, 0xFFA500, "bold");
+                    });
+                });
+            }
             
             
             else if (words[0] === "!prev") {

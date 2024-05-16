@@ -1185,7 +1185,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     //             Função AFK a meio do jogo            //
 
     const activities: { [key: string]: number } = {}; // Verificar quando foi a última atividade.
-    var AFKTimeout = 12000; // 10 segundos afk = kick
+    var AFKTimeout = 1200000; // 10 segundos afk = kick
     let lastWarningTime: number = 0; // Mandar avisos de kick
 
     function afkKick() {
@@ -3034,18 +3034,24 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
     function isGk() {
         let players = room.getPlayerList();
-        let min = players[0];
-        min.position = { x: room.getBallPosition().x }
+        if (!players.length) return [];  // Retorna vazio caso não haja jogadores
+    
+        // Inicialize min e max com base no primeiro jogador com uma posição definida.
+        let min = players.find((p: Player) => p.position !== null);
         let max = min;
-
-        for (let i = 0; i < players.length; i++) {
-            if (players[i].position != null) {
-                if (min.position.x > players[i].position.x) min = players[i];
-                if (max.position.x < players[i].position.x) max = players[i];
+    
+        if (!min) return [];  // Retorna vazio se não houver posições de jogadores definidas.
+    
+        players.forEach((player: Player) => {
+            if (player.position !== null) {
+                if (player.position.x < min.position.x) min = player;
+                if (player.position.x > max.position.x) max = player;
             }
-        }
-        return [min, max]
+        });
+    
+        return [min, max];  // Retorna os jogadores mais à esquerda e à direita
     }
+    
 
     function handleAssistsAndGoals() {
         let players = room.getPlayerList();

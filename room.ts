@@ -1290,7 +1290,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     //             Função AFK a meio do jogo            //
 
     const activities: { [key: string]: number } = {}; // Verificar quando foi a última atividade.
-    var AFKTimeout = 1200000; // 10 segundos afk = kick
+    var AFKTimeout = 12000; // 10 segundos afk = kick
     let lastWarningTime: number = 0; // Mandar avisos de kick
 
     function afkKick() {
@@ -2927,7 +2927,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             return false;
                         } else {
                             room.setPlayerTeam(teamS[Number.parseInt(words[0]) - 1].id, Team.BLUE);
-                            room.sendAnnouncement(player.name + "  " + teamS[Number.parseInt(words[0]) - 1].name + "!", null, 0xFF0000, 'bold');
+                            room.sendAnnouncement(player.name + " escolheu " + teamS[Number.parseInt(words[0]) - 1].name + "!", null, 0xFF0000, 'bold');
                             return false;
                         }
                     }

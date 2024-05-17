@@ -2760,6 +2760,10 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 });
             }
 
+            else if (words[0] == "!provocacoes" || words[0] === "!provos" || words[0] === "!prov") {
+                room.sendAnnouncement('!oe, !izi, !red, !blue, !paired, !paiblue, !ifood, !chora, !bolso, !divisao, !seupai, !pega, !quentin, !arn, !cag, !dmr, !fran, !furo, !grl, !ini', player.id, 0x39E63C, "bold")
+            }
+
             // ---------- PROVOCAÇÕES ------------//
 
             else if (words[0] === "!arn") {

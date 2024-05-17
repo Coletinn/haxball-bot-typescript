@@ -2295,11 +2295,11 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 }
                 // Comando Streak
             } 
-            else if (words[0] === "!streak") {
+            else if (words[0] === "!sequencia") {
                 room.sendAnnouncement(`🏆 ${player.name} a streak atual da sala é de ${winstreak} jogos para a equipe 🔴!`, player.id, 0xFFFFFF, "bold");
                 // Comando Top Streak
             } 
-            else if (words[0] === "!topstreak") {
+            else if (words[0] === "!topsequencia") {
                 const sql = `SELECT * FROM streak ORDER BY games DESC LIMIT 1`;
                 con.query(sql, (err: any, result: any) => {
                     if (err) throw err;
@@ -2761,70 +2761,70 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             }
 
             else if (words[0] == "!provocacoes" || words[0] === "!provos" || words[0] === "!prov") {
-                room.sendAnnouncement('!oe, !izi, !red, !blue, !paired, !paiblue, !ifood, !chora, !bolso, !divisao, !seupai, !pega, !quentin, !arn, !cag, !dmr, !fran, !furo, !grl, !ini', player.id, 0x39E63C, "bold")
+                room.sendAnnouncement('Provocações: !oe, !izi, !red, !blue, !paired, !paiblue, !ifood, !chora, !bolso, !divisao, !seupai, !pega, !quentin, !arn, !cag, !dmr, !fran, !furo, !grl, !ini', player.id, 0xFFFFFF, "bold")
             }
 
             // ---------- PROVOCAÇÕES ------------//
 
             else if (words[0] === "!arn") {
-                room.sendAnnouncement(`Pode isso, Arnaldo? 🤔`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: Pode isso, Arnaldo? 🤔`, null, 0x39E63C, "bold");
             }
-            else if (words[0] === "cag") {
-                room.sendAnnouncement(`'Cagada 💩'`, null, 0x39E63C, "bold");
+            else if (words[0] === "!cag") {
+                room.sendAnnouncement(`${player.name} provocou: Cagada 💩`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!dmr") {
-                room.sendAnnouncement(`'Demora mais!!! 🙄`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: Demora mais!!! 🙄`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!fran") {
-                room.sendAnnouncement(`Frango! 🐔`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: Frango! 🐔`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!furo") {
-                room.sendAnnouncement(`Mustela putorius furo, o Furão! 🦦`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: Mustela putorius furo, o Furão! 🦦`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!grl") {
-                room.sendAnnouncement(`Gorila é sinistro 🦍`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: Gorila é sinistro 🦍`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!ini") {
-                room.sendAnnouncement(`Inimigo do gol! 👹`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: Inimigo do gol! 👹`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!oe") {
-                room.sendAnnouncement(`OEEE! Virou Space Bounce! 😅😅`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: OEEE! Virou Space Bounce! 😅😅`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!red") {
-                room.sendAnnouncement(`Esse era o RED?`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: Esse era o RED?`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!blue") {
-                room.sendAnnouncement(`Esse era o BLUE?`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: Esse era o BLUE?`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!divisao") {
-                room.sendAnnouncement(`EU SOU O PROBLEMA DA DIVISÃO!!!`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: EU SOU O PROBLEMA DA DIVISÃO!!!`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!paired") {
-                room.sendAnnouncement(`EU = PAI DO RED𝗞𝗞𝗞𝗞𝗞𝗞🤣😂🤣😂`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: EU = PAI DO RED𝗞𝗞𝗞𝗞𝗞𝗞🤣😂🤣😂`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!paiblue") {
-                room.sendAnnouncement(`EU = PAI DO BLUE𝗞𝗞𝗞𝗞𝗞𝗞🤣😂🤣😂`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: EU = PAI DO BLUE𝗞𝗞𝗞𝗞𝗞𝗞🤣😂🤣😂`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!ifood") {
-                room.sendAnnouncement(`Olha o ifood! foi aqui que pediram a entrega?`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: Olha o ifood! foi aqui que pediram a entrega?`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!chora") {
-                room.sendAnnouncement(`CHORA NÃO BEBÊ, SE QUISER CHORAR VAI PRA MATERNIDADE❗👶🏼🍼`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: CHORA NÃO BEBÊ, SE QUISER CHORAR VAI PRA MATERNIDADE❗👶🏼🍼`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!bolso") {
-                room.sendAnnouncement(`Sai do meu bolso ai, ta incomodando.`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: Sai do meu bolso ai, ta incomodando.`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!seupai") {
-                room.sendAnnouncement(`Chora não!!!! Ja pode me registrar como seu pai.`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: Chora não!!!! Ja pode me registrar como seu pai.`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!pega") {
-                room.sendAnnouncement(`QUERO VER PEGAR ESSA PORRA!!!`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: QUERO VER PEGAR ESSA PORRA!!!`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!izi") {
-                room.sendAnnouncement(`TEM COMO AUMENTAR O NÍVEL? TÁ MUITO EASY!`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: TEM COMO AUMENTAR O NÍVEL? TÁ MUITO EASY!`, null, 0x39E63C, "bold");
             }
             else if (words[0] === "!quentin") {
-                room.sendAnnouncement(`TÁ QUENTINHO AÍ? MEU BOLSO É DE VELUDO!`, null, 0x39E63C, "bold");
+                room.sendAnnouncement(`${player.name} provocou: TÁ QUENTINHO AÍ? MEU BOLSO É DE VELUDO!`, null, 0x39E63C, "bold");
             }
             
             
@@ -2848,7 +2848,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 // Comando help
             } else if (words[0] === "!help" || words[0] === "!ajuda" || words[0] === "!comandos" || words[0] === "!commands") {
                 if (words.length === 1) {
-                    const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!streak", "!topstreak", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists"];
+                    const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!sequencia", "!topsequencia", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists", "!provos"];
                     const adminCommands = ["!ban", "!mute", "!rr2", "!setvip <1, 2 ou 3>"]
 
                     room.sendAnnouncement(`📃 Comandos: ${commands.join(", ")}`, player.id, 0xFF0000, "bold");

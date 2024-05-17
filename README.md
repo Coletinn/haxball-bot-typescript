@@ -53,8 +53,8 @@
 - !stats: Mostra-te as tuas estátisticas ou as de outro jogador. `(!stats)` ou `(!stats NOME)`
 - !rank: Mostra-te os ranks que podes obter na sala.
 - t: Faz t Mensagem para enviar uma mensagem para a tua equipa (Red ou Blue).
-- !streak: Mostra-te a streak atual da sala.
-- !topstreak: Mostra-te o recorde de streak da sala.
+- !sequencia: Mostra-te a streak atual da sala.
+- !topsequencia: Mostra-te o recorde de streak da sala.
 - !prev: Dá-te a previsão de vitória para o jogo atual.
 - #: Envia mensagem privada para o jogador à tua escolha através da sua ID. `(ex. #50 teste)`
 - !bb: Faz logout da sala ( é o mesmo que simplesmente sair ).

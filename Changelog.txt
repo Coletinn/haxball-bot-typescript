@@ -76,7 +76,7 @@ V1.1.0
 - Se o usuário tentar usar o comando !gk e o mesmo já se encontrar a GK apresentará agora um erro ao mesmo.
 - Agora os jogadores que joguem à baliza e consigam um CS recebem um valor bónus de elo.
 - Sistema de winstreak adicionado. ( SUPER Requisitado ‼️‼️ )
-- Comandos !streak e !topstreak adicionados para complementar o sistema de winstreak.
+- Comandos !sequencia e !topsequencia adicionados para complementar o sistema de winstreak.
 
 V1.1.1
 - Correção de um problema no novo sistema de quem ganha vai para a RED, que por vezes não colocava os jogadores na equipa correta.
@@ -178,7 +178,7 @@ V1.2.17
 V1.3.0
 - Comando !prev adicionado para verificar a previsão de vitória entre ambas as equipas.
 - Mensagem automática que aparece de 5 em 5 minutos foi complementada com mais informações.
-- Sempre que a !topstreak for batida uma mensagem vai aparecer no chat a anunciar o mesmo.
+- Sempre que a !topsequencia for batida uma mensagem vai aparecer no chat a anunciar o mesmo.
 - Texto do !help afk ajustado para melhorar a informação que transmite.
 - Introdução das mensagens privadas, ver #comandos para perceber como se envia as mesmas.
 - Caso o jogador não estivesse com login efetuado e enviasse mensagem no Team Chat dos spectators a mensagem era enviada sem problema, esse problema foi corrigido.

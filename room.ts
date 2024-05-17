@@ -55,6 +55,111 @@ export let roomErrorsChannel: string | null = null;
 export let roomEntradasChannel: string | null = null;
 export let roomStatusChannel: string | null = null;
 
+var provos = {
+    '!ali': 'Alisa meu pelo 🐆',
+    '!arn': 'Pode isso, Arnaldo? 🤔',
+    '!cag': 'Cagada 💩',
+    '!calc': '📊📐❌➕📚➗ = Calculado',
+    '!cham': 'Chama 🔥',
+    '!chu': 'Chuta!! 👟',
+    '!dig': 'Digita mais 🤓',
+    '!dmr': 'Demora mais!!! 🙄',
+    '!faz': 'Faz... 🤲',
+    '!fal': 'Foi falta!! 🚑',
+    '!fran': 'Frango! 🐔',
+    '!fran2': 'Franguei 🐓',
+    '!frio': 'Frio 🥶',
+    '!fru': 'Mustela putorius furo, o Furão! 🦦',
+    '!gira': 'Gira a bola! 🤹‍♂️',
+    '!glç': 'Que golaço! ⚽ ',
+    '!grl': 'Gorila é sinistro 🦍',
+    '!ini': 'Inimigo do gol! 👹',
+    '!lad': 'Ladrão! 😠',
+    '!lç': 'LAÇO 🎀',
+    '!mar': 'Marca! 🤼‍♂️',
+    '!olho': 'Olho no lance! 👁️',
+    '!olhu': 'OLHUGOL, OLHUGOL 🥅',
+    '!pç': 'Paçe 🦵',
+    '!pick': 'Pickford! 🙌',
+    '!pint': 'Uma pintura!! 👨‍🎨🖼️',
+    '!pip': 'Olha a pipoca! 🍿',
+    '!proi': 'Proibido fazer gol!! 🚫',
+    '!ptz': 'Putz... 🤦',
+    '!sap': 'Que sapatada!!! 🥾',
+    '!sdg': 'Sai do gol, GK!!!',
+    '!ski': 'Skills and tricks 🏄🏾‍♀️',
+    '!siu': 'SIUUUUU 👐',
+    '!taf': 'Sai que é sua Taffarel!!! 🙌',
+    '!tira': 'Tira, zaga! 🙅‍♂️',
+    '!tnc': 'Tomar nescau! 🥤',
+    '!ui': 'UI! 😲',
+    '!ui2': '( ͡° ͜ʖ ͡°)',
+    '!uu': 'UUUU... 😯',
+    '!vira': 'Virada 🔀',
+    '!volt': 'Volta pra defesa! 👉',
+    '!vl': 'Alguém VL? 👇',
+    '!x': 'Aperta ✖ ❕❕',
+    '!zag': 'Cadê a zaga? 👨🏼‍🦯 ', 
+    '!zen': 'Zen 🧘',
+    '!divisao': 'EU SOU O PROBLEMA DA DIVISÃO!!!',
+    '!quentin': 'TÁ QUENTINHO AÍ? MEU BOLSO É DE VELUDO!',
+    '!logica': 'DEU A LÓGICA...',
+    '!base': 'VAI DE BASE ',
+    '!meto2': 'Eu meto mesmo!',
+    '!boa': 'Boa time!👊',
+    '!bai': 'Baila!💃',
+    '!bag': 'Bagre!🐟', 
+    '!bike': 'De bike!!!🚲',
+    '!bch': 'Belo chute!👏',
+    '!bpa': 'Belo passe!👏',
+    '!brb': 'Brabo😈', 
+    '!cal': 'Calma, pô!✨',
+    '!fome': 'Hmmm que fominha...😋',
+    '!fds': 'FDS!! Um ótimo final de semana!😎',
+    '!jlu': 'Joga a luva, goleirão!🧤',
+    '!itk': 'Alguém GK? Intankável...🚙🚫',
+    '!fzl': 'Faz o L!🙋‍♂️',
+    '!gen': 'Seja gentil fdm👨‍🏫',
+    '!kk': 'KKKKKKKKKKKKKKKKKKKK!🤣',
+    '!lae': 'La ele🖊️',
+    '!puskas': 'Esse é puskas!',
+    '!bolso': 'Sai do meu bolso ai, ta incomodando.',
+    '!pika': 'HAHAHAHA, ele é pik@',
+    '!papai': 'Ai papaii!',
+    '!seupai': 'Chora não!!!! Ja pode me registrar como seu pai.',
+    '!peganunca': 'Pega nunk!!',
+    '!quentin2': 'Tá quentinho ai????',
+    '!izi': 'TEM COMO AUMENTAR O NÍVEL? TÁ MUITO EASY!',
+    '!piden': 'Ei Piden, vai tomar no c*, filha da put@!',
+    '!qsl': 'Ei Qsl, vai tomar no c*, filha da put@!',
+    '!system': 'Ei System, vai tomar no c*, filha da put@!',
+    '!oi': 'Oie ♥️',
+    '!toma': 'Quem não faz... toma!',
+    '!ifood': 'Olha o ifood! foi aqui que pediram a entrega?',
+    '!chute': 'QUE CHUTE FOI ESSE? LÁ ONDE A CORUJA DORME!',
+    '!moscou': 'CAPITAL DA RUSSIA É MOSCOW E COM NÓS NÃO PODE MOSCAR. rs 😎',
+    '!chora': 'CHORA NÃO BEBÊ, SE QUISER CHORAR VAI PRA MATERNIDADE❗👶🏼🍼',
+    '!red': 'Esse era o RED?',
+    '!blue': 'Esse era o BLUE?',
+    '!paired': 'EU = PAI DO RED𝗞𝗞𝗞𝗞𝗞𝗞🤣😂🤣😂',
+    '!paiblue': 'EU = PAI DO BLUE𝗞𝗞𝗞𝗞𝗞𝗞🤣😂🤣😂',
+    '!pegala': 'PEGA LÁ GOLEIRÃO 𝗞𝗞𝗞𝗞𝗞𝗞👟⚽🥅😅',
+    '!perdoa': 'ELE NãO PERDOA C4R4LH0❗❗❗',
+    '!perdoa2': 'NÓS NÃO PERDOA NÃO, VIU❓❗😁',
+    '!receba': 'RECEBA C4R4LH0❗😤😤😤',
+    '!meto': 'EU METO MESMO!!!',
+    '!pega': 'QUERO VER PEGAR ESSA PORRA!!!',
+    '!toca2': 'Toca no pae e descansa...', 
+    '!toca': 'Toca a bola!! 🦶',
+    '!gk': 'Alguém GK?',
+    '!gk2': 'ACORDA GOLEIRÃO!!!',
+    '!gk3': 'Ui, pega la Gk',
+    '!gk4': 'O GK aqui sou eu! ⛹️‍♀️',
+    '!gk5': 'Boa GK! ⛹️‍♀️',
+    '!bobiu': 'BOBIU tomou ᵒᵗᵃ́ʳᶦᵒ. 𝗞𝗞𝗞𝗞𝗞𝗞🤣😂😅',
+    '!oe': 'OEEE! Virou Space Bounce! 😅😅',
+}
+
 //Tudo que precisar de conexão com a database deve ser colocado abaixo desta linha.
 //TODO: Mover tudo de DB para outro lugar futuramente
 import { uniformes, EquipeUniforme } from './src/Room/Config/uniformes';
@@ -879,7 +984,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     var timeOutCap: NodeJS.Timeout;
     var redCaptainChoice: string = "";
     var blueCaptainChoice: string = "";
-    var chooseTime: number = 20;
+    var chooseTime: number = 12;
 
     function updateRoleOnPlayerIn() {
         updateTeams();
@@ -1185,7 +1290,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     //             Função AFK a meio do jogo            //
 
     const activities: { [key: string]: number } = {}; // Verificar quando foi a última atividade.
-    var AFKTimeout = 12000; // 10 segundos afk = kick
+    var AFKTimeout = 1200000; // 10 segundos afk = kick
     let lastWarningTime: number = 0; // Mandar avisos de kick
 
     function afkKick() {
@@ -2353,7 +2458,25 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     }
                 });
             }
-                        
+
+
+            else if (words[0] === "!gk") {
+                // Coloca status de GK no jogador que digitou o comando
+                if (player.team === 1) {  // Equipe RED
+                    gk[0] = player;  // Atualiza o GK do Red
+                    room.sendAnnouncement(`🔴 ${player.name} é agora o GK do Red!`, null, 0xFFFFFF, "bold", 0);
+                } 
+                else if (player.team === 2) {  // Equipe BLUE
+                    gk[1] = player;  // Atualiza o GK do Blue
+                    room.sendAnnouncement(`🔵 ${player.name} é agora o GK do Blue!`, null, 0xFFFFFF, "bold", 0);
+                } 
+                else {
+                    // Se o jogador não está em uma equipe, envia uma mensagem de erro
+                    room.sendAnnouncement(`Você precisa estar em uma equipe para ser o GK.`, player.id, 0xFF0000, "bold", 0);
+                }
+                return false;
+            }
+
             
             else if (words[0] === "!unmute") {
                 // Verifica se o jogador tem permissão para usar o comando
@@ -2636,6 +2759,69 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     });
                 });
             }
+
+            // ---------- PROVOCAÇÕES ------------//
+
+            else if (words[0] === "!arn") {
+                room.sendAnnouncement(`Pode isso, Arnaldo? 🤔`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "cag") {
+                room.sendAnnouncement(`'Cagada 💩'`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!dmr") {
+                room.sendAnnouncement(`'Demora mais!!! 🙄`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!fran") {
+                room.sendAnnouncement(`Frango! 🐔`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!furo") {
+                room.sendAnnouncement(`Mustela putorius furo, o Furão! 🦦`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!grl") {
+                room.sendAnnouncement(`Gorila é sinistro 🦍`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!ini") {
+                room.sendAnnouncement(`Inimigo do gol! 👹`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!oe") {
+                room.sendAnnouncement(`OEEE! Virou Space Bounce! 😅😅`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!red") {
+                room.sendAnnouncement(`Esse era o RED?`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!blue") {
+                room.sendAnnouncement(`Esse era o BLUE?`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!divisao") {
+                room.sendAnnouncement(`EU SOU O PROBLEMA DA DIVISÃO!!!`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!paired") {
+                room.sendAnnouncement(`EU = PAI DO RED𝗞𝗞𝗞𝗞𝗞𝗞🤣😂🤣😂`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!paiblue") {
+                room.sendAnnouncement(`EU = PAI DO BLUE𝗞𝗞𝗞𝗞𝗞𝗞🤣😂🤣😂`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!ifood") {
+                room.sendAnnouncement(`Olha o ifood! foi aqui que pediram a entrega?`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!chora") {
+                room.sendAnnouncement(`CHORA NÃO BEBÊ, SE QUISER CHORAR VAI PRA MATERNIDADE❗👶🏼🍼`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!bolso") {
+                room.sendAnnouncement(`Sai do meu bolso ai, ta incomodando.`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!seupai") {
+                room.sendAnnouncement(`Chora não!!!! Ja pode me registrar como seu pai.`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!pega") {
+                room.sendAnnouncement(`QUERO VER PEGAR ESSA PORRA!!!`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!izi") {
+                room.sendAnnouncement(`TEM COMO AUMENTAR O NÍVEL? TÁ MUITO EASY!`, null, 0x39E63C, "bold");
+            }
+            else if (words[0] === "!quentin") {
+                room.sendAnnouncement(`TÁ QUENTINHO AÍ? MEU BOLSO É DE VELUDO!`, null, 0x39E63C, "bold");
+            }
             
             
             else if (words[0] === "!prev") {
@@ -2681,6 +2867,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             return false; // Não enviar comandos para o chat geral.
         }
 
+
         const words = message.split(" ");
         if (teamR.length != 0 && teamB.length != 0 && inChooseMode) { //choosing management
             if (player.id == teamR[0].id || player.id == teamB[0].id) { // we care if it's one of the captains choosing
@@ -2689,20 +2876,20 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         room.setPlayerTeam(teamS[0].id, Team.RED);
                         redCaptainChoice = "top";
                         clearTimeout(timeOutCap);
-                        room.sendAnnouncement(player.name + " escolheu Top!", 0xFF0000, 'bold');
+                        room.sendAnnouncement(player.name + " escolheu Top!", null, 0xFF0000, 'bold');
                         return false;
                     } else if (["random", "rand"].includes(words[0].toLowerCase())) {
                         var r = getRandomInt(teamS.length);
                         room.setPlayerTeam(teamS[r].id, Team.RED);
                         redCaptainChoice = "random";
                         clearTimeout(timeOutCap);
-                        room.sendAnnouncement(player.name + " escolheu Random!", 0xFF0000, 'bold');
+                        room.sendAnnouncement(player.name + " escolheu Random!", null, 0xFF0000, 'bold');
                         return false;
                     } else if (["bottom", "bot"].includes(words[0].toLowerCase())) {
                         room.setPlayerTeam(teamS[teamS.length - 1].id, Team.RED);
                         redCaptainChoice = "bottom";
                         clearTimeout(timeOutCap);
-                        room.sendAnnouncement(player.name + " escolheu Bottom!", 0xFF0000, 'bold');
+                        room.sendAnnouncement(player.name + " escolheu Bottom!", null, 0xFF0000, 'bold');
                         return false;
                     } else if (!Number.isNaN(Number.parseInt(words[0]))) {
                         if (Number.parseInt(words[0]) > teamS.length || Number.parseInt(words[0]) < 1) {
@@ -2710,7 +2897,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             return false;
                         } else {
                             room.setPlayerTeam(teamS[Number.parseInt(words[0]) - 1].id, Team.RED);
-                            room.sendAnnouncement(player.name + " escolheu " + teamS[Number.parseInt(words[0]) - 1].name + "!", 0xFF0000, 'bold');
+                            room.sendAnnouncement(player.name + " escolheu " + teamS[Number.parseInt(words[0]) - 1].name + "!", null, 0xFF0000, 'bold');
                             return false;
                         }
                     }
@@ -2720,19 +2907,19 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         room.setPlayerTeam(teamS[0].id, Team.BLUE);
                         blueCaptainChoice = "top";
                         clearTimeout(timeOutCap);
-                        room.sendAnnouncement(player.name + " escolheu Top!", 0xFF0000, 'bold');
+                        room.sendAnnouncement(player.name + " escolheu Top!", null, 0xFF0000, 'bold');
                         return false;
                     } else if (["random", "rand"].includes(words[0].toLowerCase())) {
                         room.setPlayerTeam(teamS[getRandomInt(teamS.length)].id, Team.BLUE);
                         blueCaptainChoice = "random";
                         clearTimeout(timeOutCap);
-                        room.sendAnnouncement(player.name + " escolheu Random!", 0xFF0000, 'bold');
+                        room.sendAnnouncement(player.name + " escolheu Random!", null, 0xFF0000, 'bold');
                         return false;
                     } else if (["bottom", "bot"].includes(words[0].toLowerCase())) {
                         room.setPlayerTeam(teamS[teamS.length - 1].id, Team.BLUE);
                         blueCaptainChoice = "bottom";
                         clearTimeout(timeOutCap);
-                        room.sendAnnouncement(player.name + " escolheu Bottom!", 0xFF0000, 'bold');
+                        room.sendAnnouncement(player.name + " escolheu Bottom!", null, 0xFF0000, 'bold');
                         return false;
                     } else if (!Number.isNaN(Number.parseInt(words[0]))) {
                         if (Number.parseInt(words[0]) > teamS.length || Number.parseInt(words[0]) < 1) {
@@ -2740,7 +2927,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             return false;
                         } else {
                             room.setPlayerTeam(teamS[Number.parseInt(words[0]) - 1].id, Team.BLUE);
-                            room.sendAnnouncement(player.name + "  " + teamS[Number.parseInt(words[0]) - 1].name + "!", 0xFF0000, 'bold');
+                            room.sendAnnouncement(player.name + "  " + teamS[Number.parseInt(words[0]) - 1].name + "!", null, 0xFF0000, 'bold');
                             return false;
                         }
                     }
@@ -3091,7 +3278,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     room.sendAnnouncement(`📊 Previsão de Vitória: 🔴 ${team1Chance.toFixed(2)}% chance de vencer contra 🔵 ${team2Chance.toFixed(2)}% chance de vencer.`, null, 0xFFFFFF, "bold", 0);
                     if (redTeam.length >= 2 && blueTeam.length >= 2) {
                         gk = isGk();
-                        //room.sendAnnouncement("🔴 GK: " + gk[0].name + ", 🔵 GK: " + gk[1].name + ", se for necessário trocar faz !gk", null, 0xFFFFFF, "bold", 0);
+                        room.sendAnnouncement("🔴 GK do red: " + gk[0].name + ", 🔵 GK do blue: " + gk[1].name + ", se for necessário trocar digite !gk", null, 0xFFFFFF, "bold", 0);
                     }
                 }
             }

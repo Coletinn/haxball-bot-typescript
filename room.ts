@@ -9,10 +9,10 @@ import { con, getConexaoEstabelecida } from './src/Room/Config/dbConnection';
 const HaxballJS = require("haxball.js");
 const bcrypt = require('bcrypt');
 const fs = require("fs");
-const NoGoal = fs.readFileSync('./stadiums/nogoal.hbs', 'utf8'); // Mapa 1
-const Aquecimento = fs.readFileSync('./stadiums/Aquecimento.hbs', 'utf8'); // Mapa 2
-const nomeMapa = process.env.mapa ?? 'x3'
-const Mapa = fs.readFileSync(`./stadiums/${nomeMapa}.hbs`, 'utf8'); // Mapa 3
+
+const x2Map = fs.readFileSync('./stadiums/x2.hbs', 'utf8');
+const x3Map = fs.readFileSync('./stadiums/x3.hbs', 'utf8');
+
 const readline = require('readline');
 const config = require('./config.json');
 const FormData = require('form-data');
@@ -480,7 +480,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             if (err) throw err;
         });
         console.log(link);
-        room.setCustomStadium(Mapa); // Carregar estádio.
+        organizedMap(0);
         console.log(`Sala iniciada com sucesso, se quiser encerrar a sala digite: Ctrl + C`);
 
         if (roomStatusChannel !== null) {
@@ -498,6 +498,28 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             client.send(roomStatusChannel, [embed], true);
         }
     };
+
+    // Ensure the correct TypeScript type is used
+    async function organizedMap(players: number) {
+        if (players == null || players < 0) {
+            console.error('Invalid player count: "players" must be a non-negative number.');
+            return;
+        }
+
+        // Handling for smaller rooms
+        if (players < 6) {
+            room.setCustomStadium(x2Map);  // Assumes x2Map is a smaller or default map
+            console.log(`🚧 Mapa de x2 colocado!`);
+        }
+        // Handling for larger rooms
+        else if (players >= 6) {
+            room.setCustomStadium(x3Map);
+            console.log(`🚧 Mapa de x3 colocado!`);
+        }
+    }
+
+
+
 
     var rankTag: any = [];
     var vipPausou: any = [];
@@ -1290,7 +1312,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     //             Função AFK a meio do jogo            //
 
     const activities: { [key: string]: number } = {}; // Verificar quando foi a última atividade.
-    var AFKTimeout = 12000; // 10 segundos afk = kick
+    var AFKTimeout = 1200000; // 10 segundos afk = kick
     let lastWarningTime: number = 0; // Mandar avisos de kick
 
     function afkKick() {
@@ -3435,6 +3457,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     //                      Quando o jogo começa                    //
 
     room.onGameStart = () => {
+        organizedMap(players.length);
+
         endGameVariable = false;
         gameState = State.PLAY;
 
@@ -3534,6 +3558,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
     room.onGameStop = () => {
         sendRecordToDiscord(room.stopRecording());
+        organizedMap(players.length);
         // Limpar GK's
         gk = [null, null];
         executed = false;
@@ -3543,7 +3568,6 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
         gameState = State.STOP;
 
-        const players = room.getPlayerList();
         for (const player of players) {
             handleRanks(player); // Definir avatares.
         }

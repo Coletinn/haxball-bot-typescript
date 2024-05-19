@@ -480,8 +480,9 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             if (err) throw err;
         });
         console.log(link);
-        organizedMap(0);
         console.log(`Sala iniciada com sucesso, se quiser encerrar a sala digite: Ctrl + C`);
+
+        room.setCustomStadium(x3Map);
 
         if (roomStatusChannel !== null) {
             let responseMessage = `Dados da sala:\n${link}\n`;
@@ -499,27 +500,24 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         }
     };
 
-    // Ensure the correct TypeScript type is used
-    async function organizedMap(players: number) {
-        if (players == null || players < 0) {
-            console.error('Invalid player count: "players" must be a non-negative number.');
-            return;
-        }
-
-        // Handling for smaller rooms
-        if (players < 6) {
-            room.setCustomStadium(x2Map);  // Assumes x2Map is a smaller or default map
-            console.log(`🚧 Mapa de x2 colocado!`);
-        }
-        // Handling for larger rooms
-        else if (players >= 6) {
-            room.setCustomStadium(x3Map);
-            console.log(`🚧 Mapa de x3 colocado!`);
+    function organizedMap() {
+        const playerCount = room.getPlayerList().length;
+        console.log(`Verificando mapa a colocar... Jogadores na sala: ${playerCount}`);
+    
+        try {
+            if (playerCount < 6) {
+                room.setCustomStadium(x2Map);
+                console.log('Alterado para mapa de x2.');
+            } 
+            else if (playerCount >= 6) {
+                room.setCustomStadium(x3Map);
+                console.log('Alterado para mapa de x3.');
+            }
+        } 
+        catch (error) {
+            console.error('Erro ao alterar o mapa:', error);
         }
     }
-
-
-
 
     var rankTag: any = [];
     var vipPausou: any = [];
@@ -3457,8 +3455,6 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     //                      Quando o jogo começa                    //
 
     room.onGameStart = () => {
-        organizedMap(players.length);
-
         endGameVariable = false;
         gameState = State.PLAY;
 
@@ -3558,7 +3554,6 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
     room.onGameStop = () => {
         sendRecordToDiscord(room.stopRecording());
-        organizedMap(players.length);
         // Limpar GK's
         gk = [null, null];
         executed = false;

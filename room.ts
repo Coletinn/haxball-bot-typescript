@@ -2662,14 +2662,19 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             else if (words[0] === "!bet" || words[0] === "!apostar") {
                 const currentTime = new Date();
                 const timeDiff = (currentTime.getTime() - matchStartTime.getTime()) / 1000; // time difference in seconds
+                
+                if (player.team === 1 || player.team === 2) {
+                    room.sendAnnouncement(`💰 ${player.name} Jogadores que estão em um time não podem apostar.`, player.id, 0xFF0000, "bold", 2);
+                    return false;
+                }
 
                 if (timeDiff > 15) {
-                    room.sendAnnouncement(`🩸 ${player.name} Só é permitido apostar nos primeiros 15 segundos da partida.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`💰 ${player.name} Só é permitido apostar nos primeiros 15 segundos da partida.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
                 if (numberOfPlayers < 6) {
-                    room.sendAnnouncement(`🩸 ${player.name} Precisa ter 6 jogadores na sala para apostar.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`💰 ${player.name} Precisa ter 6 jogadores na sala para apostar.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
             
@@ -2677,7 +2682,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 const betValue = parseInt(words[2]);
             
                 if (!betTeam || isNaN(betValue) || (betTeam !== "red" && betTeam !== "blue")) {
-                    room.sendAnnouncement(`🩸 ${player.name} Formato inválido. Use: !bet [red/blue] [valor] ou !apostar [red/blue] [valor]`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`💰 ${player.name} Formato inválido. Use: !bet [red/blue] [valor] ou !apostar [red/blue] [valor]`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
             
@@ -2686,7 +2691,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 con.query(`SELECT id, balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
                     if (result.length === 0) {
-                        room.sendAnnouncement(`🩸 ${player.name} Você precisa registrar para poder apostar.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`💰 ${player.name} Você precisa registrar para poder apostar.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
             
@@ -2694,7 +2699,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     const playerBalance = result[0].balance;
             
                     if (playerBalance < betValue) {
-                        room.sendAnnouncement(`🩸 ${player.name} Você não tem dinheiro suficiente para apostar.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`💰 ${player.name} Você não tem Atacoins suficiente para apostar.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
             
@@ -2702,7 +2707,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     con.query(`SELECT * FROM bets WHERE player_id = ? AND room_id = ?`, [playerId, process.env.room_id], (err: any, existingBets: any) => {
                         if (err) throw err;
                         if (existingBets.length > 0) {
-                            room.sendAnnouncement(`🩸 ${player.name} Você já fez uma aposta nesse jogo.`, player.id, 0xFF0000, "bold", 2);
+                            room.sendAnnouncement(`💰 ${player.name} Você já fez uma aposta nesse jogo.`, player.id, 0xFF0000, "bold", 2);
                             return false;
                         }
             
@@ -2714,7 +2719,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             con.query(`INSERT INTO bets (player_id, team, value, room_id) VALUES (?, ?, ?, ?)`, [playerId, teamValue, betValue, process.env.room_id], (err: any) => {
                                 if (err) throw err;
             
-                                room.sendAnnouncement(`🩸 ${player.name} apostou ${betValue} atacoins no time ${betTeam.toUpperCase()}.`, null, 0x00FF00, "bold", 2);
+                                room.sendAnnouncement(`💰 ${player.name} apostou ${betValue} atacoins no time ${betTeam.toUpperCase()}.`, null, 0xD4CE22, "bold", 2);
                             });
                         });
                     });
@@ -2727,7 +2732,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
                     if (result.length === 0) {
-                        room.sendAnnouncement(`🩸 ${player.name} Você precisa se registrar para ter um saldo.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`💰 ${player.name} Você precisa se registrar para ter um saldo.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
                     
@@ -3415,13 +3420,25 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
     room.onGameStart = () => {
         matchStartTime = new Date();
-
-        room.sendAnnouncement("⚽ Apostas permitidas por 15 segundos!", null, 0x00FF00, "bold", 0);
-        room.sendAnnouncement("⚽ Para apostar digite !bet [red/blue] [valor]", null, 0x00FF00, "bold", 0);
-        room.sendAnnouncement("⚽ Para ver seus atacoins digite !saldo ou !meusaldo", null, 0x00FF00, "bold", 0);
-
+    
+        room.pauseGame(true);
+        room.sendAnnouncement(`💰 Jogo pausado por 5 segundos para as apostas.`, null, 0xD4CE22, "bold", 2);
+    
+        setTimeout(function () {
+            room.pauseGame(false);
+        }, 5000);
+    
+        room.sendAnnouncement("💰 Apostas permitidas por 15 segundos!", null, 0xD4CE22, "bold", 0);
+        room.sendAnnouncement("💰 Para apostar digite !bet [red/blue] [valor]", null, 0xD4CE22, "bold", 0);
+        room.sendAnnouncement("💰 Para ver seus Atacoins digite !saldo ou !meusaldo", null, 0xD4CE22, "bold", 0);
+    
         endGameVariable = false;
         gameState = State.PLAY;
+    
+        // Agendar o envio da mensagem após 15 segundos
+        setTimeout(() => {
+            room.sendAnnouncement("💰 Apostas encerradas! [💰]", null, 0xD4CE22, 'bold');
+        }, 15000);  // 15000 milissegundos equivalem a 15 segundos
 
         // Definir constantes
         const team1Players = room.getPlayerList().filter((p: any) => p.team === 1);
@@ -3651,7 +3668,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
                             if (err) throw err;
                             const playerName = result[0].name;
-                            room.sendAnnouncement(`🎉 ${playerName} ganhou ${winningAmount} atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, null, 0x00FF00, "bold", 2);
+                            room.sendAnnouncement(`🎉 ${playerName} ganhou ${winningAmount} Atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, null, 0xD4CE22, "bold", 2);
                         });
                     });
                 }

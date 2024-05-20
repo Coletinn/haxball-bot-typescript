@@ -55,111 +55,6 @@ export let roomErrorsChannel: string | null = null;
 export let roomEntradasChannel: string | null = null;
 export let roomStatusChannel: string | null = null;
 
-var provos = {
-    '!ali': 'Alisa meu pelo 🐆',
-    '!arn': 'Pode isso, Arnaldo? 🤔',
-    '!cag': 'Cagada 💩',
-    '!calc': '📊📐❌➕📚➗ = Calculado',
-    '!cham': 'Chama 🔥',
-    '!chu': 'Chuta!! 👟',
-    '!dig': 'Digita mais 🤓',
-    '!dmr': 'Demora mais!!! 🙄',
-    '!faz': 'Faz... 🤲',
-    '!fal': 'Foi falta!! 🚑',
-    '!fran': 'Frango! 🐔',
-    '!fran2': 'Franguei 🐓',
-    '!frio': 'Frio 🥶',
-    '!fru': 'Mustela putorius furo, o Furão! 🦦',
-    '!gira': 'Gira a bola! 🤹‍♂️',
-    '!glç': 'Que golaço! ⚽ ',
-    '!grl': 'Gorila é sinistro 🦍',
-    '!ini': 'Inimigo do gol! 👹',
-    '!lad': 'Ladrão! 😠',
-    '!lç': 'LAÇO 🎀',
-    '!mar': 'Marca! 🤼‍♂️',
-    '!olho': 'Olho no lance! 👁️',
-    '!olhu': 'OLHUGOL, OLHUGOL 🥅',
-    '!pç': 'Paçe 🦵',
-    '!pick': 'Pickford! 🙌',
-    '!pint': 'Uma pintura!! 👨‍🎨🖼️',
-    '!pip': 'Olha a pipoca! 🍿',
-    '!proi': 'Proibido fazer gol!! 🚫',
-    '!ptz': 'Putz... 🤦',
-    '!sap': 'Que sapatada!!! 🥾',
-    '!sdg': 'Sai do gol, GK!!!',
-    '!ski': 'Skills and tricks 🏄🏾‍♀️',
-    '!siu': 'SIUUUUU 👐',
-    '!taf': 'Sai que é sua Taffarel!!! 🙌',
-    '!tira': 'Tira, zaga! 🙅‍♂️',
-    '!tnc': 'Tomar nescau! 🥤',
-    '!ui': 'UI! 😲',
-    '!ui2': '( ͡° ͜ʖ ͡°)',
-    '!uu': 'UUUU... 😯',
-    '!vira': 'Virada 🔀',
-    '!volt': 'Volta pra defesa! 👉',
-    '!vl': 'Alguém VL? 👇',
-    '!x': 'Aperta ✖ ❕❕',
-    '!zag': 'Cadê a zaga? 👨🏼‍🦯 ',
-    '!zen': 'Zen 🧘',
-    '!divisao': 'EU SOU O PROBLEMA DA DIVISÃO!!!',
-    '!quentin': 'TÁ QUENTINHO AÍ? MEU BOLSO É DE VELUDO!',
-    '!logica': 'DEU A LÓGICA...',
-    '!base': 'VAI DE BASE ',
-    '!meto2': 'Eu meto mesmo!',
-    '!boa': 'Boa time!👊',
-    '!bai': 'Baila!💃',
-    '!bag': 'Bagre!🐟',
-    '!bike': 'De bike!!!🚲',
-    '!bch': 'Belo chute!👏',
-    '!bpa': 'Belo passe!👏',
-    '!brb': 'Brabo😈',
-    '!cal': 'Calma, pô!✨',
-    '!fome': 'Hmmm que fominha...😋',
-    '!fds': 'FDS!! Um ótimo final de semana!😎',
-    '!jlu': 'Joga a luva, goleirão!🧤',
-    '!itk': 'Alguém GK? Intankável...🚙🚫',
-    '!fzl': 'Faz o L!🙋‍♂️',
-    '!gen': 'Seja gentil fdm👨‍🏫',
-    '!kk': 'KKKKKKKKKKKKKKKKKKKK!🤣',
-    '!lae': 'La ele🖊️',
-    '!puskas': 'Esse é puskas!',
-    '!bolso': 'Sai do meu bolso ai, ta incomodando.',
-    '!pika': 'HAHAHAHA, ele é pik@',
-    '!papai': 'Ai papaii!',
-    '!seupai': 'Chora não!!!! Ja pode me registrar como seu pai.',
-    '!peganunca': 'Pega nunk!!',
-    '!quentin2': 'Tá quentinho ai????',
-    '!izi': 'TEM COMO AUMENTAR O NÍVEL? TÁ MUITO EASY!',
-    '!piden': 'Ei Piden, vai tomar no c*, filha da put@!',
-    '!qsl': 'Ei Qsl, vai tomar no c*, filha da put@!',
-    '!system': 'Ei System, vai tomar no c*, filha da put@!',
-    '!oi': 'Oie ♥️',
-    '!toma': 'Quem não faz... toma!',
-    '!ifood': 'Olha o ifood! foi aqui que pediram a entrega?',
-    '!chute': 'QUE CHUTE FOI ESSE? LÁ ONDE A CORUJA DORME!',
-    '!moscou': 'CAPITAL DA RUSSIA É MOSCOW E COM NÓS NÃO PODE MOSCAR. rs 😎',
-    '!chora': 'CHORA NÃO BEBÊ, SE QUISER CHORAR VAI PRA MATERNIDADE❗👶🏼🍼',
-    '!red': 'Esse era o RED?',
-    '!blue': 'Esse era o BLUE?',
-    '!paired': 'EU = PAI DO RED𝗞𝗞𝗞𝗞𝗞𝗞🤣😂🤣😂',
-    '!paiblue': 'EU = PAI DO BLUE𝗞𝗞𝗞𝗞𝗞𝗞🤣😂🤣😂',
-    '!pegala': 'PEGA LÁ GOLEIRÃO 𝗞𝗞𝗞𝗞𝗞𝗞👟⚽🥅😅',
-    '!perdoa': 'ELE NãO PERDOA C4R4LH0❗❗❗',
-    '!perdoa2': 'NÓS NÃO PERDOA NÃO, VIU❓❗😁',
-    '!receba': 'RECEBA C4R4LH0❗😤😤😤',
-    '!meto': 'EU METO MESMO!!!',
-    '!pega': 'QUERO VER PEGAR ESSA PORRA!!!',
-    '!toca2': 'Toca no pae e descansa...',
-    '!toca': 'Toca a bola!! 🦶',
-    '!gk': 'Alguém GK?',
-    '!gk2': 'ACORDA GOLEIRÃO!!!',
-    '!gk3': 'Ui, pega la Gk',
-    '!gk4': 'O GK aqui sou eu! ⛹️‍♀️',
-    '!gk5': 'Boa GK! ⛹️‍♀️',
-    '!bobiu': 'BOBIU tomou ᵒᵗᵃ́ʳᶦᵒ. 𝗞𝗞𝗞𝗞𝗞𝗞🤣😂😅',
-    '!oe': 'OEEE! Virou Space Bounce! 😅😅',
-}
-
 //Tudo que precisar de conexão com a database deve ser colocado abaixo desta linha.
 //TODO: Mover tudo de DB para outro lugar futuramente
 import { uniformes, EquipeUniforme } from './src/Room/Config/uniformes';
@@ -278,6 +173,9 @@ type UserUnsaved = {
 
 type UsersCollection = { [userId: number]: UserUnsaved };
 
+// Assuming you have a variable to track match start time
+let matchStartTime: Date;
+
 export let unsavedUsers: UsersCollection = {};
 let nextUserId = 1;
 
@@ -385,6 +283,7 @@ var palavrasSuicidio = ["se suicida", "se corta"],
 export var passwordVip = getRandomInt2(10000, 97999);
 export var passwordPremium = getRandomInt2(10000, 98999);
 export var passwordLegend = getRandomInt2(10000, 99999);
+
 
 function getRandomInt2(min: any, max: any) {
     return Math.floor(Math.random() * (max - min) + 1)
@@ -540,7 +439,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             losingTeam = 1;
         }
     }
-
+    
     function distribuirStats(playerStatistics: PlayerStatistics) {
         const playersOnTeam = activePlayers.filter((p: { team: number; }) => p.team === 1 || p.team === 2);
         for (let player of playersOnTeam) {
@@ -1290,7 +1189,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     //             Função AFK a meio do jogo            //
 
     const activities: { [key: string]: number } = {}; // Verificar quando foi a última atividade.
-    var AFKTimeout = 12000; // 10 segundos afk = kick
+    var AFKTimeout = 1200000; // 10 segundos afk = kick
     let lastWarningTime: number = 0; // Mandar avisos de kick
 
     function afkKick() {
@@ -2760,6 +2659,86 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 });
             }
 
+            else if (words[0] === "!bet" || words[0] === "!apostar") {
+                const currentTime = new Date();
+                const timeDiff = (currentTime.getTime() - matchStartTime.getTime()) / 1000; // time difference in seconds
+
+                if (timeDiff > 15) {
+                    room.sendAnnouncement(`🩸 ${player.name} Só é permitido apostar nos primeiros 15 segundos da partida.`, player.id, 0xFF0000, "bold", 2);
+                    return false;
+                }
+
+                if (numberOfPlayers < 6) {
+                    room.sendAnnouncement(`🩸 ${player.name} Precisa ter 6 jogadores na sala para apostar.`, player.id, 0xFF0000, "bold", 2);
+                    return false;
+                }
+            
+                const betTeam = words[1];
+                const betValue = parseInt(words[2]);
+            
+                if (!betTeam || isNaN(betValue) || (betTeam !== "red" && betTeam !== "blue")) {
+                    room.sendAnnouncement(`🩸 ${player.name} Formato inválido. Use: !bet [red/blue] [valor] ou !apostar [red/blue] [valor]`, player.id, 0xFF0000, "bold", 2);
+                    return false;
+                }
+            
+                const teamValue = betTeam === "red" ? 1 : 2;
+            
+                con.query(`SELECT id, balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
+                    if (err) throw err;
+                    if (result.length === 0) {
+                        room.sendAnnouncement(`🩸 ${player.name} Você precisa registrar para poder apostar.`, player.id, 0xFF0000, "bold", 2);
+                        return false;
+                    }
+            
+                    const playerId = result[0].id;
+                    const playerBalance = result[0].balance;
+            
+                    if (playerBalance < betValue) {
+                        room.sendAnnouncement(`🩸 ${player.name} Você não tem dinheiro suficiente para apostar.`, player.id, 0xFF0000, "bold", 2);
+                        return false;
+                    }
+            
+                    // Check if the player has already placed a bet in this game
+                    con.query(`SELECT * FROM bets WHERE player_id = ? AND room_id = ?`, [playerId, process.env.room_id], (err: any, existingBets: any) => {
+                        if (err) throw err;
+                        if (existingBets.length > 0) {
+                            room.sendAnnouncement(`🩸 ${player.name} Você já fez uma aposta nesse jogo.`, player.id, 0xFF0000, "bold", 2);
+                            return false;
+                        }
+            
+                        // Deduct the bet amount from the player's balance
+                        con.query(`UPDATE players SET balance = balance - ? WHERE id = ?`, [betValue, playerId], (err: any) => {
+                            if (err) throw err;
+            
+                            // Add the bet to the bets table
+                            con.query(`INSERT INTO bets (player_id, team, value, room_id) VALUES (?, ?, ?, ?)`, [playerId, teamValue, betValue, process.env.room_id], (err: any) => {
+                                if (err) throw err;
+            
+                                room.sendAnnouncement(`🩸 ${player.name} apostou ${betValue} atacoins no time ${betTeam.toUpperCase()}.`, null, 0x00FF00, "bold", 2);
+                            });
+                        });
+                    });
+                });
+            
+                return false;
+            }
+
+            else if (words[0] === "!meusaldo" || words[0] === "!saldo") {
+                con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
+                    if (err) throw err;
+                    if (result.length === 0) {
+                        room.sendAnnouncement(`🩸 ${player.name} Você precisa se registrar para ter um saldo.`, player.id, 0xFF0000, "bold", 2);
+                        return false;
+                    }
+                    
+                    const playerBalance = result[0].balance;
+                    room.sendAnnouncement(`💰 ${player.name}, seu saldo é de ${playerBalance} atacoins.`, player.id, 0x00FF00, "bold", 2);
+                });
+                return false;
+            }
+            
+            
+            
             else if (words[0] == "!provocacoes" || words[0] === "!provos" || words[0] === "!prov") {
                 room.sendAnnouncement('Provocações: !oe, !izi, !red, !blue, !paired, !paiblue, !ifood, !chora, !bolso, !divisao, !seupai, !pega, !quentin, !arn, !cag, !dmr, !fran, !furo, !grl, !ini', player.id, 0xFFFFFF, "bold")
             }
@@ -3435,6 +3414,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     //                      Quando o jogo começa                    //
 
     room.onGameStart = () => {
+        matchStartTime = new Date();
+
+        room.sendAnnouncement("⚽ Apostas permitidas por 15 segundos!", null, 0x00FF00, "bold", 0);
+        room.sendAnnouncement("⚽ Para apostar digite !bet [red/blue] [valor]", null, 0x00FF00, "bold", 0);
+        room.sendAnnouncement("⚽ Para ver seus atacoins digite !saldo ou !meusaldo", null, 0x00FF00, "bold", 0);
+
         endGameVariable = false;
         gameState = State.PLAY;
 
@@ -3533,6 +3518,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     }
 
     room.onGameStop = () => {
+        handleEndOfGame(winningTeam);
         sendRecordToDiscord(room.stopRecording());
         // Limpar GK's
         gk = [null, null];
@@ -3645,6 +3631,37 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 }, 2000);
             }
         }
+    }
+
+    // Função para atualizar o saldo do jogador caso tenha apostado no time vencedor.
+    function handleEndOfGame(winningTeam: number) {
+        con.query(`SELECT * FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any, bets: any) => {
+            if (err) throw err;
+
+            bets.forEach((bet: any) => {
+                if ((winningTeam === 1 && bet.team === 'red') || (winningTeam === 2 && bet.team === 'blue')) {
+                    // Jogador ganhou a bet
+                    const winningAmount = bet.value * 2; // Ganha o dobro do que apostou
+                    console.log(`Player ID ${bet.player_id} ganhou ${winningAmount}`);
+
+                    con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
+                        if (err) throw err;
+
+                        // Notify the player
+                        con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
+                            if (err) throw err;
+                            const playerName = result[0].name;
+                            room.sendAnnouncement(`🎉 ${playerName} ganhou ${winningAmount} atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, null, 0x00FF00, "bold", 2);
+                        });
+                    });
+                }
+            });
+
+            // Limpa a tabela de bets
+            con.query(`DELETE FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any) => {
+                if (err) throw err;
+            });
+        });
     }
 
     //                                                            //

@@ -71,7 +71,7 @@ async function loadConfig() {
             roomStatusChannel = result[0].status;
         }
     });
-}loadConfig();
+} loadConfig();
 
 export const setRoomLogChannel = (log: string) => {
     con.query(`UPDATE rooms SET log = ? WHERE id = ?`, [log, process.env.room_id], (err: any, result: any) => {
@@ -439,7 +439,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             losingTeam = 1;
         }
     }
-    
+
     function distribuirStats(playerStatistics: PlayerStatistics) {
         const playersOnTeam = activePlayers.filter((p: { team: number; }) => p.team === 1 || p.team === 2);
         for (let player of playersOnTeam) {
@@ -2662,17 +2662,17 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             else if (words[0] === "!bet" || words[0] === "!apostar") {
                 const currentTime = new Date();
                 const timeDiff = (currentTime.getTime() - matchStartTime.getTime()) / 1000; // time difference in seconds
-                
+            
                 if (player.team === 1 || player.team === 2) {
                     room.sendAnnouncement(`💰 ${player.name} Jogadores que estão em um time não podem apostar.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-
+            
                 if (timeDiff > 15) {
                     room.sendAnnouncement(`💰 ${player.name} Só é permitido apostar nos primeiros 15 segundos da partida.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-
+            
                 if (numberOfPlayers < 6) {
                     room.sendAnnouncement(`💰 ${player.name} Precisa ter 6 jogadores na sala para apostar.`, player.id, 0xFF0000, "bold", 2);
                     return false;
@@ -2680,6 +2680,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             
                 const betTeam = words[1];
                 const betValue = parseInt(words[2]);
+            
+                // Verificação do valor mínimo e máximo da aposta
+                if (betValue < 5 || betValue > 1000) {
+                    room.sendAnnouncement(`💰 ${player.name} O valor da aposta deve estar entre 5 e 1000 Atacoins.`, player.id, 0xFF0000, "bold", 2);
+                    return false;
+                }
             
                 if (!betTeam || isNaN(betValue) || (betTeam !== "red" && betTeam !== "blue")) {
                     room.sendAnnouncement(`💰 ${player.name} Formato inválido. Use: !bet [red/blue] [valor] ou !apostar [red/blue] [valor]`, player.id, 0xFF0000, "bold", 2);
@@ -2691,7 +2697,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 con.query(`SELECT id, balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
                     if (result.length === 0) {
-                        room.sendAnnouncement(`💰 ${player.name} Você precisa registrar para poder apostar.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`💰 ${player.name} Você precisa se registrar para poder apostar.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
             
@@ -2727,7 +2733,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             
                 return false;
             }
-
+            
             else if (words[0] === "!atacoins" || words[0] === "!saldo") {
                 con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
@@ -2735,15 +2741,15 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         room.sendAnnouncement(`💰 ${player.name} Você precisa se registrar para ter um saldo.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
-                    
+
                     const playerBalance = result[0].balance;
                     room.sendAnnouncement(`💰 ${player.name}, seu saldo é de ${playerBalance} atacoins.`, player.id, 0x00FF00, "bold", 2);
                 });
                 return false;
             }
-            
-            
-            
+
+
+
             else if (words[0] == "!provocacoes" || words[0] === "!provos" || words[0] === "!prov") {
                 room.sendAnnouncement('Provocações: !oe, !izi, !red, !blue, !paired, !paiblue, !ifood, !chora, !bolso, !divisao, !seupai, !pega, !quentin, !arn, !cag, !dmr, !fran, !furo, !grl, !ini', player.id, 0xFFFFFF, "bold")
             }
@@ -3349,7 +3355,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             "QUE GOLAÇOOOOO de",
             "IMPRESSIONANTE O CHUTE DO",
             "🔥🔥🔥 TÁ ON FIRE O"
-       ];
+        ];
 
         // Random celebration message for assists
         const frasesASS = [
@@ -3357,7 +3363,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             "EU AMO ESSE CARA!",
             "PASSE COM A MÃO DE",
             "Assistência fenomenal de"
-       ];
+        ];
 
         const golcontra = [
             "TROLA Y TROLLA",
@@ -3366,7 +3372,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             "INCRIVEL O QUE ESSA LENDA FAZ, MAS SERIA MELHOR SE FOSSE PARA O OUTRO LADO NÉ",
             "PARABÉNS!! AGORA TENTA DO OUTRO LADO...",
             "ERROU O LADO! RUIM DEMAIS,"
-       ]
+        ]
 
         let randomPhraseGol = frasesGOL[Math.floor(Math.random() * frasesGOL.length)];
         let randomPhraseAss = frasesASS[Math.floor(Math.random() * frasesASS.length)];
@@ -3420,21 +3426,21 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
     room.onGameStart = () => {
         matchStartTime = new Date();
-    
+
         room.pauseGame(true);
         room.sendAnnouncement(`💰 Jogo pausado por 5 segundos para as apostas.`, null, 0x10F200, "bold", 2);
-    
+
         setTimeout(function () {
             room.pauseGame(false);
         }, 5000);
-    
+
         room.sendAnnouncement("💰 Façam suas apostas!", null, 0x10F200, "bold", 0);
         room.sendAnnouncement("💰 Para apostar digite !bet [red/blue] [valor]", null, 0x10F200, "bold", 0);
         room.sendAnnouncement("💰 Após iniciada a partida, você tem 15 segundos para apostar", null, 0x10F200, "bold", 0);
-    
+
         endGameVariable = false;
         gameState = State.PLAY;
-    
+
         // Agendar o envio da mensagem após 15 segundos
         setTimeout(() => {
             room.sendAnnouncement("💰 Apostas encerradas!", null, 0x10F200, 'bold');
@@ -3468,13 +3474,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     function consultaElo(player: any) {
         return new Promise((resolve, reject) => {
             con.query(`SELECT elo FROM stats WHERE player_id = (SELECT id FROM players WHERE LOWER(name) = LOWER(?)) AND room_id = ?`,
-            [player.name, process.env.room_id], (err: any, result: any) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result[0].elo);
-                }
-            });
+                [player.name, process.env.room_id], (err: any, result: any) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result[0].elo);
+                    }
+                });
         });
     }
 
@@ -3531,7 +3537,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 name: fileName
             }]
         })
-        .catch(console.error);
+            .catch(console.error);
     }
 
     room.onGameStop = () => {

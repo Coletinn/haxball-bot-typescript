@@ -2734,9 +2734,9 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 return false;
             }
 
-            else if (words[0] === "!doar") {
+            else if (words[0] === "!doarcoins") {
                 if (words.length < 3) {
-                    room.sendAnnouncement(`💰 ${player.name} Formato inválido. Use: !doar [nome do jogador] [valor]`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`💰 ${player.name} Formato inválido. Use: !doarcoins [nome do jogador] [valor]`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
             
@@ -2895,7 +2895,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 // Comando help
             } else if (words[0] === "!help" || words[0] === "!ajuda" || words[0] === "!comandos" || words[0] === "!commands") {
                 if (words.length === 1) {
-                    const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!sequencia", "!topsequencia", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists", "!provos", "!apostar", "!atacoins"];
+                    const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!sequencia", "!topsequencia", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists", "!provos", "!apostar", "!saldo", "!doarcoins"];
                     const adminCommands = ["!ban", "!mute", "!rr2", "!setvip <1, 2 ou 3>"]
 
                     room.sendAnnouncement(`📃 Comandos: ${commands.join(", ")}`, player.id, 0xFF0000, "bold");

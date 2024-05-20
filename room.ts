@@ -2719,7 +2719,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             con.query(`INSERT INTO bets (player_id, team, value, room_id) VALUES (?, ?, ?, ?)`, [playerId, teamValue, betValue, process.env.room_id], (err: any) => {
                                 if (err) throw err;
             
-                                room.sendAnnouncement(`💰 ${player.name} apostou ${betValue} atacoins no time ${betTeam.toUpperCase()}.`, null, 0xD4CE22, "bold", 2);
+                                room.sendAnnouncement(`💰 ${player.name} apostou ${betValue} atacoins no time ${betTeam.toUpperCase()}.`, null, 0x10F200, "bold", 2);
                             });
                         });
                     });
@@ -2728,7 +2728,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 return false;
             }
 
-            else if (words[0] === "!meusaldo" || words[0] === "!saldo") {
+            else if (words[0] === "!atacoins" || words[0] === "!saldo") {
                 con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
                     if (result.length === 0) {
@@ -2832,7 +2832,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 // Comando help
             } else if (words[0] === "!help" || words[0] === "!ajuda" || words[0] === "!comandos" || words[0] === "!commands") {
                 if (words.length === 1) {
-                    const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!sequencia", "!topsequencia", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists", "!provos", "!apostar"];
+                    const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!sequencia", "!topsequencia", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists", "!provos", "!apostar", "!atacoins"];
                     const adminCommands = ["!ban", "!mute", "!rr2", "!setvip <1, 2 ou 3>"]
 
                     room.sendAnnouncement(`📃 Comandos: ${commands.join(", ")}`, player.id, 0xFF0000, "bold");
@@ -3422,22 +3422,22 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         matchStartTime = new Date();
     
         room.pauseGame(true);
-        room.sendAnnouncement(`💰 Jogo pausado por 5 segundos para as apostas.`, null, 0xD4CE22, "bold", 2);
+        room.sendAnnouncement(`💰 Jogo pausado por 5 segundos para as apostas.`, null, 0x10F200, "bold", 2);
     
         setTimeout(function () {
             room.pauseGame(false);
         }, 5000);
     
-        room.sendAnnouncement("💰 Apostas permitidas por 15 segundos!", null, 0xD4CE22, "bold", 0);
-        room.sendAnnouncement("💰 Para apostar digite !bet [red/blue] [valor]", null, 0xD4CE22, "bold", 0);
-        room.sendAnnouncement("💰 Para ver seus Atacoins digite !saldo ou !meusaldo", null, 0xD4CE22, "bold", 0);
+        room.sendAnnouncement("💰 Façam suas apostas!", null, 0x10F200, "bold", 0);
+        room.sendAnnouncement("💰 Para apostar digite !bet [red/blue] [valor]", null, 0x10F200, "bold", 0);
+        room.sendAnnouncement("💰 Após iniciada a partida, você tem 15 segundos para apostar", null, 0x10F200, "bold", 0);
     
         endGameVariable = false;
         gameState = State.PLAY;
     
         // Agendar o envio da mensagem após 15 segundos
         setTimeout(() => {
-            room.sendAnnouncement("💰 Apostas encerradas! [💰]", null, 0xD4CE22, 'bold');
+            room.sendAnnouncement("💰 Apostas encerradas!", null, 0x10F200, 'bold');
         }, 15000);  // 15000 milissegundos equivalem a 15 segundos
 
         // Definir constantes
@@ -3668,7 +3668,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
                             if (err) throw err;
                             const playerName = result[0].name;
-                            room.sendAnnouncement(`🎉 ${playerName} ganhou ${winningAmount} Atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, null, 0xD4CE22, "bold", 2);
+                            room.sendAnnouncement(`🎉 ${playerName} ganhou ${winningAmount} Atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, null, 0x10F200, "bold", 2);
                         });
                     });
                 }

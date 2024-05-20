@@ -826,8 +826,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 room.sendAnnouncement(`🩸 Digite !help para ver todos os comandos disponíveis na sala, em caso de dúvida digite: !help <comando>`, player.id, 0xFFFFFF, "bold");
                 room.sendAnnouncement(`👥 Não se esqueça de entrar no nosso discord: ${discord}`, player.id, 0xFFFFFF, "bold");
                 const auth = playerAuth.get(player.id);
-                const sql = `INSERT INTO players (game_id, name, password, loggedIn, conn, ipv4, auth, balance) VALUES (?,?,?,?,?,?,?, 1000)`;
-                const values = [player.id, player.name, null, 1, conn, ipv4, auth];
+                const sql = `INSERT INTO players (game_id, name, password, loggedIn, conn, ipv4, auth, balance) VALUES (?,?,?,?,?,?,?,?)`;
+                const values = [player.id, player.name, null, 1, conn, ipv4, auth, 1000];
                 con.query(sql, values, (err: any) => {
                     if (err) throw err;
                     handleRanks(player); // Definir avatar.
@@ -2748,7 +2748,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     return false;
                 }
             
-                con.query(`SELECT id, balance FROM players WHERE name = ?`, [player.name], (err, result) => {
+                con.query(`SELECT id, balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
                     if (result.length === 0) {
                         room.sendAnnouncement(`💰 ${player.name} Você precisa se registrar para poder doar.`, player.id, 0xFF0000, "bold", 2);
@@ -2764,7 +2764,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     }
             
                     // Checa se o jogador destinatário está registrado
-                    con.query(`SELECT id FROM players WHERE name = ?`, [nomeJogador], (err, recipientResult) => {
+                    con.query(`SELECT id FROM players WHERE name = ?`, [nomeJogador], (err: any, recipientResult: any) => {
                         if (err) throw err;
                         if (recipientResult.length === 0) {
                             room.sendAnnouncement(`💰 ${player.name} O jogador "${nomeJogador}" não está registrado.`, player.id, 0xFF0000, "bold", 2);
@@ -2774,10 +2774,10 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         const recipientId = recipientResult[0].id;
             
                         // Procede com a doação
-                        con.query(`UPDATE players SET balance = balance - ? WHERE id = ?`, [valorDoado, playerId], (err) => {
+                        con.query(`UPDATE players SET balance = balance - ? WHERE id = ?`, [valorDoado, playerId], (err: any) => {
                             if (err) throw err;
             
-                            con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [valorDoado, recipientId], (err) => {
+                            con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [valorDoado, recipientId], (err: any) => {
                                 if (err) throw err;
             
                                 room.sendAnnouncement(`💰 ${player.name} doou ${valorDoado} Atacoins para ${nomeJogador}.`, null, 0x10F200, "bold", 2);
@@ -3716,7 +3716,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     // Função para atualizar o saldo do jogador caso tenha apostado no time vencedor.
     function handleEndOfGame(winningTeam: number) {
         // Jogador que ganhar a partida ganha 100 atacoins
-        room.getPlayerList().forEach(player => {
+        room.getPlayerList().forEach((player: Player) => {
             if (player.team === winningTeam) {
                 con.query(`UPDATE players SET balance = balance + 100 WHERE id = ?`, [player.id], (err: any) => {
                     if (err) throw err;

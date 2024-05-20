@@ -1189,7 +1189,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     //             Função AFK a meio do jogo            //
 
     const activities: { [key: string]: number } = {}; // Verificar quando foi a última atividade.
-    var AFKTimeout = 12000; // 10 segundos afk = kick
+    var AFKTimeout = 1200000; // 10 segundos afk = kick
     let lastWarningTime: number = 0; // Mandar avisos de kick
 
     function afkKick() {
@@ -3713,46 +3713,86 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         }
     }
 
-    // Função para atualizar o saldo do jogador caso tenha apostado no time vencedor.
     function handleEndOfGame(winningTeam: number) {
-        // Jogador que ganhar a partida ganha 100 atacoins
         room.getPlayerList().forEach((player: Player) => {
-            if (player.team === winningTeam) {
-                con.query(`UPDATE players SET balance = balance + 100 WHERE id = ?`, [player.id], (err: any) => {
-                    if (err) throw err;
-                    room.sendAnnouncement(`🎉 Você ganhou 100 Atacoins por ganhar o jogo!`, player.id, 0x10F200, "bold", 2);
-                });
-            }
+            console.log(`Processando jogador com ID: ${player.id}`); // Log the player ID from the room
+        
+            // Assuming you need to map this to a database ID, you might need an additional query or a stored mapping
+            // Example query to fetch the corresponding database ID (adjust based on your schema)
+            con.query(`SELECT id FROM players WHERE game_id = ?`, [player.id], (err: any, results: any) => {
+                if (err) {
+                    console.error(`Error fetching database ID for game ID ${player.id}: ${err}`);
+                    return;
+                }
+                if (results.length > 0) {
+                    const dbId = results[0].id;
+                    console.log(`DB ID para a room ID ${player.id} é ${dbId}`);
+        
+                    if (player.team === winningTeam) {
+                        con.query(`UPDATE players SET balance = balance + 100 WHERE id = ?`, [dbId], (err: any, updateResults: any) => {
+                            if (err) {
+                                console.error(`Erro ao atualizar o saldo ${dbId}: ${err}`);
+                                throw err;
+                            }
+                            if (updateResults.affectedRows > 0) {
+                                room.sendAnnouncement(`🎉 Você ganhou 100 Atacoins por ganhar o jogo!`, player.id, 0x10F200, "bold", 2);
+                                console.log(`Saldo atualizado para o jogador ${player.name}, ID ${dbId}`);
+                            } else {
+                                console.log(`Nenhuma linha foi atualizada com o ID ${dbId}, checar se o ID está correto.`);
+                            }
+                        });
+                    }
+                } else {
+                    console.log(`No database ID found for game ID ${player.id}`);
+                }
+            });
         });
-
+        
+        
+    
+        // Handle bets
         con.query(`SELECT * FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any, bets: any) => {
-            if (err) throw err;
-
+            if (err) {
+                console.error(`Error retrieving bets: ${err}`);
+                throw err;
+            }
+    
             bets.forEach((bet: any) => {
                 if ((winningTeam === 1 && bet.team === 'red') || (winningTeam === 2 && bet.team === 'blue')) {
-                    // Jogador ganhou a bet
-                    const winningAmount = bet.value * 2; // Ganha o dobro do que apostou
-                    console.log(`Player ID ${bet.player_id} ganhou ${winningAmount}`);
-
+                    const winningAmount = bet.value * 2;
+                    console.log(`Player ID ${bet.player_id} won ${winningAmount}`);
+    
                     con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
-                        if (err) throw err;
-
+                        if (err) {
+                            console.error(`Error updating balance for winner ${bet.player_id}: ${err}`);
+                            throw err;
+                        }
+    
                         // Notify the player
                         con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
-                            if (err) throw err;
+                            if (err) {
+                                console.error(`Error retrieving player name for ID ${bet.player_id}: ${err}`);
+                                throw err;
+                            }
                             const playerName = result[0].name;
                             room.sendAnnouncement(`🎉 ${playerName} ganhou ${winningAmount} Atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, null, 0x10F200, "bold", 2);
+                            console.log(`Announcement sent to ${playerName}`);
                         });
                     });
                 }
             });
-
-            // Limpa a tabela de bets
+    
+            // Clear the bets table
             con.query(`DELETE FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any) => {
-                if (err) throw err;
+                if (err) {
+                    console.error(`Error clearing bets table: ${err}`);
+                    throw err;
+                }
+                console.log("Bets table cleared");
             });
         });
     }
+    
 
     //                                                            //
     //                                                            //

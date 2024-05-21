@@ -2034,13 +2034,25 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         }
                     });
                 }
+
             } else if (words[0] === "!setadmin") {
+                if (superadmin[player.id] !== 1) {
+                    room.sendAnnouncement(`🩸 Desculpe, apenas CEOs podem usar este comando.`, player.id, cores.vermelho, "bold", 2);
+                    return false;
+                }
+            
                 const input = words;
                 const jogador: any = input[1];
-                const adminType: any = input[2];
+                const cargo: any = input[2];
+                const acao: any = input[3]; // 'add' para adicionar cargo, 'remove' para remover
                 var userId: any;
                 var userName: any;
-
+            
+                if (!jogador || !cargo || !acao) {
+                    room.sendAnnouncement(`🩸 Você não especificou o ID do jogador, o cargo ou a ação. Os cargos disponíveis são: ceo, gerente, admin, mod. As ações disponíveis são: add, remove.`, player.id, cores.vermelho, "bold", 2);
+                    return false;
+                }
+            
                 if (jogador.startsWith("#")) {
                     var id = jogador.substring(1);
                     var playerSet = room.getPlayerList().filter((p: any) => p.id === parseInt(id));
@@ -2052,49 +2064,62 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         return false;
                     }
                 } else {
-                    room.sendAnnouncement(`🩸 ${player.name} Você não digitou o comando corretamente. (Ex: !setadmin #id 1-4)`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} Você não digitou o comando corretamente. (Ex: !setadmin #id cargo acao)`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-
+            
                 if (!userId || !userName) {
                     room.sendAnnouncement(`🩸 Não consegui encontrar nenhum jogador com esse ID!`, player.id, cores.vermelho, "bold", 2);
                     return false;
                 }
-
-                if (!adminType || isNaN(adminType)) {
-                    room.sendAnnouncement(`🩸 Você não digitou o cargo corretamente. (Ex: !setadmin #id 1-4)`, player.id, cores.vermelho, "bold", 2);
+            
+                if (!cargo || !['ceo', 'gerente', 'admin', 'mod'].includes(cargo)) {
+                    room.sendAnnouncement(`🩸 Você não digitou o cargo corretamente. (Ex: !setadmin #id cargo acao)`, player.id, cores.vermelho, "bold", 2);
                     return false;
                 }
-
+            
                 con.query(`SELECT * FROM players WHERE name = ?`, [userName], (err: any, result: any) => {
                     if (err) throw err;
-
+            
                     if (result.length > 0) {
-                        if (adminType === 1) {
-                            if (result[0].ceo === 0) {
-                                con.query(`UPDATE players SET ceo = 1 WHERE name = ?`, [userName], (err: any, result: any) => {
-                                    if (err) {
-                                        console.error(err);
-                                        return false;
-                                    }
-
-                                    if (result.affectedRows > 0) {
-                                        room.sendAnnouncement(`👑 ${userName} Agora é um CEO!`, null, 0xFFA500, "bold", 2);
-                                        superadmin[userId] = 1;
-                                    } else {
-                                        return false;
-                                    }
-                                });
-                            } else {
-                                room.sendAnnouncement(`O ${userName} já é um CEO!`, player.id, cores.vermelho, "bold", 2);
-                                return false;
-                            }
+                        if (acao === 'add' && result[0][cargo] === 0) {
+                            con.query(`UPDATE players SET ${cargo} = 1 WHERE name = ?`, [userName], (err: any, result: any) => {
+                                if (err) {
+                                    console.error(err);
+                                    return false;
+                                }
+            
+                                if (result.affectedRows > 0) {
+                                    room.sendAnnouncement(`👑 ${userName} Agora é um ${cargo.toUpperCase()}!`, null, 0xFFA500, "bold", 2);
+                                    superadmin[userId] = 1;
+                                } else {
+                                    return false;
+                                }
+                            });
+                        } else if (acao === 'remove' && result[0][cargo] === 1) {
+                            con.query(`UPDATE players SET ${cargo} = 0 WHERE name = ?`, [userName], (err: any, result: any) => {
+                                if (err) {
+                                    console.error(err);
+                                    return false;
+                                }
+            
+                                if (result.affectedRows > 0) {
+                                    room.sendAnnouncement(`👑 ${userName} não é mais um ${cargo.toUpperCase()}!`, null, 0xFFA500, "bold", 2);
+                                    superadmin[userId] = 0;
+                                } else {
+                                    return false;
+                                }
+                            });
+                        } else {
+                            room.sendAnnouncement(`O ${userName} já é um ${cargo.toUpperCase()}!`, player.id, cores.vermelho, "bold", 2);
+                            return false;
                         }
                     } else {
                         room.sendAnnouncement(`🩸 ${player.name} não encontrei um jogador com esse nome/id.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
-                });
+                })
+            
             } else if (words[0] === "!mudarsenha") {
                 const input = words;
                 if (input.length < 3) {
@@ -2193,21 +2218,40 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     room.sendAnnouncement(`🩸 Não há jogadores AFK no momento.`, player.id, 0xFF0000, "bold");
                 }
                 // Comando Streak
-            }
-            else if (words[0] === "!sequencia") {
-                room.sendAnnouncement(`🏆 ${player.name} a streak atual da sala é de ${winstreak} jogos para a equipe 🔴!`, player.id, 0xFFFFFF, "bold");
-                // Comando Top Streak
-            }
-            else if (words[0] === "!topsequencia") {
-                const sql = `SELECT * FROM streak ORDER BY games DESC LIMIT 1`;
-                con.query(sql, (err: any, result: any) => {
-                    if (err) throw err;
-                    if (result.length == 0) {
-                        room.sendAnnouncement(`🩸 ${player.name} não há nenhuma streak registrada.`, player.id, 0xFF0000, "bold", 2);
-                        return false;
+
+                // Variáveis para rastrear a sequência de vitórias e os jogadores
+                let winstreak = 0;
+                let teamPlayers = {
+                    'team1': ['player1', 'player2', 'player3'],
+                    'team2': ['player4', 'player5', 'player6'],
+                    // etc...
+                };
+
+                // Função para lidar com comandos
+                function handleCommand(words, player) {
+                    if (words[0] === "!sequencia") {
+                        if (winstreak >= 5) {
+                            let winningPlayers = teamPlayers[winningTeam];
+                            const sql = `INSERT INTO streak (games, player1, player2, player3) VALUES (${winstreak}, '${winningPlayers[0]}', '${winningPlayers[1]}', '${winningPlayers[2]}')`;
+                            con.query(sql, (err: any, result: any) => {
+                                if (err) throw err;
+                                room.sendAnnouncement(`🏆 ${player.name} a streak atual da sala é de ${winstreak} jogos para a equipe 🔴!`, player.id, 0xFFFFFF, "bold");
+                            });
+                        } else {
+                            room.sendAnnouncement(`🏆 ${player.name} a streak atual da sala é de ${winstreak} jogos para a equipe 🔴!`, player.id, 0xFFFFFF, "bold");
+                        }
                     }
-                    room.sendAnnouncement(`🏆 ${player.name} a top streak atual é de ${result[0].games} jogos e foi conquistada pelos jogadores ${result[0].player1}, ${result[0].player2} e ${result[0].player3}!`, player.id, 0xFFFFFF, "bold");
-                });
+                    else if (words[0] === "!topsequencia") {
+                        const sql = `SELECT * FROM topstreak ORDER BY games DESC LIMIT 1`;
+                        con.query(sql, (err: any, result: any) => {
+                            if (err) throw err;
+                            if (result.length == 0) {
+                                room.sendAnnouncement(`🩸 ${player.name} não há nenhuma streak registrada.`, player.id, 0xFF0000, "bold", 2);
+                                return false;
+                            }
+                            room.sendAnnouncement(`🏆 ${player.name} a top streak atual é de ${result[0].games} jogos e foi conquistada pelos jogadores ${result[0].player1}, ${result[0].player2} e ${result[0].player3}!`, player.id, 0xFFFFFF, "bold");
+                        })
+
                 // Logout bem básico.
             }
             else if (words[0] === "!bb") {

@@ -2907,15 +2907,9 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     // Remove a última vírgula e espaço
                     itemList = itemList.slice(0, -2);
 
-<<<<<<< HEAD
                     room.sendAnnouncement(itemList, player.id, 0xFFFFFF, "bold", 2);
                     room.sendAnnouncement('🩸 Para comprar um item, use: !loja comprar [nome do item].', player.id, 0xFF0000, "bold", 2);
                     room.sendAnnouncement('🩸 Para comprar uma cor de chat, use o comando: !loja comprar cordochat [código da cor em formato hexadecimal].', player.id, 0xFF0000, "bold", 2);
-=======
-                    room.sendAnnouncement(itemList, null, 0xFFFFFF, "bold", 2);
-                    room.sendAnnouncement('Para comprar um item, use o comando: !loja comprar [nome do item].', null, 0xFF0000, "bold", 2);
-                    room.sendAnnouncement('Para comprar uma cor de chat, use: !loja comprar cordochat [código da cor em formato hexadecimal].', null, 0xFF0000, "bold", 2);
->>>>>>> 8eafa4f25b5ca4197e2abed4d798464ded337840
 
                     return false;
                 }

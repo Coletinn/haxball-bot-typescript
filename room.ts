@@ -2745,9 +2745,9 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     // Remove a última vírgula e espaço
                     itemList = itemList.slice(0, -2);
 
-                    room.sendAnnouncement(itemList, player.id, 0x10F200, "bold", 2);
-                    room.sendAnnouncement('Para comprar um item, use o comando: !loja comprar [nome do item].', player.id, 0x10F200, "bold", 2);
-                    room.sendAnnouncement('Para comprar uma cor de chat, use: !loja comprar cordochat [código da cor em formato hexadecimal].', player.id, 0x10F200, "bold", 2);
+                    room.sendAnnouncement(itemList, player.id, 0xFFFFFF, "bold", 2);
+                    room.sendAnnouncement('Para comprar um item, use o comando: !loja comprar [nome do item].', player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement('Para comprar uma cor de chat, use: !loja comprar cordochat [código da cor em formato hexadecimal].', player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
             }
@@ -2761,7 +2761,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     }
                     
                     const playerBalance = result[0].balance;
-                    room.sendAnnouncement(`💰 ${player.name}, seu saldo é de ${playerBalance} atacoins.`, player.id, 0x00FF00, "bold", 2);
+                    room.sendAnnouncement(`💰 ${player.name}, seu saldo é de ${playerBalance} atacoins.`, player.id, 0x10F200, "bold", 2);
                 });
                 return false;
             }
@@ -3456,8 +3456,6 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             setTimeout(function () {
                 room.pauseGame(false);
             }, 5000);
-    
-            room.sendAnnouncement("💰 Façam suas apostas!", null, 0x10F200, "bold", 0);
             room.sendAnnouncement("💰 Para apostar digite !bet [red/blue] [valor]", null, 0x10F200, "bold", 0);
             room.sendAnnouncement("💰 Após iniciada a partida, você tem 15 segundos para apostar", null, 0x10F200, "bold", 0);
     

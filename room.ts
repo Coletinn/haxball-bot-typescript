@@ -3590,12 +3590,6 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     //                      Quando o jogo começa                    //
 
     room.onGameStart = () => {
-        // Definir constantes
-        const team1Players = room.getPlayerList().filter((p: any) => p.team === 1);
-        const team2Players = room.getPlayerList().filter((p: any) => p.team === 2);
-    
-        // Verifique se há 3 jogadores em cada time
-        if (team1Players.length === 3 && team2Players.length === 3) {
             matchStartTime = new Date();
     
             room.pauseGame(true);
@@ -3712,6 +3706,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     }
 
     room.onGameStop = () => {
+        let capLeft = false; // ou true
         handleEndOfGame(winningTeam);
         sendRecordToDiscord(room.stopRecording());
         // Limpar GK's
@@ -4164,3 +4159,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 });
 
 export { room };
+
+function resumeGame() {
+    throw new Error('Function not implemented.');
+};

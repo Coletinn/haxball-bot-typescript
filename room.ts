@@ -3597,33 +3597,30 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
     room.onGameStart = () => {
         // Verifique se há 3 jogadores em cada time
-        const redPlayers = room.getPlayerList().filter(player => player.team === 1);
-        const bluePlayers = room.getPlayerList().filter(player => player.team === 2);
+        const team1Players = room.getPlayerList().filter(player => player.team === 1);
+        const team2Players = room.getPlayerList().filter(player => player.team === 2);
     
-        if (redPlayers.length !== 3 || bluePlayers.length !== 3) {
-            return;
-        }
+        if (team1Players.length === 3 && team2Players.length === 3) {
+            matchStartTime = new Date();
     
-        matchStartTime = new Date();
+            room.pauseGame(true);
+            room.sendAnnouncement(`💰 Jogo pausado por 5 segundos para as apostas.`, null, 0x10F200, "bold", 2);
     
-        room.pauseGame(true);
-        room.sendAnnouncement(`💰 Jogo pausado por 5 segundos para as apostas.`, null, 0x10F200, "bold", 2);
+            setTimeout(function () {
+                room.pauseGame(false);
+            }, 5000);
     
-        setTimeout(function () {
-            room.pauseGame(false);
-        }, 5000);
+            room.sendAnnouncement("💰 Façam suas apostas!", null, 0x10F200, "bold", 0);
+            room.sendAnnouncement("💰 Para apostar digite !bet [red/blue] [valor]", null, 0x10F200, "bold", 0);
+            room.sendAnnouncement("💰 Após iniciada a partida, você tem 15 segundos para apostar", null, 0x10F200, "bold", 0);
     
-        room.sendAnnouncement("💰 Façam suas apostas!", null, 0x10F200, "bold", 0);
-        room.sendAnnouncement("💰 Para apostar digite !bet [red/blue] [valor]", null, 0x10F200, "bold", 0);
-        room.sendAnnouncement("💰 Após iniciada a partida, você tem 15 segundos para apostar", null, 0x10F200, "bold", 0);
+            // Agendar o envio da mensagem após 15 segundos
+            setTimeout(() => {
+                room.sendAnnouncement("💰 Apostas encerradas!", null, 0x10F200, 'bold');
+            }, 15000);  // 15000 milissegundos equivalem a 15 segundos
     
         endGameVariable = false;
         gameState = State.PLAY;
-    
-        // Agendar o envio da mensagem após 15 segundos
-        setTimeout(() => {
-            room.sendAnnouncement("💰 Apostas encerradas!", null, 0x10F200, 'bold');
-        }, 15000);  // 15000 milissegundos equivalem a 15 segundos
     
         // Definir constantes
         const team1Players = room.getPlayerList().filter((p: any) => p.team === 1);

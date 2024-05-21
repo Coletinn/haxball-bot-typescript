@@ -2642,13 +2642,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 return false;
             }
             //DOAÇÃO
-            let lastDonationTime = {};
+            let lastDonationTime: { [key: string]: number } = {};
 
             if (words[0] === "!doarcoins") {
                 const recipient_id = parseInt(words[1].substring(1), 10);
                 const amount = parseInt(words[2], 10);
                 const recipient = room.getPlayer(recipient_id);
-
+            
                 if (!lastDonationTime[player.name] || Date.now() - lastDonationTime[player.name] >= 5 * 60 * 1000) {
                     con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err: any, result: string | any[]) => {
                         if (err) throw err;
@@ -2656,13 +2656,16 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             room.sendAnnouncement(`🩸 ${player.name}, você precisa se registrar para doar atacoins.`, player.id, 0xFF0000, "bold", 2);
                             return false;
                         }
-
+            
                         const playerBalance = result[0].balance;
-                        if (playerBalance < amount) {
+                        if (playerBalance < 50) {
+                            room.sendAnnouncement(`💰 ${player.name}, você precisa ter pelo menos 50 atacoins para fazer uma doação.`, player.id, 0x10F200, "bold", 2);
+                            return false;
+                        } else if (playerBalance < amount) {
                             room.sendAnnouncement(`💰 ${player.name}, você não tem atacoins suficientes para doar.`, player.id, 0x10F200, "bold", 2);
                             return false;
                         }
-
+            
                         con.query(`UPDATE players SET balance = balance - ? WHERE name = ?`, [amount, player.name]);
                         con.query(`UPDATE players SET balance = balance + ? WHERE name = ?`, [amount, recipient.name]);
                         room.sendAnnouncement(`💰 ${player.name}, você doou ${amount} atacoins para ${recipient.name}.`, player.id, 0x10F200, "bold", 2);
@@ -2672,7 +2675,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 } else {
                     room.sendAnnouncement(`🕒 ${player.name}, você precisa esperar 5 minutos entre as doações.`, player.id, 0xFF0000, "bold", 2);
                 }
-            }
+            }            
             //LOJA
             if (words[0] === "!loja") {
                 if (words[1] === "comprar" && words[2]) {
@@ -3796,7 +3799,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
         // Adicionar atacoins para o time vencedor
         for (let player of activePlayers.filter((p: { team: number; }) => p.team === winningTeam)) {
-            con.query(`UPDATE players SET balance = balance + 50 WHERE name = ?`, [player.name], (err, result) => {
+            con.query(`UPDATE players SET balance = balance + 50 WHERE name = ?`, [player.name], (err: any, result: any) => {
                 if (err) throw err;
             });
         }

@@ -2641,7 +2641,39 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             
                 return false;
             }
+            //DOAÇÃO
+            let lastDonationTime = {};
 
+            if (words[0] === "!doarcoins") {
+                const recipient_id = parseInt(words[1].substring(1), 10);
+                const amount = parseInt(words[2], 10);
+                const recipient = room.getPlayer(recipient_id);
+
+                if (!lastDonationTime[player.name] || Date.now() - lastDonationTime[player.name] >= 5 * 60 * 1000) {
+                    con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err, result) => {
+                        if (err) throw err;
+                        if (result.length === 0) {
+                            room.sendAnnouncement(`🩸 ${player.name}, você precisa se registrar para doar atacoins.`, player.id, 0xFF0000, "bold", 2);
+                            return false;
+                        }
+
+                        const playerBalance = result[0].balance;
+                        if (playerBalance < amount) {
+                            room.sendAnnouncement(`💰 ${player.name}, você não tem atacoins suficientes para doar.`, player.id, 0x10F200, "bold", 2);
+                            return false;
+                        }
+
+                        con.query(`UPDATE players SET balance = balance - ? WHERE name = ?`, [amount, player.name]);
+                        con.query(`UPDATE players SET balance = balance + ? WHERE name = ?`, [amount, recipient.name]);
+                        room.sendAnnouncement(`💰 ${player.name}, você doou ${amount} atacoins para ${recipient.name}.`, player.id, 0x10F200, "bold", 2);
+                        room.sendAnnouncement(`💰 ${recipient.name}, você recebeu ${amount} atacoins de ${player.name}.`, recipient.id, 0x10F200, "bold", 2);
+                        lastDonationTime[player.name] = Date.now();
+                    });
+                } else {
+                    room.sendAnnouncement(`🕒 ${player.name}, você precisa esperar 5 minutos entre as doações.`, player.id, 0xFF0000, "bold", 2);
+                }
+            }
+            //LOJA
             if (words[0] === "!loja") {
                 if (words[1] === "comprar" && words[2]) {
                     const itemType = words[2];
@@ -2751,7 +2783,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     return false;
                 }
             }
-            
+            //SALDO
             else if (words[0] === "!meusaldo" || words[0] === "!saldo") {
                 con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
@@ -2856,7 +2888,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 // Comando help
             } else if (words[0] === "!help" || words[0] === "!ajuda" || words[0] === "!comandos" || words[0] === "!commands") {
                 if (words.length === 1) {
-                    const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!sequencia", "!topsequencia", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists", "!provos", "!apostar", "!loja"];
+                    const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!sequencia", "!topsequencia", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists", "!provos", "!apostar", "!doarcoins", "!loja"];
                     const adminCommands = ["!ban", "!mute", "!rr2", "!setvip <1, 2 ou 3>"]
 
                     room.sendAnnouncement(`📃 Comandos: ${commands.join(", ")}`, player.id, 0xFF0000, "bold");
@@ -3761,7 +3793,14 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 winstreak = 1;
                 TopStreakBatida = false;
             }
+
+        // Adicionar atacoins para o time vencedor
+        for (let player of activePlayers.filter((p: { team: number; }) => p.team === winningTeam)) {
+            con.query(`UPDATE players SET balance = balance + 50 WHERE name = ?`, [player.name], (err, result) => {
+                if (err) throw err;
+            });
         }
+    }
         // Terminar jogo.
         room.stopGame();
 

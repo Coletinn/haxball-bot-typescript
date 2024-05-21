@@ -3599,7 +3599,6 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 room.pauseGame(false);
             }, 5000);
     
-            room.sendAnnouncement("💰 Façam suas apostas!", null, 0x10F200, "bold", 0);
             room.sendAnnouncement("💰 Para apostar digite !bet [red/blue] [valor]", null, 0x10F200, "bold", 0);
             room.sendAnnouncement("💰 Após iniciada a partida, você tem 15 segundos para apostar", null, 0x10F200, "bold", 0);
     

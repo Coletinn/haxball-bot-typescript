@@ -2870,7 +2870,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                             return;
                                         }
 
-                                        room.sendAnnouncement(`💰 ${player.name} comprou a cor de chat ${chatColor} com sucesso!`, null, 0x10F200, "bold", 2);
+                                        room.sendAnnouncement(`💰 ${player.name} comprou a cor de chat ${chatColor} com sucesso!`, null, 0xFFA500, "bold", 2);
                                     });
                                 } else {
                                     room.sendAnnouncement(`💰 ${player.name} Código/Formato de cor inválido! Formato correto: FFFFFF`, player.id, 0xFF0000, "bold", 2);
@@ -2884,7 +2884,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         return;
                                     }
 
-                                    room.sendAnnouncement(`💰 ${player.name} comprou o cargo ${itemType.toUpperCase()} com sucesso!`, null, 0x10F200, "bold", 2);
+                                    room.sendAnnouncement(`💰 ${player.name} comprou o cargo ${itemType.toUpperCase()} com sucesso!`, null, 0xFFA500, "bold", 2);
                                 });
                             }
                         });
@@ -2907,14 +2907,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     // Remove a última vírgula e espaço
                     itemList = itemList.slice(0, -2);
 
-                    room.sendAnnouncement(itemList, null, 0xFF0000, "bold", 2);
-                    room.sendAnnouncement('Para comprar um item, use o comando: !loja comprar [nome do item].', null, 0xFF0000, "bold", 2);
-                    room.sendAnnouncement('Para comprar uma cor de chat, use: !loja comprar cordochat [código da cor em formato hexadecimal].', null, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(itemList, player.id, 0xFFFFFF, "bold", 2);
+                    room.sendAnnouncement('🩸 Para comprar um item, use: !loja comprar [nome do item].', player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement('🩸 Para comprar uma cor de chat, use o comando: !loja comprar cordochat [código da cor em formato hexadecimal].', player.id, 0xFF0000, "bold", 2);
 
                     return false;
                 }
             }
-            
 
             else if (words[0] == "!provocacoes" || words[0] === "!provos" || words[0] === "!prov") {
                 room.sendAnnouncement('Provocações: !oe, !izi, !red, !blue, !paired, !paiblue, !ifood, !chora, !bolso, !divisao, !seupai, !pega, !quentin, !arn, !cag, !dmr, !fran, !furo, !grl, !ini', player.id, 0xFFFFFF, "bold")
@@ -3004,7 +3003,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 // Comando help
             } else if (words[0] === "!help" || words[0] === "!ajuda" || words[0] === "!comandos" || words[0] === "!commands") {
                 if (words.length === 1) {
-                    const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!sequencia", "!topsequencia", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists", "!provos", "!apostar", "!saldo", "!doarcoins"];
+                    const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!sequencia", "!topsequencia", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists", "!provos", "!apostar", "!saldo", "!doarcoins", "!loja"];
                     const adminCommands = ["!ban", "!mute", "!rr2", "!setvip <1, 2 ou 3>"]
 
                     room.sendAnnouncement(`📃 Comandos: ${commands.join(", ")}`, player.id, 0xFF0000, "bold");
@@ -3591,27 +3590,35 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     //                      Quando o jogo começa                    //
 
     room.onGameStart = () => {
+        // Verifique se há 3 jogadores em cada time
+        const redPlayers = room.getPlayerList().filter(player => player.team === 1);
+        const bluePlayers = room.getPlayerList().filter(player => player.team === 2);
+    
+        if (redPlayers.length !== 3 || bluePlayers.length !== 3) {
+            return;
+        }
+    
         matchStartTime = new Date();
-
+    
         room.pauseGame(true);
         room.sendAnnouncement(`💰 Jogo pausado por 5 segundos para as apostas.`, null, 0x10F200, "bold", 2);
-
+    
         setTimeout(function () {
             room.pauseGame(false);
         }, 5000);
-
+    
         room.sendAnnouncement("💰 Façam suas apostas!", null, 0x10F200, "bold", 0);
         room.sendAnnouncement("💰 Para apostar digite !bet [red/blue] [valor]", null, 0x10F200, "bold", 0);
         room.sendAnnouncement("💰 Após iniciada a partida, você tem 15 segundos para apostar", null, 0x10F200, "bold", 0);
-
+    
         endGameVariable = false;
         gameState = State.PLAY;
-
+    
         // Agendar o envio da mensagem após 15 segundos
         setTimeout(() => {
             room.sendAnnouncement("💰 Apostas encerradas!", null, 0x10F200, 'bold');
         }, 15000);  // 15000 milissegundos equivalem a 15 segundos
-
+    
         // Definir constantes
         const team1Players = room.getPlayerList().filter((p: any) => p.team === 1);
         const team2Players = room.getPlayerList().filter((p: any) => p.team === 2);

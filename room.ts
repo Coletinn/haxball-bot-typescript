@@ -3597,8 +3597,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
     room.onGameStart = () => {
         // Verifique se há 3 jogadores em cada time
-        const team1Players = room.getPlayerList().filter(player => player.team === 1);
-        const team2Players = room.getPlayerList().filter(player => player.team === 2);
+        const team1Players = room.getPlayerList().filter((player: { team: number; }) => player.team === 1);
+        const team2Players = room.getPlayerList().filter((player: { team: number; }) => player.team === 2);
     
         if (team1Players.length === 3 && team2Players.length === 3) {
             matchStartTime = new Date();
@@ -3618,6 +3618,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             setTimeout(() => {
                 room.sendAnnouncement("💰 Apostas encerradas!", null, 0x10F200, 'bold');
             }, 15000);  // 15000 milissegundos equivalem a 15 segundos
+        }
     
         endGameVariable = false;
         gameState = State.PLAY;

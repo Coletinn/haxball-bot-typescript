@@ -2807,8 +2807,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             if (words[0] === "!loja") {
                 if (words[1] === "comprar" && words[2]) {
                     const itemType = words[2];
-                    let itemCost;
-                    let vipStatus;
+                    let itemCost = 0;
+                    let vipStatus = 0;
 
                     switch (itemType) {
                         case "vip":
@@ -2915,6 +2915,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     return false;
                 }
             }
+            
 
             else if (words[0] == "!provocacoes" || words[0] === "!provos" || words[0] === "!prov") {
                 room.sendAnnouncement('Provocações: !oe, !izi, !red, !blue, !paired, !paiblue, !ifood, !chora, !bolso, !divisao, !seupai, !pega, !quentin, !arn, !cag, !dmr, !fran, !furo, !grl, !ini', player.id, 0xFFFFFF, "bold")

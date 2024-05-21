@@ -117,11 +117,11 @@ export function createChannelMessage(channelName: string, channelId: string | nu
 const timeoutIds: Record<string, any> = {};
 
 // definir Interfaces para player
-/* interface Player {
+ interface Player {
     id: number;
     name: string;
     team: number;
-} */
+} 
 
 interface PlayerStatus {
     [id: number]: boolean;
@@ -2228,7 +2228,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 };
 
                 // Função para lidar com comandos
-                function handleCommand(words, player) {
+                function handleCommand(words: string[], player: { name: any; id: string | number; team: number; }) {
                     if (words[0] === "!sequencia") {
                         if (winstreak >= 5) {
                             let winningPlayers = teamPlayers[winningTeam];

@@ -2650,7 +2650,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 const recipient = room.getPlayer(recipient_id);
 
                 if (!lastDonationTime[player.name] || Date.now() - lastDonationTime[player.name] >= 5 * 60 * 1000) {
-                    con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err, result) => {
+                    con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err: any, result: string | any[]) => {
                         if (err) throw err;
                         if (result.length === 0) {
                             room.sendAnnouncement(`🩸 ${player.name}, você precisa se registrar para doar atacoins.`, player.id, 0xFF0000, "bold", 2);

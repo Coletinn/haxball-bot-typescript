@@ -2584,8 +2584,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     });
                 });
             }
-
-            else if (words[0] === "!bet" || words[0] === "!apostar") {
+            //LOJA
+            if (words[0] === "!bet" || words[0] === "!apostar") {
                 const currentTime = new Date();
                 const timeDiff = (currentTime.getTime() - matchStartTime.getTime()) / 1000; // time difference in seconds
 
@@ -2599,41 +2599,44 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     return false;
                 }
 
-                if (player.team === "red" || player.team === "blue") {
-                    room.sendAnnouncement(`💰 ${player.name} Jogadores que estão em um time não podem apostar.`, player.id, 0xFF0000, "bold", 2);
-                    return false;
+                if (loggedInPlayers[player.id]) {
+                    let playersGaming = room.getPlayerList().filter((p: Player) => p.team > 0);
+                    if (playersGaming.length >= getMaxTeamSize() * 2 && (player.team === 1 || player.team === 2)) {
+                        room.sendAnnouncement(`💰 ${player.name} Jogadores que estão em um time não podem apostar.`, player.id, 0xFF0000, "bold", 2);
+                        return false;
+                    }
                 }
-            
+
                 const betTeam = words[1];
                 const betValue = parseInt(words[2]);
-            
+
                 if (!betTeam || isNaN(betValue) || (betTeam !== "red" && betTeam !== "blue")) {
                     room.sendAnnouncement(`🩸 ${player.name} Formato inválido. Use: !bet [red/blue] [valor] ou !apostar [red/blue] [valor]`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-            
+
                 if (betValue < 10 || betValue > 5000) {
                     room.sendAnnouncement(`🩸 ${player.name} O valor da aposta deve estar entre 10 e 5000.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
                 const teamValue = betTeam === "red" ? 1 : 2;
-            
+
                 con.query(`SELECT id, balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
                     if (result.length === 0) {
                         room.sendAnnouncement(`🩸 ${player.name} Você precisa registrar para poder apostar.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
-            
+
                     const playerId = result[0].id;
                     const playerBalance = result[0].balance;
-            
+
                     if (playerBalance < betValue) {
                         room.sendAnnouncement(`🩸 ${player.name} Você não tem dinheiro suficiente para apostar.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
-            
+
                     // Check if the player has already placed a bet in this game
                     con.query(`SELECT * FROM bets WHERE player_id = ? AND room_id = ?`, [playerId, process.env.room_id], (err: any, existingBets: any) => {
                         if (err) throw err;
@@ -2641,23 +2644,23 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             room.sendAnnouncement(`🩸 ${player.name} Você já fez uma aposta nesse jogo.`, player.id, 0xFF0000, "bold", 2);
                             return false;
                         }
-            
+
                         // Deduct the bet amount from the player's balance
                         con.query(`UPDATE players SET balance = balance - ? WHERE id = ?`, [betValue, playerId], (err: any) => {
                             if (err) throw err;
-            
+
                             // Add the bet to the bets table
                             con.query(`INSERT INTO bets (player_id, team, value, room_id) VALUES (?, ?, ?, ?)`, [playerId, teamValue, betValue, process.env.room_id], (err: any) => {
                                 if (err) throw err;
-            
+
                                 room.sendAnnouncement(`💰 ${player.name} apostou ${betValue} atacoins no time ${betTeam.toUpperCase()}.`, null, 0x00FF00, "bold", 2);
                             });
                         });
                     });
                 });
-            
+
                 return false;
-            }
+            }            
             //DOAÇÃO
             let lastDonationTime: { [key: string]: number } = {};
 

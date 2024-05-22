@@ -2589,16 +2589,19 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 const currentTime = new Date();
                 const timeDiff = (currentTime.getTime() - matchStartTime.getTime()) / 1000; // diferença de tempo em segundos
 
+                // Verifica se a aposta foi feita nos primeiros 15 segundos da partida
                 if (timeDiff > 15) {
                     room.sendAnnouncement(`🩸 ${player.name} Só é permitido apostar nos primeiros 15 segundos da partida.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
+                // Verifica se há pelo menos 6 jogadores na sala
                 if (numberOfPlayers < 6) {
                     room.sendAnnouncement(`🩸 ${player.name} Precisa ter 6 jogadores na sala para apostar.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
+                // Verifica se o jogador está logado e em um time
                 if (loggedInPlayers[player.id]) {
                     let playersGaming = room.getPlayerList().filter((p: Player) => p.team > 0);
                     if (playersGaming.length >= getMaxTeamSize() * 2 && (player.team === 1 || player.team === 2)) {
@@ -2610,11 +2613,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 const betTeam = words[1];
                 const betValue = parseInt(words[2]);
 
+                // Verifica se a aposta é válida
                 if (!betTeam || isNaN(betValue) || (betTeam !== "red" && betTeam !== "blue")) {
                     room.sendAnnouncement(`🩸 ${player.name} Formato inválido. Use: !bet [red/blue] [valor] ou !apostar [red/blue] [valor]`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
+                // Verifica se o valor da aposta está entre 10 e 5000
                 if (betValue < 10 || betValue > 5000) {
                     room.sendAnnouncement(`🩸 ${player.name} O valor da aposta deve estar entre 10 e 5000.`, player.id, 0xFF0000, "bold", 2);
                     return false;
@@ -2632,11 +2637,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     const playerId = result[0].id;
                     const playerBalance = result[0].balance;
 
+                    // Verifica se o jogador tem saldo suficiente para apostar
                     if (playerBalance < betValue) {
                         room.sendAnnouncement(`🩸 ${player.name} Você não tem dinheiro suficiente para apostar.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
 
+                    // Verifica se o jogador já fez uma aposta neste jogo
                     con.query(`SELECT * FROM bets WHERE player_id = ? AND room_id = ?`, [playerId, process.env.room_id], (err: any, existingBets: any) => {
                         if (err) throw err;
                         if (existingBets.length > 0) {
@@ -2644,9 +2651,11 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             return false;
                         }
 
+                        // Deduz o valor da aposta do saldo do jogador
                         con.query(`UPDATE players SET balance = balance - ? WHERE id = ?`, [betValue, playerId], (err: any) => {
                             if (err) throw err;
 
+                            // Adiciona a aposta à tabela de apostas
                             con.query(`INSERT INTO bets (player_id, team, value, room_id) VALUES (?, ?, ?, ?)`, [playerId, teamValue, betValue, process.env.room_id], (err: any) => {
                                 if (err) throw err;
 
@@ -2657,7 +2666,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 });
 
                 return false;
-            }   
+            }            
             //DOAÇÃO
             let lastDonationTime: { [key: string]: number } = {};
 
@@ -2665,7 +2674,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 const recipient_id = parseInt(words[1].substring(1), 10);
                 const amount = parseInt(words[2], 10);
                 const recipient = room.getPlayer(recipient_id);
-            
+
+                if (!recipient) {
+                    // Trate o caso em que recipient é null
+                    return false;
+                }
+
                 if (!lastDonationTime[player.name] || Date.now() - lastDonationTime[player.name] >= 5 * 60 * 1000) {
                     con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err: any, result: string | any[]) => {
                         if (err) throw err;
@@ -2673,7 +2687,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             room.sendAnnouncement(`🩸 ${player.name}, você precisa se registrar para doar atacoins.`, player.id, 0xFF0000, "bold", 2);
                             return false;
                         }
-            
+
                         const playerBalance = result[0].balance;
                         if (playerBalance < 50) {
                             room.sendAnnouncement(`💰 ${player.name}, você precisa ter pelo menos 50 atacoins para fazer uma doação.`, player.id, 0x10F200, "bold", 2);
@@ -2682,7 +2696,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             room.sendAnnouncement(`💰 ${player.name}, você não tem atacoins suficientes para doar.`, player.id, 0x10F200, "bold", 2);
                             return false;
                         }
-            
+
                         con.query(`UPDATE players SET balance = balance - ? WHERE name = ?`, [amount, player.name]);
                         con.query(`UPDATE players SET balance = balance + ? WHERE name = ?`, [amount, recipient.name]);
                         room.sendAnnouncement(`💰 ${player.name}, você doou ${amount} atacoins para ${recipient.name}.`, player.id, 0x10F200, "bold", 2);
@@ -2692,7 +2706,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 } else {
                     room.sendAnnouncement(`🕒 ${player.name}, você precisa esperar 5 minutos entre as doações.`, player.id, 0xFF0000, "bold", 2);
                 }
-            }            
+            }
             //LOJA
             if (words[0] === "!loja") {
                 var input = words;

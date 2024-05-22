@@ -1976,7 +1976,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 }
 
                 if (userId === player.id) {
-                    room.sendAnnouncement(`🩸 ${userName} você não pode se auto-promover.`, userId, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 ${player.name} você não pode se auto-promover.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
@@ -1986,98 +1986,37 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 }
 
                 // Verifica se o jogador que está tentando usar o comando é um CEO
-                con.query(`SELECT * FROM players WHERE name = ? AND ceo = 1`, [userName], (err: any, result: any) => {
+                con.query(`SELECT * FROM players WHERE name = ? AND ceo = 1`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
 
                     if (result.length > 0) {
-                        con.query(`SELECT * FROM players WHERE name = ?`, [userName], (err: any, result: any) => {
+                        var adminColumn = '';
+                        if (adminType === '1') {
+                            adminColumn = '`ceo`';
+                        } else if (adminType === '2') {
+                            adminColumn = '`gerente`';
+                        } else if (adminType === '3') {
+                            adminColumn = '`admin`';
+                        } else if (adminType === '4') {
+                            adminColumn = '`mod`';
+                        } else {
+                            room.sendAnnouncement(`🩸 Você não digitou o cargo corretamente. (Ex: !setadmin #id 1-4)`, player.id, cores.vermelho, "bold", 2);
+                            return false;
+                        }
+
+                        con.query(`UPDATE players SET ${adminColumn} = 1 WHERE name = ?`, [userName], (err: any, result: any) => {
                             if (err) throw err;
 
-                            if (result.length > 0) {
-                                if (adminType === 1) {
-                                    if (result[0].ceo === 0) {
-                                        con.query(`UPDATE players SET ceo = 1 WHERE name = ?`, [userName], (err: any, result: any) => {
-                                            if (err) {
-                                                console.error(err);
-                                                return false;
-                                            }
-
-                                            if (result.affectedRows > 0) {
-                                                room.sendAnnouncement(`👑 ${userName} Agora é um CEO!`, null, 0xFFA500, "bold", 2);
-                                                superadmin[userId] = 1;
-                                            } else {
-                                                return false;
-                                            }
-                                        });
-                                    } else {
-                                        room.sendAnnouncement(`O ${userName} já é um CEO!`, player.id, cores.vermelho, "bold", 2);
-                                        return false;
-                                    }
-                                } else if (adminType === 2) {
-                                    if (result[0].gerente === 0) {
-                                        con.query(`UPDATE players SET gerente = 1 WHERE name = ?`, [userName], (err: any, result: any) => {
-                                            if (err) {
-                                                console.error(err);
-                                                return false;
-                                            }
-
-                                            if (result.affectedRows > 0) {
-                                                room.sendAnnouncement(`👑 ${userName} Agora é um Gerente!`, null, 0xFFA500, "bold", 2);
-                                                superadmin[userId] = 2;
-                                            } else {
-                                                return false;
-                                            }
-                                        });
-                                    } else {
-                                        room.sendAnnouncement(`O ${userName} já é um Gerente!`, player.id, cores.vermelho, "bold", 2);
-                                        return false;
-                                    }
-                                } else if (adminType === 3) {
-                                    if (result[0].admin === 0) {
-                                        con.query(`UPDATE players SET admin = 1 WHERE name = ?`, [userName], (err: any, result: any) => {
-                                            if (err) {
-                                                console.error(err);
-                                                return false;
-                                            }
-
-                                            if (result.affectedRows > 0) {
-                                                room.sendAnnouncement(`👑 ${userName} Agora é um Administrador!`, null, 0xFFA500, "bold", 2);
-                                                superadmin[userId] = 3;
-                                            } else {
-                                                return false;
-                                            }
-                                        });
-                                    } else {
-                                        room.sendAnnouncement(`O ${userName} já é um Administrador!`, player.id, cores.vermelho, "bold", 2);
-                                        return false;
-                                    }
-                                } else if (adminType === 4) {
-                                    if (result[0].mod === 0) {
-                                        con.query(`UPDATE players SET mod = 1 WHERE name = ?`, [userName], (err: any, result: any) => {
-                                            if (err) {
-                                                console.error(err);
-                                                return false;
-                                            }
-
-                                            if (result.affectedRows > 0) {
-                                                room.sendAnnouncement(`👑 ${userName} Agora é um Moderador!`, null, 0xFFA500, "bold", 2);
-                                                superadmin[userId] = 4;
-                                            } else {
-                                                return false;
-                                            }
-                                        });
-                                    } else {
-                                        room.sendAnnouncement(`O ${userName} já é um Moderador!`, player.id, cores.vermelho, "bold", 2);
-                                        return false;
-                                    }
-                                }
+                            if (result.affectedRows > 0) {
+                                room.sendAnnouncement(`👑 ${userName} Agora é um ${adminColumn.replace(/`/g, '')}!`, null, 0xFFA500, "bold", 2);
+                                room.sendAnnouncement(`👑 ${userName} Por favor, saia e entre na sala novamente para que o cargo seja atualizado.`, userId, 0xFF0000, "bold", 2);
+                                superadmin[userId] = parseInt(adminType);
                             } else {
-                                room.sendAnnouncement(`🩸 ${player.name} não encontrei um jogador com esse nome/id.`, player.id, 0xFF0000, "bold", 2);
                                 return false;
                             }
                         });
                     } else {
-                        room.sendAnnouncement(`🩸 ${userName} você não tem permissão para usar este comando.`, userId, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`🩸 ${userName} você não tem permissão para usar este comando.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
                 });

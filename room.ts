@@ -3143,35 +3143,35 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 for (var index = 0; index < room.getPlayerList().filter((p: { team: number; }) => p.team == 0).length; index++)
                     if (superadmin[player.id] === 1) {
                         room.sendAnnouncement(
-                            `[Equipe Spectators] ${CeoTag} ${rankTag[player.id]} ${player.name}: ${message}`,
+                            `[Espectador] ${CeoTag} ${rankTag[player.id]} ${player.name}: ${message}`,
                             room.getPlayerList().filter((p: { team: number; }) => p.team == 0)[index].id,
                             0xF5F5F5,
                             "bold"
                         );
                     } else if (gerentes[player.id] === 1) {
                         room.sendAnnouncement(
-                            `[Equipe Spectators] ${gerentesTag} ${rankTag[player.id]} ${player.name}: ${message}`,
+                            `[Espectador] ${gerentesTag} ${rankTag[player.id]} ${player.name}: ${message}`,
                             room.getPlayerList().filter((p: { team: number; }) => p.team == 0)[index].id,
                             0xF5F5F5,
                             "bold"
                         );
                     } else if (admins[player.id] === 1) {
                         room.sendAnnouncement(
-                            `[Equipe Spectators] ${adminsTag} ${rankTag[player.id]} ${player.name}: ${message}`,
+                            `[Espectador] ${adminsTag} ${rankTag[player.id]} ${player.name}: ${message}`,
                             room.getPlayerList().filter((p: { team: number; }) => p.team == 0)[index].id,
                             0xF5F5F5,
                             "bold"
                         );
                     } else if (mods[player.id] === 1) {
                         room.sendAnnouncement(
-                            `[Equipe Spectators] ${modsTag} ${rankTag[player.id]} ${player.name}: ${message}`,
+                            `[Espectador] ${modsTag} ${rankTag[player.id]} ${player.name}: ${message}`,
                             room.getPlayerList().filter((p: { team: number; }) => p.team == 0)[index].id,
                             0xF5F5F5,
                             "bold"
                         );
                     } else {
                         room.sendAnnouncement(
-                            `[Equipe Spectators] ${rankTag[player.id]} ${player.name} ${message}`,
+                            `[Espectador] ${rankTag[player.id]} ${player.name}: ${message}`,
                             room.getPlayerList().filter((p: { team: number; }) => p.team == 0)[index].id,
                             0xF5F5F5,
                             "bold"

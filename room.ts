@@ -3320,7 +3320,11 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         // Enviar a mensagem apenas para os jogadores em campo
                         let playersGaming = room.getPlayerList().filter((p: Player) => p.team > 0);
                         for (let player of playersGaming) {
-                            room.sendAnnouncement("🔴 GK do red: " + gk[0].name + ", 🔵 GK do blue: " + gk[1].name + ", se for necessário trocar digite !gk", player.id, 0xFFFFFF, "bold", 0);
+                            if (player.team === 1) { // Jogador da equipe vermelha
+                                room.sendAnnouncement("🔴 GK do red: " + gk[0].name + ", se for necessário trocar digite !gk", player.id, 0xFFFFFF, "bold", 0);
+                            } else if (player.team === 2) { // Jogador da equipe azul
+                                room.sendAnnouncement("🔵 GK do blue: " + gk[1].name + ", se for necessário trocar digite !gk", player.id, 0xFFFFFF, "bold", 0);
+                            }
                         }
                     }
                 }

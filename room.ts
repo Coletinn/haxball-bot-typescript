@@ -3317,7 +3317,11 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     room.sendAnnouncement(`📊 Previsão de Vitória: 🔴 ${team1Chance.toFixed(2)}% chance de vencer contra 🔵 ${team2Chance.toFixed(2)}% chance de vencer.`, null, 0xFFFFFF, "bold", 0);
                     if (redTeam.length >= 2 && blueTeam.length >= 2) {
                         gk = isGk();
-                        room.sendAnnouncement("🔴 GK do red: " + gk[0].name + ", 🔵 GK do blue: " + gk[1].name + ", se for necessário trocar digite !gk", null, 0xFFFFFF, "bold", 0);
+                        // Enviar a mensagem apenas para os jogadores em campo
+                        let playersGaming = room.getPlayerList().filter((p: Player) => p.team > 0);
+                        for (let player of playersGaming) {
+                            room.sendAnnouncement("🔴 GK do red: " + gk[0].name + ", 🔵 GK do blue: " + gk[1].name + ", se for necessário trocar digite !gk", player.id, 0xFFFFFF, "bold", 0);
+                        }
                     }
                 }
             }

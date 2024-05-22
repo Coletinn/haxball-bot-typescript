@@ -2671,12 +2671,22 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             let lastDonationTime: { [key: string]: number } = {};
 
             if (words[0] === "!doarcoins") {
-                const recipient_id = parseInt(words[1].substring(1), 10);
+                if (!words[1] || !words[2] || isNaN(parseInt(words[1].substring(1), 10)) || isNaN(parseInt(words[2], 10))) {
+                    room.sendAnnouncement(`📝 Para doar atacoins, use o comando: !doarcoins [#ID do jogador] [quantidade]. Por exemplo, !doarcoins #2 50`, player.id, 0xFF0000, "bold", 2);
+                    return false;
+                }
+
+                const recipient_id = parseInt(words[1].substring(1), 10); // Aqui usamos substring(1) para remover o '#'
                 const amount = parseInt(words[2], 10);
                 const recipient = room.getPlayer(recipient_id);
 
                 if (!recipient) {
-                    // Trate o caso em que recipient é null
+                    room.sendAnnouncement(`🩸 ${player.name}, o ID do jogador que você forneceu não é válido.`, player.id, 0xFF0000, "bold", 2);
+                    return false;
+                }
+
+                if (recipient.id === player.id) {
+                    room.sendAnnouncement(`🩸 ${player.name}, você não pode doar atacoins para si mesmo.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 

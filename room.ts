@@ -791,15 +791,15 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         }
 
                         if (result[0].vip === 1) {
-                            room.sendAnnouncement(`💎 O VIP ${player.name} acabou de entrar!`, player.id, cores.ciano, "bold");
+                            room.sendAnnouncement(`💎 ${player.name}, seja bem vindo Vip!`, player.id, cores.ciano, "bold");
                             vips[player.id] = 1;
                         }
                         if (result[0].vip === 2) {
-                            room.sendAnnouncement(`🔰 O jogador PREMIUM ${player.name} acabou de entrar!`, player.id, cores.coral, "bold");
+                            room.sendAnnouncement(`🔰 ${player.name}, seja bem vindo Premium!`, player.id, cores.coral, "bold");
                             premiums[player.id] = 1;
                         }
                         if (result[0].vip === 3) {
-                            room.sendAnnouncement(`🌋 O jogador Legend ${player.name} acabou de entrar!`, player.id, cores.violeta, "bold");
+                            room.sendAnnouncement(`🌋 ${player.name}, seja bem vindo Legend!`, player.id, cores.violeta, "bold");
                             legends[player.id] = 1;
                         }
 
@@ -1737,22 +1737,22 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
                                         if (result[0].ceo === 1) { // O usuário é super admin como tal dar admin ao mesmo.
                                             room.setPlayerAdmin(player.id, true);
-                                            room.sendAnnouncement(`👑 ${player.name}, você recebeu o cargo de CEO automaticamente.`, player.id, 0xFFA500, "bold");
+                                            room.sendAnnouncement(`👑 ${player.name}, você entrou logado como CEO automaticamente.`, player.id, 0xFFA500, "bold");
                                             superadmin[player.id] = 1;
                                         }
                                         if (result[0].gerente === 1) {
                                             room.setPlayerAdmin(player.id, true);
-                                            room.sendAnnouncement(`🔥 ${player.name} você recebeu o cargo de Gerente automaticamente.`, player.id, 0xFFA500, "bold");
+                                            room.sendAnnouncement(`🔥 ${player.name}, você entrou logado como Gerente automaticamente.`, player.id, 0xFFA500, "bold");
                                             gerentes[player.id] = 1;
                                         }
                                         if (result[0].admin === 1) {
                                             room.setPlayerAdmin(player.id, true);
-                                            room.sendAnnouncement(`🚧 ${player.name} você recebeu o cargo de administrador automaticamente.`, player.id, 0xFFA500, "bold");
+                                            room.sendAnnouncement(`🚧 ${player.name}, você entrou logado como Administrator automaticamente.`, player.id, 0xFFA500, "bold");
                                             admins[player.id] = 1;
                                         }
                                         if (result[0].mod === 1) {
                                             room.setPlayerAdmin(player.id, true);
-                                            room.sendAnnouncement(`🚧 ${player.name} você recebeu o cargo de moderador automaticamente.`, player.id, 0xFFA500, "bold");
+                                            room.sendAnnouncement(`🚧 ${player.name}, você entrou logado como Moderador automaticamente.`, player.id, 0xFFA500, "bold");
                                             mods[player.id] = 1;
                                         }
 
@@ -2678,93 +2678,65 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             }            
             //LOJA
             if (words[0] === "!loja") {
-                if (words[1] === "comprar" && words[2]) {
-                    const itemType = words[2];
-                    let itemCost = 0;
-                    let vipStatus = 0;
+                var input = words;
+                var action = input[1];
+                var itemNumber = parseInt(input[2]); // Convert to integer
+                var userId = player.id;
+                var userName = player.name;
 
-                    switch (itemType) {
-                        case "vip":
-                            itemCost = 50000;
-                            vipStatus = 1;
-                            break;
-                        case "premium":
-                            itemCost = 70000;
-                            vipStatus = 2;
-                            break;
-                        case "legend":
-                            itemCost = 100000;
-                            vipStatus = 3;
-                            break;
-                        case "cordochat":
-                            itemCost = 50000; // Atualizado para 50k atacoins
-                            break;
-                        default:
-                            room.sendAnnouncement(`💰 ${player.name} Tipo de item inválido. Use: !loja comprar [vip/premium/legend/cordochat]`, player.id, 0xFF0000, "bold", 2);
-                            return false;
-                    }
+                var storeItems: { [key: number]: { name: string, cost: number } } = {
+                    1: { name: 'VIP', cost: 150000 },
+                    2: { name: 'PREMIUM', cost: 250000 },
+                    3: { name: 'LEGEND', cost: 300000 }
+                };
 
-                    con.query(`SELECT id, balance FROM players WHERE name = ?`, [player.name], (err, result) => {
-                        if (err) {
-                            // Handle error
-                            console.error(err);
-                            return;
-                        }
-                        if (result.length === 0) {
-                            room.sendAnnouncement(`💰 ${player.name} Você precisa registrar para poder comprar um item.`, player.id, 0xFF0000, "bold", 2);
-                            return false;
-                        }
-
-                        const playerId = result[0].id;
-                        const playerBalance = result[0].balance;
-
-                        if (playerBalance < itemCost) {
-                            room.sendAnnouncement(`💰 ${player.name} Você não tem Atacoins suficiente para comprar o item ${itemType.toUpperCase()}.`, player.id, 0xFF0000, "bold", 2);
-                            return false;
-                        }
-
-                        // Deduct the item cost from the player's balance
-                        con.query(`UPDATE players SET balance = balance - ? WHERE id = ?`, [itemCost, playerId], (err) => {
+                if (action === 'comprar' && !isNaN(itemNumber)) {
+                    var item = storeItems[itemNumber];
+                    if (item) {
+                        con.query(`SELECT balance FROM players WHERE name = ?`, [userName], (err: Error, result: any[]) => {
                             if (err) {
-                                // Handle error
                                 console.error(err);
+                                room.sendAnnouncement(`🩸 Desculpe ${userName}, ocorreu um erro ao verificar seu saldo.`, userId, 0xFF0000, "bold", 2);
                                 return;
                             }
 
-                            if (itemType === "cordochat") {
-                                const chatColor = words[3];
-                                let regEx0 = new RegExp(`^[0-9a-fA-F]{6}$`)
-                                if (regEx0.test(chatColor)) {
-                                    // Set the player's chat color to the purchased color
-                                    con.query(`UPDATE players SET chatColor = ? WHERE id = ?`, [chatColor, playerId], (err) => {
+                            if (result[0]) {
+                                if (result[0].balance >= item.cost) {
+                                    con.query(`UPDATE players SET balance = balance - ?, vip = ? WHERE name = ?`, [item.cost, itemNumber, userName], (err: Error, result: any) => {
                                         if (err) {
-                                            // Handle error
                                             console.error(err);
+                                            room.sendAnnouncement(`🩸 Desculpe ${userName}, ocorreu um erro ao atualizar seu saldo e status VIP.`, userId, 0xFF0000, "bold", 2);
                                             return;
                                         }
 
-                                        room.sendAnnouncement(`💰 ${player.name} comprou a cor de chat ${chatColor} com sucesso!`, null, 0x10F200, "bold", 2);
+                                        if (result.affectedRows > 0) {
+                                            room.sendAnnouncement(`🎉 ${userName} acabou de comprar o cargo "${item.name}" na loja!`, null, 0xFFA500, "bold", 2);
+                                            room.sendAnnouncement(`🩸 Para atualizar sua nova tag, por favor, saia e entre na sala novamente.`, userId, 0xFF0000, "bold", 2);
+                                        } else {
+                                            return false;
+                                        }
                                     });
                                 } else {
-                                    room.sendAnnouncement(`💰 ${player.name} Código/Formato de cor inválido! Formato correto: FFFFFF`, player.id, 0xFF0000, "bold", 2);
+                                    room.sendAnnouncement(`🩸 Desculpe ${userName}, você não tem atacoins suficientes para comprar este item.`, userId, 0xFF0000, "bold", 2);
                                 }
                             } else {
-                                // Set the player's role to the purchased VIP type
-                                con.query(`UPDATE players SET role = ?, vip = ? WHERE id = ?`, [itemType.toUpperCase(), vipStatus, playerId], (err) => {
-                                    if (err) {
-                                        // Handle error
-                                        console.error(err);
-                                        return;
-                                    }
-
-                                    room.sendAnnouncement(`💰 ${player.name} comprou o cargo ${itemType.toUpperCase()} com sucesso!`, null, 0x10F200, "bold", 2);
-                                });
+                                room.sendAnnouncement(`🩸 Desculpe ${userName}, não foi possível encontrar suas informações de jogador.`, userId, 0xFF0000, "bold", 2);
                             }
                         });
-                    });
+                    } else {
+                        room.sendAnnouncement(`🩸 Desculpe ${userName}, este item não está disponível na loja.`, userId, 0xFF0000, "bold", 2);
+                    }
+                } else {
+                    var storeMessage = '🛒 Loja de Itens: ';
+                    for (var i in storeItems) {
+                        storeMessage += `${i}. ${storeItems[i].name} - ${storeItems[i].cost} atacoins, `;
+                    }
+                    // Remove the trailing comma and space
+                    storeMessage = storeMessage.slice(0, -2);
+                    room.sendAnnouncement(storeMessage, userId, 0xFFFFFF, "bold", 2);
+                    room.sendAnnouncement(`💰 Para comprar um item, digite "!loja comprar <número do item>".`, userId, 0xFF0000, "bold", 2);
                 }
-            }
-            
+            }  
             //SALDO
             else if (words[0] === "!meusaldo" || words[0] === "!saldo") {
                 con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {

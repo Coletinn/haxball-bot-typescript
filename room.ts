@@ -2633,7 +2633,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             con.query(`INSERT INTO bets (player_id, team, value, room_id) VALUES (?, ?, ?, ?)`, [playerId, teamValue, betValue, process.env.room_id], (err: any) => {
                                 if (err) throw err;
             
-                                room.sendAnnouncement(`🩸 ${player.name} apostou ${betValue} atacoins no time ${betTeam.toUpperCase()}.`, null, 0x00FF00, "bold", 2);
+                                room.sendAnnouncement(`💰 ${player.name} apostou ${betValue} atacoins no time ${betTeam.toUpperCase()}.`, null, 0x00FF00, "bold", 2);
                             });
                         });
                     });
@@ -2704,7 +2704,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             return false;
                     }
 
-                    con.query(`SELECT id, balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
+                    con.query(`SELECT id, balance FROM players WHERE name = ?`, [player.name], (err, result) => {
                         if (err) {
                             // Handle error
                             console.error(err);
@@ -2724,7 +2724,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         }
 
                         // Deduct the item cost from the player's balance
-                        con.query(`UPDATE players SET balance = balance - ? WHERE id = ?`, [itemCost, playerId], (err: any) => {
+                        con.query(`UPDATE players SET balance = balance - ? WHERE id = ?`, [itemCost, playerId], (err) => {
                             if (err) {
                                 // Handle error
                                 console.error(err);
@@ -2736,7 +2736,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                 let regEx0 = new RegExp(`^[0-9a-fA-F]{6}$`)
                                 if (regEx0.test(chatColor)) {
                                     // Set the player's chat color to the purchased color
-                                    con.query(`UPDATE players SET chatColor = ? WHERE id = ?`, [chatColor, playerId], (err: any) => {
+                                    con.query(`UPDATE players SET chatColor = ? WHERE id = ?`, [chatColor, playerId], (err) => {
                                         if (err) {
                                             // Handle error
                                             console.error(err);
@@ -2750,7 +2750,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                 }
                             } else {
                                 // Set the player's role to the purchased VIP type
-                                con.query(`UPDATE players SET role = ?, vip = ? WHERE id = ?`, [itemType.toUpperCase(), vipStatus, playerId], (err: any) => {
+                                con.query(`UPDATE players SET role = ?, vip = ? WHERE id = ?`, [itemType.toUpperCase(), vipStatus, playerId], (err) => {
                                     if (err) {
                                         // Handle error
                                         console.error(err);
@@ -2762,30 +2762,9 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             }
                         });
                     });
-
-                    return false;
-                } else {
-                    const items = {
-                        "VIP": 50000,
-                        "Premium": 70000,
-                        "Legend": 100000,
-                        "Cor do Chat": 50000
-                    };
-
-                    let itemList = '💰 Itens disponíveis na loja: ';
-                    for (const [item, cost] of Object.entries(items)) {
-                        itemList += `${item} (custo: ${cost} atacoins), `;
-                    }
-
-                    // Remove a última vírgula e espaço
-                    itemList = itemList.slice(0, -2);
-
-                    room.sendAnnouncement(itemList, player.id, 0xFFFFFF, "bold", 2);
-                    room.sendAnnouncement('Para comprar um item, use o comando: !loja comprar [nome do item].', player.id, 0xFF0000, "bold", 2);
-                    room.sendAnnouncement('Para comprar uma cor de chat, use: !loja comprar cordochat [código da cor em formato hexadecimal].', player.id, 0xFF0000, "bold", 2);
-                    return false;
                 }
             }
+            
             //SALDO
             else if (words[0] === "!meusaldo" || words[0] === "!saldo") {
                 con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {

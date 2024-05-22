@@ -2672,7 +2672,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
             if (words[0] === "!doarcoins") {
                 if (!words[1] || !words[2] || isNaN(parseInt(words[1].substring(1), 10)) || isNaN(parseInt(words[2], 10))) {
-                    room.sendAnnouncement(`📝 Para doar atacoins, use o comando: !doarcoins [#ID do jogador] [quantidade]. Por exemplo, !doarcoins #2 50`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`🩸 Use: !doarcoins [#ID] [quantidade]. Exemplo: !doarcoins #2 50`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 

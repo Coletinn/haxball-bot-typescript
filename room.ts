@@ -2709,9 +2709,9 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     betType = "player";
                     betOn = betTarget.slice(1);  // Remove o '@' do início do nome do jogador
 
-                    // Verifica se o valor da aposta está entre 50 e 1000 para apostas em jogadores
-                    if (betValue < 50 || betValue > 1000) {
-                        room.sendAnnouncement(`🩸 ${player.name} O valor da aposta em jogadores deve estar entre 50 e 1000.`, player.id, 0xFF0000, "bold", 2);
+                    // Verifica se o valor da aposta está entre 50 e 2500 para apostas em jogadores
+                    if (betValue < 50 || betValue > 2500) {
+                        room.sendAnnouncement(`🩸 ${player.name} O valor da aposta em jogadores deve estar entre 50 e 2500.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
                 }

@@ -2649,39 +2649,44 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 let matchStartTime = new Date();
                 const currentTime = new Date();
                 const timeDiff = (currentTime.getTime() - matchStartTime.getTime()) / 1000; // diferença de tempo em segundos
-
+            
                 // Verifica se a aposta foi feita nos primeiros 15 segundos da partida
                 if (timeDiff > 15) {
                     room.sendAnnouncement(`🩸 ${player.name} Só é permitido apostar nos primeiros 15 segundos da partida.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-
+            
                 // Verifica se há pelo menos 6 jogadores na sala
                 if (numberOfPlayers < 6) {
                     room.sendAnnouncement(`🩸 ${player.name} Precisa ter 6 jogadores na sala para apostar.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-
+            
                 // Verifica se o jogador está logado e em um time
                 if (!loggedInPlayers[player.id] || (player.team === 1 || player.team === 2)) {
                     room.sendAnnouncement(`💰 ${player.name} Jogadores que estão em um time ou não estão logados não podem apostar.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-
+            
                 const betTarget = words[1];
                 const betValue = parseInt(words[2]);
-                const betGoals = parseInt(words[3]);
-
+                let betGoals: number | null = parseInt(words[3]);
+            
+                // Se a aposta é em um time, ignore o número de gols
+                if (betTarget === "red" || betTarget === "blue") {
+                    betGoals = null;
+                }
+            
                 // Verifica se a aposta é válida
-                if (!betTarget || isNaN(betValue) || isNaN(betGoals) || (betTarget !== "red" && betTarget !== "blue" && !betTarget.startsWith("@")) || betGoals < 1 || betGoals > 3) {
+                if (!betTarget || isNaN(betValue) || (betTarget !== "red" && betTarget !== "blue" && !betTarget.startsWith("@")) || (betGoals !== null && (betGoals < 1 || betGoals > 3))) {
                     room.sendAnnouncement(`🩸 ${player.name} Formato inválido. Use: !apostar [red/blue] [valor] para apostar em um time ou !apostar [@jogador] [valor] [gols] para apostar em um jogador`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
-                if (betTarget.startsWith("@") && isNaN(betGoals)) {
+                if (betTarget.startsWith("@") && (betGoals === null || isNaN(betGoals))) {
                     room.sendAnnouncement(`🩸 ${player.name} Quando apostar em um jogador, você precisa especificar o número de gols. Use: !apostar [@jogador] [valor] [gols]`, player.id, 0xFF0000, "bold", 2);
                     return false;
-                }
+                }                
 
                 let betType: string;
                 let betOn: string | number;
@@ -2755,7 +2760,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                 } else {
                                     announcement = `💰 ${player.name} apostou ${betValue} atacoins que o jogador ${betOn} vai marcar ${betGoals} gol(s).`;
                                 }
-                                room.sendAnnouncement(announcement, null, 0x00FF00, "bold", 2);
+                                room.sendAnnouncement(announcement, player.id, 0x00FF00, "bold", 2);                                
                             });
                         });
                     });
@@ -3875,7 +3880,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             });
         });
     }    
-
+    
     //                                                            //
     //                                                            //
     //                Quando equipe ganha                         //

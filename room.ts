@@ -3624,12 +3624,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             }, 5000);
             room.sendAnnouncement("💰 Para apostar em um JOGADOR digite !bet [@jogador] [valor] [quantos gols irá fazer]", null, 0x10F200, "bold", 0);
             room.sendAnnouncement("💰 Para apostar em um TIME digite !bet [red/blue] [valor]", null, 0x10F200, "bold", 0);
-            room.sendAnnouncement("💰 Após iniciada a partida, você tem 15 segundos para apostar", null, 0x10F200, "bold", 0);
+            room.sendAnnouncement("💰 Após iniciada a partida, você tem 20 segundos para apostar", null, 0x10F200, "bold", 0);
 
             // Agendar o envio da mensagem após 15 segundos
             setTimeout(() => {
                 room.sendAnnouncement("💰 Apostas encerradas!", null, 0x10F200, 'bold');
-            }, 15000);  // 15000 milissegundos equivalem a 15 segundos
+            }, 20000);  // 15000 milissegundos equivalem a 20 segundos
         }
 
         endGameVariable = false;

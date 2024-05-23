@@ -2884,7 +2884,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             } else if (words[0] === "!help" || words[0] === "!ajuda" || words[0] === "!comandos" || words[0] === "!commands") {
                 if (words.length === 1) {
                     const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!sequencia", "!topsequencia", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists", "!provos", "!apostar", "!doarcoins", "!loja", "!saldo"];
-                    const adminCommands = ["!ban", "!mute", "!rr2", "!setvip <1, 2 ou 3>"]
+                    const adminCommands = ["!ban", "!mute", "!rr2", "!setvip <1, 2 ou 3>", "!setadmin <1, 2, 3 ou 4>"]
 
                     room.sendAnnouncement(`📃 Comandos: ${commands.join(", ")}`, player.id, 0xFF0000, "bold");
 

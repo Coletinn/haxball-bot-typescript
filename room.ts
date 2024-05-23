@@ -1061,7 +1061,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     if (err) throw err;
                     room.sendAnnouncement(`💰 Sua aposta foi cancelada e seus ${existingBets[0].value} atacoins foram reembolsados ${reason}.`, player.id, 0x00FF00, "bold", 2);
                 });
-    
+
                 // Remove a aposta da tabela de apostas
                 con.query(`DELETE FROM bets WHERE player_id = ? AND room_id = ?`, [player.id, process.env.room_id], (err: any) => {
                     if (err) throw err;
@@ -2762,7 +2762,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 });
 
                 return false;
-            }                                                
+            }
             //DOAÇÃO
             if (words[0] === "!doarcoins") {
                 if (!words[1] || !words[2] || isNaN(parseInt(words[1].substring(1), 10)) || isNaN(parseInt(words[2], 10))) {
@@ -3836,20 +3836,17 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
             bets.forEach((bet: any) => {
                 if (bet.bet_type === "player") {
-                    // Verifica se o jogador em quem foi apostado marcou o número correto de gols
                     con.query(`SELECT goals FROM players WHERE name = ?`, [bet.bet_on], (err: any, result: any) => {
                         if (err) throw err;
                         const playerGoals = result[0].goals;
 
                         if (playerGoals === bet.goals) {
-                            // Jogador ganhou a aposta
-                            const winningAmount = bet.value * 2; // Ganha o dobro do que apostou
+                            const winningAmount = bet.value * 2;
                             console.log(`Player ID ${bet.player_id} ganhou ${winningAmount}`);
 
                             con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
                                 if (err) throw err;
 
-                                // Notifica o jogador
                                 con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
                                     if (err) throw err;
                                     const playerName = result[0].name;
@@ -3859,14 +3856,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         }
                     });
                 } else if ((winningTeam === 1 && bet.team === 'red') || (winningTeam === 2 && bet.team === 'blue')) {
-                    // Jogador ganhou a aposta
-                    const winningAmount = bet.value * 2; // Ganha o dobro do que apostou
+                    const winningAmount = bet.value * 2;
                     console.log(`Player ID ${bet.player_id} ganhou ${winningAmount}`);
 
                     con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
                         if (err) throw err;
 
-                        // Notifica o jogador
                         con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
                             if (err) throw err;
                             const playerName = result[0].name;
@@ -3875,9 +3870,11 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     });
                 }
             });
+
             // Limpa a tabela de bets
-            con.query(`DELETE FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any) => {
+            con.query(`TRUNCATE TABLE bets`, (err: any) => {
                 if (err) throw err;
+                console.log("A tabela 'bets' foi limpa.");
             });
         });
     }
@@ -4143,7 +4140,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             }
         });
 
-        updateRoleOnPlayerOut(); 
+        updateRoleOnPlayerOut();
     }
 });
 

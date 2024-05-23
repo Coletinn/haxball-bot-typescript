@@ -3616,7 +3616,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             setTimeout(function () {
                 room.pauseGame(false);
             }, 5000);
-            room.sendAnnouncement("💰 Para apostar digite !bet [red/blue] [valor]", null, 0x10F200, "bold", 0);
+            room.sendAnnouncement("💰 Para apostar em um JOGADOR digite !bet [@jogador] [valor] [quantos gols irá fazer]", null, 0x10F200, "bold", 0);
+            room.sendAnnouncement("💰 Para apostar em um TIME digite !bet [red/blue] [valor]", null, 0x10F200, "bold", 0);
             room.sendAnnouncement("💰 Após iniciada a partida, você tem 15 segundos para apostar", null, 0x10F200, "bold", 0);
 
             // Agendar o envio da mensagem após 15 segundos

@@ -2659,12 +2659,9 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 }
 
                 // Verifica se o jogador está logado e em um time
-                if (loggedInPlayers[player.id]) {
-                    let playersGaming = room.getPlayerList().filter((p: Player) => p.team > 0);
-                    if (playersGaming.length >= getMaxTeamSize() * 2 && (player.team === 1 || player.team === 2)) {
-                        room.sendAnnouncement(`💰 ${player.name} Jogadores que estão em um time não podem apostar.`, player.id, 0xFF0000, "bold", 2);
-                        return false;
-                    }
+                if (!loggedInPlayers[player.id] || (player.team === 1 || player.team === 2)) {
+                    room.sendAnnouncement(`💰 ${player.name} Jogadores que estão em um time ou não estão logados não podem apostar.`, player.id, 0xFF0000, "bold", 2);
+                    return false;
                 }
 
                 const betTeam = words[1];
@@ -2723,7 +2720,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 });
 
                 return false;
-            }
+            }            
             //DOAÇÃO
             if (words[0] === "!doarcoins") {
                 if (!words[1] || !words[2] || isNaN(parseInt(words[1].substring(1), 10)) || isNaN(parseInt(words[2], 10))) {

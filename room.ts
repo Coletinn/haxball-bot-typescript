@@ -2646,6 +2646,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             }
             //APOSTAR
             if (words[0] === "!bet" || words[0] === "!apostar") {
+                let matchStartTime = new Date();
                 const currentTime = new Date();
                 const timeDiff = (currentTime.getTime() - matchStartTime.getTime()) / 1000; // diferença de tempo em segundos
 

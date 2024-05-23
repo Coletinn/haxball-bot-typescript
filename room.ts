@@ -2349,15 +2349,15 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 // Coloca status de GK no jogador que digitou o comando
                 if (player.team === 1) {  // Equipe RED
                     gk[0] = player;  // Atualiza o GK do Red
-                    let redTeamPlayers = room.getPlayerList().filter(p => p.team === 1);  // Obtém a lista de jogadores da equipe RED
-                    redTeamPlayers.forEach(p => {
+                    let redTeamPlayers = room.getPlayerList().filter((p: { team: number; }) => p.team === 1);  // Obtém a lista de jogadores da equipe RED
+                    redTeamPlayers.forEach((p: { id: any; }) => {
                         room.sendAnnouncement(`🔴 ${player.name} é agora o GK do Red!`, p.id, 0xFFFFFF, "bold", 0);  // Envia o anúncio apenas para os jogadores da equipe RED
                     });
                 }
                 else if (player.team === 2) {  // Equipe BLUE
                     gk[1] = player;  // Atualiza o GK do Blue
-                    let blueTeamPlayers = room.getPlayerList().filter(p => p.team === 2);  // Obtém a lista de jogadores da equipe BLUE
-                    blueTeamPlayers.forEach(p => {
+                    let blueTeamPlayers = room.getPlayerList().filter((p: { team: number; }) => p.team === 2);  // Obtém a lista de jogadores da equipe BLUE
+                    blueTeamPlayers.forEach((p: { id: any; }) => {
                         room.sendAnnouncement(`🔵 ${player.name} é agora o GK do Blue!`, p.id, 0xFFFFFF, "bold", 0);  // Envia o anúncio apenas para os jogadores da equipe BLUE
                     });
                 }

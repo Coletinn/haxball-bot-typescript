@@ -2729,13 +2729,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         }
 
                         // Verifica se o jogador já apostou em um time
-                        if (betType === "team" && existingBets.some(bet => bet.bet_type === "team")) {
+                        if (betType === "team" && existingBets.some((bet: { bet_type: string; }) => bet.bet_type === "team")) {
                             room.sendAnnouncement(`🩸 ${player.name} Você já fez uma aposta em um time neste jogo.`, player.id, 0xFF0000, "bold", 2);
                             return false;
                         }
 
                         // Verifica se o jogador já apostou no mesmo jogador
-                        if (betType === "player" && existingBets.some(bet => bet.bet_type === "player" && bet.bet_on === betOn)) {
+                        if (betType === "player" && existingBets.some((bet: { bet_type: string; bet_on: string | number; }) => bet.bet_type === "player" && bet.bet_on === betOn)) {
                             room.sendAnnouncement(`🩸 ${player.name} Você já fez uma aposta neste jogador neste jogo.`, player.id, 0xFF0000, "bold", 2);
                             return false;
                         }

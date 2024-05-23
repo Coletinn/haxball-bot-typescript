@@ -2720,11 +2720,23 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         return false;
                     }
 
-                    // Verifica se o jogador já fez uma aposta neste jogo
+                    // Verifica se o jogador já fez duas apostas neste jogo
                     con.query(`SELECT * FROM bets WHERE player_id = ? AND room_id = ?`, [playerId, process.env.room_id], (err: any, existingBets: any) => {
                         if (err) throw err;
-                        if (existingBets.length > 0) {
-                            room.sendAnnouncement(`🩸 ${player.name} Você já fez uma aposta nesse jogo.`, player.id, 0xFF0000, "bold", 2);
+                        if (existingBets.length >= 2) {
+                            room.sendAnnouncement(`🩸 ${player.name} Você já fez duas apostas nesse jogo.`, player.id, 0xFF0000, "bold", 2);
+                            return false;
+                        }
+
+                        // Verifica se o jogador já apostou em um time
+                        if (betType === "team" && existingBets.some(bet => bet.bet_type === "team")) {
+                            room.sendAnnouncement(`🩸 ${player.name} Você já fez uma aposta em um time neste jogo.`, player.id, 0xFF0000, "bold", 2);
+                            return false;
+                        }
+
+                        // Verifica se o jogador já apostou no mesmo jogador
+                        if (betType === "player" && existingBets.some(bet => bet.bet_type === "player" && bet.bet_on === betOn)) {
+                            room.sendAnnouncement(`🩸 ${player.name} Você já fez uma aposta neste jogador neste jogo.`, player.id, 0xFF0000, "bold", 2);
                             return false;
                         }
 
@@ -2749,7 +2761,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 });
 
                 return false;
-            }                                    
+            }                                                
             //DOAÇÃO
             if (words[0] === "!doarcoins") {
                 if (!words[1] || !words[2] || isNaN(parseInt(words[1].substring(1), 10)) || isNaN(parseInt(words[2], 10))) {

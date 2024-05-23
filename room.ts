@@ -2676,7 +2676,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     room.sendAnnouncement(`🩸 ${player.name} Formato inválido. Use: !apostar [red/blue] [valor] para apostar em um time ou !apostar [@jogador] [valor] [gols] para apostar em um jogador`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-                
+
                 if (betTarget.startsWith("@") && isNaN(betGoals)) {
                     room.sendAnnouncement(`🩸 ${player.name} Quando apostar em um jogador, você precisa especificar o número de gols. Use: !apostar [@jogador] [valor] [gols]`, player.id, 0xFF0000, "bold", 2);
                     return false;
@@ -2687,6 +2687,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 if (betTarget === "red" || betTarget === "blue") {
                     betType = "team";
                     betOn = betTarget === "red" ? 1 : 2;
+
+                    // Verifica se o valor da aposta está entre 50 e 2500 para apostas em times
+                    if (betValue < 50 || betValue > 2500) {
+                        room.sendAnnouncement(`🩸 ${player.name} O valor da aposta em times deve estar entre 50 e 2500.`, player.id, 0xFF0000, "bold", 2);
+                        return false;
+                    }
                 } else {
                     betType = "player";
                     betOn = betTarget.slice(1);  // Remove o '@' do início do nome do jogador
@@ -2743,7 +2749,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 });
 
                 return false;
-            }                        
+            }                                    
             //DOAÇÃO
             if (words[0] === "!doarcoins") {
                 if (!words[1] || !words[2] || isNaN(parseInt(words[1].substring(1), 10)) || isNaN(parseInt(words[2], 10))) {

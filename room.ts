@@ -2682,8 +2682,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     return false;
                 }
 
-                let betType;
-                let betOn;
+                let betType: string;
+                let betOn: string | number;
                 if (betTarget === "red" || betTarget === "blue") {
                     betType = "team";
                     betOn = betTarget === "red" ? 1 : 2;
@@ -2730,7 +2730,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             con.query(`INSERT INTO bets (player_id, bet_type, bet_on, value, goals, room_id) VALUES (?, ?, ?, ?, ?, ?)`, [playerId, betType, betOn, betValue, betGoals, process.env.room_id], (err: any) => {
                                 if (err) throw err;
 
-                                let announcement;
+                                let announcement: string;
                                 if (betType === "team") {
                                     announcement = `💰 ${player.name} apostou ${betValue} atacoins no time ${betTarget.toUpperCase()}.`;
                                 } else {
@@ -3816,24 +3816,46 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             if (err) throw err;
 
             bets.forEach((bet: any) => {
-                if ((winningTeam === 1 && bet.team === 'red') || (winningTeam === 2 && bet.team === 'blue')) {
-                    // Jogador ganhou a bet
+                if (bet.bet_type === "player") {
+                    // Verifica se o jogador em quem foi apostado marcou o número correto de gols
+                    con.query(`SELECT goals FROM players WHERE name = ?`, [bet.bet_on], (err: any, result: any) => {
+                        if (err) throw err;
+                        const playerGoals = result[0].goals;
+
+                        if (playerGoals === bet.goals) {
+                            // Jogador ganhou a aposta
+                            const winningAmount = bet.value * 2; // Ganha o dobro do que apostou
+                            console.log(`Player ID ${bet.player_id} ganhou ${winningAmount}`);
+
+                            con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
+                                if (err) throw err;
+
+                                // Notifica o jogador
+                                con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
+                                    if (err) throw err;
+                                    const playerName = result[0].name;
+                                    room.sendAnnouncement(`🎉 Parabéns ${playerName}, você apostou que ${bet.bet_on} faria ${bet.goals} gol(s) e venceu!`, bet.player_id, 0x00FF00, "bold", 2);
+                                });
+                            });
+                        }
+                    });
+                } else if ((winningTeam === 1 && bet.team === 'red') || (winningTeam === 2 && bet.team === 'blue')) {
+                    // Jogador ganhou a aposta
                     const winningAmount = bet.value * 2; // Ganha o dobro do que apostou
                     console.log(`Player ID ${bet.player_id} ganhou ${winningAmount}`);
 
                     con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
                         if (err) throw err;
 
-                        // Notify the player
+                        // Notifica o jogador
                         con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
                             if (err) throw err;
                             const playerName = result[0].name;
-                            room.sendAnnouncement(`🎉 ${playerName} ganhou ${winningAmount} atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, null, 0x00FF00, "bold", 2);
+                            room.sendAnnouncement(`🎉 Parabéns ${playerName}, você ganhou ${winningAmount} atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, bet.player_id, 0x00FF00, "bold", 2);
                         });
                     });
                 }
             });
-
             // Limpa a tabela de bets
             con.query(`DELETE FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any) => {
                 if (err) throw err;

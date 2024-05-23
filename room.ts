@@ -1031,7 +1031,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     function choosePlayer() {
         clearTimeout(timeOutCap);
         if (teamR.length <= teamB.length && teamR.length != 0) {
-            refundBet(teamR[0]);
+            refundBet(teamR[0], "pois você foi escolhido para entrar em campo");  // Passa a razão do reembolso para a função refundBet
             room.sendAnnouncement("Para escolher um player, insira seu número da lista ou use 'top', 'random' ou 'bottom'.", teamR[0].id, 0xFF0000, 'bold');
             timeOutCap = setTimeout(function (player) {
                 room.sendAnnouncement("Vai rápido @" + player.name + ", apenas " + chooseTime / 2 + " segundos restantes para escolher!", player.id, 0xFFA500, 'bold');
@@ -1040,7 +1040,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 }, chooseTime * 500, teamR[0]);
             }, chooseTime * 1000, teamR[0]);
         } else if (teamB.length < teamR.length && teamB.length != 0) {
-            refundBet(teamB[0]);
+            refundBet(teamB[0], "pois você foi escolhido para entrar em campo");  // Passa a razão do reembolso para a função refundBet
             room.sendAnnouncement("Para escolher um jogador, insira seu número da lista ou use 'top', 'random' ou 'bottom'.", teamB[0].id, 0xFF0000, 'bold');
             timeOutCap = setTimeout(function (player) {
                 room.sendAnnouncement("Vai rápido @" + player.name + ", apenas " + chooseTime / 2 + " segundos restantes para escolher!", player.id, 0xFFA500, 'bold');
@@ -1052,16 +1052,19 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         if (teamR.length != 0 && teamB.length != 0) getSpecList(teamR.length <= teamB.length ? teamR[0] : teamB[0]);
     }
 
-    function refundBet(player: Player) {
+    function refundBet(player: Player, reason: string) {
         con.query(`SELECT * FROM bets WHERE player_id = ? AND room_id = ?`, [player.id, process.env.room_id], (err: any, existingBets: string | any[]) => {
             if (err) throw err;
             if (existingBets.length > 0) {
+                // O jogador que saiu tinha uma aposta nele, então reembolse o apostador
+                con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [existingBets[0].value, player.id], (err: any) => {
+                    if (err) throw err;
+                    room.sendAnnouncement(`💰 Sua aposta foi cancelada e seus ${existingBets[0].value} atacoins foram reembolsados ${reason}.`, player.id, 0x00FF00, "bold", 2);
+                });
+    
+                // Remove a aposta da tabela de apostas
                 con.query(`DELETE FROM bets WHERE player_id = ? AND room_id = ?`, [player.id, process.env.room_id], (err: any) => {
                     if (err) throw err;
-                    con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [existingBets[0].value, player.id], (err: any) => {
-                        if (err) throw err;
-                        room.sendAnnouncement(`💰 A aposta de ${player.name} foi cancelada e ${existingBets[0].value} atacoins foram reembolsados.`, null, 0x00FF00, "bold", 2);
-                    });
                 });
             }
         });
@@ -2664,22 +2667,36 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     return false;
                 }
 
-                const betTeam = words[1];
+                const betTarget = words[1];
                 const betValue = parseInt(words[2]);
+                const betGoals = parseInt(words[3]);
 
                 // Verifica se a aposta é válida
-                if (!betTeam || isNaN(betValue) || (betTeam !== "red" && betTeam !== "blue")) {
-                    room.sendAnnouncement(`🩸 ${player.name} Formato inválido. Use: !bet [red/blue] [valor] ou !apostar [red/blue] [valor]`, player.id, 0xFF0000, "bold", 2);
+                if (!betTarget || isNaN(betValue) || isNaN(betGoals) || (betTarget !== "red" && betTarget !== "blue" && !betTarget.startsWith("@")) || betGoals < 1 || betGoals > 3) {
+                    room.sendAnnouncement(`🩸 ${player.name} Formato inválido. Use: !apostar [red/blue] [valor] para apostar em um time ou !apostar [@jogador] [valor] [gols] para apostar em um jogador`, player.id, 0xFF0000, "bold", 2);
+                    return false;
+                }
+                
+                if (betTarget.startsWith("@") && isNaN(betGoals)) {
+                    room.sendAnnouncement(`🩸 ${player.name} Quando apostar em um jogador, você precisa especificar o número de gols. Use: !apostar [@jogador] [valor] [gols]`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
-                // Verifica se o valor da aposta está entre 10 e 5000
-                if (betValue < 10 || betValue > 5000) {
-                    room.sendAnnouncement(`🩸 ${player.name} O valor da aposta deve estar entre 10 e 5000.`, player.id, 0xFF0000, "bold", 2);
-                    return false;
-                }
+                let betType;
+                let betOn;
+                if (betTarget === "red" || betTarget === "blue") {
+                    betType = "team";
+                    betOn = betTarget === "red" ? 1 : 2;
+                } else {
+                    betType = "player";
+                    betOn = betTarget.slice(1);  // Remove o '@' do início do nome do jogador
 
-                const teamValue = betTeam === "red" ? 1 : 2;
+                    // Verifica se o valor da aposta está entre 50 e 1000 para apostas em jogadores
+                    if (betValue < 50 || betValue > 1000) {
+                        room.sendAnnouncement(`🩸 ${player.name} O valor da aposta em jogadores deve estar entre 50 e 1000.`, player.id, 0xFF0000, "bold", 2);
+                        return false;
+                    }
+                }
 
                 con.query(`SELECT id, balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
@@ -2710,17 +2727,23 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             if (err) throw err;
 
                             // Adiciona a aposta à tabela de apostas
-                            con.query(`INSERT INTO bets (player_id, team, value, room_id) VALUES (?, ?, ?, ?)`, [playerId, teamValue, betValue, process.env.room_id], (err: any) => {
+                            con.query(`INSERT INTO bets (player_id, bet_type, bet_on, value, goals, room_id) VALUES (?, ?, ?, ?, ?, ?)`, [playerId, betType, betOn, betValue, betGoals, process.env.room_id], (err: any) => {
                                 if (err) throw err;
 
-                                room.sendAnnouncement(`💰 ${player.name} apostou ${betValue} atacoins no time ${betTeam.toUpperCase()}.`, null, 0x00FF00, "bold", 2);
+                                let announcement;
+                                if (betType === "team") {
+                                    announcement = `💰 ${player.name} apostou ${betValue} atacoins no time ${betTarget.toUpperCase()}.`;
+                                } else {
+                                    announcement = `💰 ${player.name} apostou ${betValue} atacoins que o jogador ${betOn} vai marcar ${betGoals} gol(s).`;
+                                }
+                                room.sendAnnouncement(announcement, null, 0x00FF00, "bold", 2);
                             });
                         });
                     });
                 });
 
                 return false;
-            }            
+            }                        
             //DOAÇÃO
             if (words[0] === "!doarcoins") {
                 if (!words[1] || !words[2] || isNaN(parseInt(words[1].substring(1), 10)) || isNaN(parseInt(words[2], 10))) {
@@ -4061,7 +4084,25 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 }
             }
         });
-        updateRoleOnPlayerOut();
+
+        // Verifica se o jogador que saiu tinha alguma aposta nele
+        con.query(`SELECT * FROM bets WHERE bet_on = ? AND bet_type = 'player' AND room_id = ?`, [player.name, process.env.room_id], (err: any, existingBets: string | any[]) => {
+            if (err) throw err;
+            if (existingBets.length > 0) {
+                // O jogador que saiu tinha uma aposta nele, então reembolse o apostador
+                con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [existingBets[0].value, existingBets[0].player_id], (err: any) => {
+                    if (err) throw err;
+                    room.sendAnnouncement(`💰 Sua aposta no jogador ${player.name} foi cancelada e seus ${existingBets[0].value} atacoins foram reembolsados.`, existingBets[0].player_id, 0x00FF00, "bold", 2);
+                });
+
+                // Remove a aposta da tabela de apostas
+                con.query(`DELETE FROM bets WHERE bet_on = ? AND bet_type = 'player' AND room_id = ?`, [player.name, process.env.room_id], (err: any) => {
+                    if (err) throw err;
+                });
+            }
+        });
+
+        updateRoleOnPlayerOut(); 
     }
 });
 

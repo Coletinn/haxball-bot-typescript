@@ -2708,8 +2708,6 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 return false;
             }
             //DOAÇÃO
-            let lastDonationTime: { [key: string]: number } = {};
-
             if (words[0] === "!doarcoins") {
                 if (!words[1] || !words[2] || isNaN(parseInt(words[1].substring(1), 10)) || isNaN(parseInt(words[2], 10))) {
                     room.sendAnnouncement(`🩸 Use: !doarcoins [#ID] [quantidade]. Exemplo: !doarcoins #2 50`, player.id, 0xFF0000, "bold", 2);
@@ -2737,21 +2735,22 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 }
 
                 const currentTime = Date.now();
-                const lastDonation = lastDonationTime[player.name] || 0;
-                const timeSinceLastDonation = currentTime - lastDonation;
 
-                if (timeSinceLastDonation >= 5 * 60 * 1000) {
-                    con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err: any, result: any[]) => {
-                        if (err) {
-                            room.sendAnnouncement(`Erro ao acessar o banco de dados. Tente novamente mais tarde.`, player.id, 0xFF0000, "bold", 2);
-                            throw err;
-                        }
-                        if (result.length === 0) {
-                            room.sendAnnouncement(`🩸 ${player.name}, você precisa se registrar para doar atacoins.`, player.id, 0xFF0000, "bold", 2);
-                            return false;
-                        }
+                con.query(`SELECT balance, last_donation_time FROM players WHERE name = ?`, [player.name], (err: any, result: any[]) => {
+                    if (err) {
+                        room.sendAnnouncement(`Erro ao acessar o banco de dados. Tente novamente mais tarde.`, player.id, 0xFF0000, "bold", 2);
+                        throw err;
+                    }
+                    if (result.length === 0) {
+                        room.sendAnnouncement(`🩸 ${player.name}, você precisa se registrar para doar atacoins.`, player.id, 0xFF0000, "bold", 2);
+                        return false;
+                    }
 
-                        const playerBalance = result[0].balance;
+                    const playerBalance = result[0].balance;
+                    const lastDonationTime = result[0].last_donation_time;
+                    const timeSinceLastDonation = currentTime - lastDonationTime;
+
+                    if (timeSinceLastDonation >= 5 * 60 * 1000) {
                         if (playerBalance < 50) {
                             room.sendAnnouncement(`💰 ${player.name}, você precisa ter pelo menos 50 atacoins para fazer uma doação.`, player.id, 0x10F200, "bold", 2);
                             return false;
@@ -2760,7 +2759,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             return false;
                         }
 
-                        con.query(`UPDATE players SET balance = balance - ? WHERE name = ?`, [amount, player.name], (err: any) => {
+                        con.query(`UPDATE players SET balance = balance - ?, last_donation_time = ? WHERE name = ?`, [amount, currentTime, player.name], (err: any) => {
                             if (err) {
                                 room.sendAnnouncement(`Erro ao atualizar o saldo. Tente novamente mais tarde.`, player.id, 0xFF0000, "bold", 2);
                                 throw err;
@@ -2774,15 +2773,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
                                 room.sendAnnouncement(`💰 ${player.name}, você doou ${amount} atacoins para ${recipient.name}.`, player.id, 0x10F200, "bold", 2);
                                 room.sendAnnouncement(`💰 ${recipient.name}, você recebeu ${amount} atacoins de ${player.name}.`, recipient.id, 0x10F200, "bold", 2);
-
-                                lastDonationTime[player.name] = currentTime;
                             });
                         });
-                    });
-                } else {
-                    const remainingTime = Math.ceil((5 * 60 * 1000 - timeSinceLastDonation) / 60000);
-                    room.sendAnnouncement(`🕒 ${player.name}, você precisa esperar ${remainingTime} minutos para fazer outra doação.`, player.id, 0xFF0000, "bold", 2);
-                }
+                    } else {
+                        const remainingTime = Math.ceil((5 * 60 * 1000 - timeSinceLastDonation) / 60000);
+                        room.sendAnnouncement(`🕒 ${player.name}, você precisa esperar ${remainingTime} minutos para fazer outra doação.`, player.id, 0xFF0000, "bold", 2);
+                    }
+                });
             }
             //LOJA
             if (words[0] === "!loja") {

@@ -2642,7 +2642,6 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 });
             }
             //APOSTAR
-            // Verifica se a mensagem é um comando de aposta
             if (words[0] === "!bet" || words[0] === "!apostar") {
                 const currentTime = new Date();
                 const timeDiff = (currentTime.getTime() - matchStartTime.getTime()) / 1000; // diferença de tempo em segundos
@@ -2665,22 +2664,23 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     return false;
                 }
 
-                const betPlayerId = words[1].slice(1); // Remove o "@" do início da menção do jogador
+                const betTeam = words[1];
                 const betValue = parseInt(words[2]);
 
-                // Verifica se é uma aposta válida
-                if (!room.getPlayerById(betPlayerId) || isNaN(betValue) || betValue <= 0) {
-                    room.sendAnnouncement(`🩸 ${player.name} Aposta inválida. Use: !bet @jogador [valor] ou !apostar @jogador [valor].`, player.id, 0xFF0000, "bold", 2);
+                // Verifica se a aposta é válida
+                if (!betTeam || isNaN(betValue) || (betTeam !== "red" && betTeam !== "blue")) {
+                    room.sendAnnouncement(`🩸 ${player.name} Formato inválido. Use: !bet [red/blue] [valor] ou !apostar [red/blue] [valor]`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
-                // Verifica se o jogador mencionado não é o próprio jogador que está fazendo a aposta
-                if (betPlayerId === player.id) {
-                    room.sendAnnouncement(`🩸 ${player.name} Você não pode apostar em si mesmo.`, player.id, 0xFF0000, "bold", 2);
+                // Verifica se o valor da aposta está entre 10 e 5000
+                if (betValue < 10 || betValue > 5000) {
+                    room.sendAnnouncement(`🩸 ${player.name} O valor da aposta deve estar entre 10 e 5000.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
 
-                // Verifica se o jogador tem saldo suficiente para apostar
+                const teamValue = betTeam === "red" ? 1 : 2;
+
                 con.query(`SELECT id, balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
                     if (result.length === 0) {
@@ -2691,6 +2691,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     const playerId = result[0].id;
                     const playerBalance = result[0].balance;
 
+                    // Verifica se o jogador tem saldo suficiente para apostar
                     if (playerBalance < betValue) {
                         room.sendAnnouncement(`🩸 ${player.name} Você não tem dinheiro suficiente para apostar.`, player.id, 0xFF0000, "bold", 2);
                         return false;
@@ -2712,14 +2713,14 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             con.query(`INSERT INTO bets (player_id, team, value, room_id) VALUES (?, ?, ?, ?)`, [playerId, teamValue, betValue, process.env.room_id], (err: any) => {
                                 if (err) throw err;
 
-                                room.sendAnnouncement(`💰 ${player.name} apostou ${betValue} atacoins no jogador @${room.getPlayerById(betPlayerId).name}.`, null, 0x00FF00, "bold", 2);
+                                room.sendAnnouncement(`💰 ${player.name} apostou ${betValue} atacoins no time ${betTeam.toUpperCase()}.`, null, 0x00FF00, "bold", 2);
                             });
                         });
                     });
                 });
 
                 return false;
-            }
+            }            
             //DOAÇÃO
             if (words[0] === "!doarcoins") {
                 if (!words[1] || !words[2] || isNaN(parseInt(words[1].substring(1), 10)) || isNaN(parseInt(words[2], 10))) {

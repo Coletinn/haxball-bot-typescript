@@ -2742,7 +2742,10 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
                 if (timeSinceLastDonation >= 5 * 60 * 1000) {
                     con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err: any, result: any[]) => {
-                        if (err) throw err;
+                        if (err) {
+                            room.sendAnnouncement(`Erro ao acessar o banco de dados. Tente novamente mais tarde.`, player.id, 0xFF0000, "bold", 2);
+                            throw err;
+                        }
                         if (result.length === 0) {
                             room.sendAnnouncement(`🩸 ${player.name}, você precisa se registrar para doar atacoins.`, player.id, 0xFF0000, "bold", 2);
                             return false;
@@ -2758,16 +2761,23 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         }
 
                         con.query(`UPDATE players SET balance = balance - ? WHERE name = ?`, [amount, player.name], (err: any) => {
-                            if (err) throw err;
-                        });
-                        con.query(`UPDATE players SET balance = balance + ? WHERE name = ?`, [amount, recipient.name], (err: any) => {
-                            if (err) throw err;
-                        });
+                            if (err) {
+                                room.sendAnnouncement(`Erro ao atualizar o saldo. Tente novamente mais tarde.`, player.id, 0xFF0000, "bold", 2);
+                                throw err;
+                            }
 
-                        room.sendAnnouncement(`💰 ${player.name}, você doou ${amount} atacoins para ${recipient.name}.`, player.id, 0x10F200, "bold", 2);
-                        room.sendAnnouncement(`💰 ${recipient.name}, você recebeu ${amount} atacoins de ${player.name}.`, recipient.id, 0x10F200, "bold", 2);
+                            con.query(`UPDATE players SET balance = balance + ? WHERE name = ?`, [amount, recipient.name], (err: any) => {
+                                if (err) {
+                                    room.sendAnnouncement(`Erro ao atualizar o saldo do destinatário. Tente novamente mais tarde.`, player.id, 0xFF0000, "bold", 2);
+                                    throw err;
+                                }
 
-                        lastDonationTime[player.name] = currentTime;
+                                room.sendAnnouncement(`💰 ${player.name}, você doou ${amount} atacoins para ${recipient.name}.`, player.id, 0x10F200, "bold", 2);
+                                room.sendAnnouncement(`💰 ${recipient.name}, você recebeu ${amount} atacoins de ${player.name}.`, recipient.id, 0x10F200, "bold", 2);
+
+                                lastDonationTime[player.name] = currentTime;
+                            });
+                        });
                     });
                 } else {
                     const remainingTime = Math.ceil((5 * 60 * 1000 - timeSinceLastDonation) / 60000);

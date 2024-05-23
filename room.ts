@@ -2244,10 +2244,9 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             }            
 
             else if (words[0] === "!ricos" || words[0] === "!rich") {
-                // Retrieve the top 10 richest players in the room
-                const sql = `SELECT p.name, p.balance FROM players p WHERE p.room_id = ? ORDER BY p.balance DESC LIMIT 10`;
-                const values = [process.env.room_id];
-                con.query(sql, values, (err: Error | null, result: any[]) => {
+                // Retrieve the top 10 richest players
+                const sql = `SELECT p.name, p.balance FROM players p ORDER BY p.balance DESC LIMIT 10`;
+                con.query(sql, (err: Error | null, result: any[]) => {
                     if (err) throw err;
                     if (result.length === 0) {
                         room.sendAnnouncement(`🩸 Não há dados suficientes para exibir os jogadores mais ricos.`, player.id, 0xFF0000, "bold", 2);
@@ -2260,7 +2259,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         room.sendAnnouncement(announcement, player.id, 0xFFFFFF, "bold");
                     }
                 });
-            }            
+            }               
 
             else if (words[0] === "!jogos" || words[0] === "!games") {
                 // Retrieve the top 10 goal scorers in the room

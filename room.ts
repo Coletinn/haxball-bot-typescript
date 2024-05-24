@@ -2762,9 +2762,9 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
                                 let announcement: string;
                                 if (betType === "team") {
-                                    announcement = `💰 ${player.name} apostou ${betValue} atacoins no time ${betTarget.toUpperCase()}.`;
+                                    announcement = `💰 ${player.name} você apostou ${betValue} atacoins no time ${betTarget.toUpperCase()}`;
                                 } else {
-                                    announcement = `💰 ${player.name} apostou ${betValue} atacoins que o jogador ${betOn} vai marcar ${betGoals} gol(s).`;
+                                    announcement = `💰 ${player.name} você apostou ${betValue} atacoins que o jogador ${betOn} vai marcar ${betGoals} gol(s)`;
                                 }
                                 room.sendAnnouncement(announcement, player.id, 0x00FF00, "bold", 2);                                
                             });
@@ -3841,16 +3841,24 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         }
     }
 
-    // Função para atualizar o saldo do jogador caso tenha apostado no time vencedor.
+    function handleGoal(player: any) {
+        // Atualiza ou insere o jogador na tabela de gols
+        con.query(`INSERT INTO goals (player, goals) VALUES (?, 1) ON DUPLICATE KEY UPDATE goals = goals + 1`, [player], (err: any) => {
+            if (err) throw err;
+            console.log(`Gol marcado por ${player}`);
+        });
+    }
+    
     function handleEndOfGame(winningTeam: number) {
         con.query(`SELECT * FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any, bets: any) => {
             if (err) throw err;
     
             bets.forEach((bet: any) => {
-                if (bet.bet_type === "player") {
-                    const playerGoals = bet.goals;
+                con.query(`SELECT goals FROM goals WHERE player = ?`, [bet.bet_on], (err: any, result: any) => {
+                    if (err) throw err;
+                    const playerGoals = result[0]?.goals || 0;
     
-                    if (playerGoals === bet.goals) {
+                    if (bet.bet_type === "player" && playerGoals === bet.goals) {
                         const winningAmount = bet.value * 2;
                         console.log(`Player ID ${bet.player_id} ganhou ${winningAmount}`);
     
@@ -3863,27 +3871,33 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                 room.sendAnnouncement(`🎉 Parabéns ${playerName}, você apostou que ${bet.bet_on} faria ${bet.goals} gol(s) e venceu!`, bet.player_id, 0x00FF00, "bold", 2);
                             });
                         });
-                    }
-                } else if ((winningTeam === 1 && bet.team === 'red') || (winningTeam === 2 && bet.team === 'blue')) {
-                    const winningAmount = bet.value * 2;
-                    console.log(`Player ID ${bet.player_id} ganhou ${winningAmount}`);
+                    } else if ((winningTeam === 1 && bet.team === 'red') || (winningTeam === 2 && bet.team === 'blue')) {
+                        const winningAmount = bet.value * 2;
+                        console.log(`Player ID ${bet.player_id} ganhou ${winningAmount}`);
     
-                    con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
-                        if (err) throw err;
-    
-                        con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
+                        con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
                             if (err) throw err;
-                            const playerName = result[0].name;
-                            room.sendAnnouncement(`🎉 Parabéns ${playerName}, você ganhou ${winningAmount} atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, bet.player_id, 0x00FF00, "bold", 2);
+    
+                            con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
+                                if (err) throw err;
+                                const playerName = result[0].name;
+                                room.sendAnnouncement(`🎉 Parabéns ${playerName}, você ganhou ${winningAmount} atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, bet.player_id, 0x00FF00, "bold", 2);
+                            });
                         });
-                    });
-                }
+                    }
+                });
             });
     
-            // Limpa a tabela de bets
-            con.query(`TRUNCATE TABLE bets`, (err: any) => {
+            // Limpa a tabela de gols
+            con.query(`TRUNCATE TABLE goals`, (err: any) => {
                 if (err) throw err;
-                console.log("A tabela 'bets' foi limpa.");
+                console.log("A tabela 'gols' foi limpa.");
+            });
+    
+            // Limpa a tabela de apostas
+            con.query(`DELETE FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any) => {
+                if (err) throw err;
+                console.log("As apostas da sala foram limpas.");
             });
         });
     }    

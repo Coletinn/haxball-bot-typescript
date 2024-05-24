@@ -2752,7 +2752,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     }
 
                     // Verifica se o jogador já fez duas apostas neste jogo
-                    con.query(`(SELECT * FROM betplayer WHERE player_id = ? AND room_id = ?) UNION ALL (SELECT * FROM betteam WHERE player_id = ? AND room_id = ?)`, [playerId, process.env.room_id, playerId, process.env.room_id], (err: any, existingBets: any) => {
+                    con.query(`(SELECT * FROM betplayer WHERE player_id = ? AND room_id = ?) UNION ALL (SELECT id, player_id, value, room_id, NULL, NULL, NULL FROM betteam WHERE player_id = ? AND room_id = ?)`, [playerId, process.env.room_id, playerId, process.env.room_id], (err: any, existingBets: any) => {
                         if (err) throw err;
                         if (existingBets.length >= 2) {
                             room.sendAnnouncement(`🩸 ${player.name} Você já fez duas apostas nesse jogo.`, player.id, 0xFF0000, "bold", 2);

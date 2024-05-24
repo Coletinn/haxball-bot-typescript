@@ -3912,6 +3912,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 if (err) throw err;
                 console.log(`Tabela betteam limpa após o término do jogo.`);
             });
+
+            // Limpa a tabela goals
+            con.query(`DELETE FROM goals WHERE room_id = ?`, [process.env.room_id], (err: any) => {
+                if (err) throw err;
+                console.log(`Tabela goals limpa após o término do jogo.`);
+            });
         });
 
         function handlePlayerBet(bet: any, playerGoals: number) {

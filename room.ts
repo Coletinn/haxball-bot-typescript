@@ -3885,19 +3885,16 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     }
     
     function handleEndOfGame(winningTeam: number) {
-        con.query(`SELECT * FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any, bets: any) => {
+        // Seleciona as apostas da tabela betplayer
+        con.query(`SELECT * FROM betplayer WHERE room_id = ?`, [process.env.room_id], (err: any, playerBets: any) => {
             if (err) throw err;
 
-            bets.forEach((bet: any) => {
+            playerBets.forEach((bet: any) => {
                 con.query(`SELECT goals FROM goals WHERE player = ?`, [bet.bet_on], (err: any, result: any) => {
                     if (err) throw err;
                     const playerGoals = result[0]?.goals || 0;
 
-                    if (bet.bet_type === "player") {
-                        handlePlayerBet(bet, playerGoals);
-                    } else {
-                        handleTeamBet(bet, winningTeam);
-                    }
+                    handlePlayerBet(bet, playerGoals);
                 });
             });
 
@@ -3906,18 +3903,27 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 if (err) throw err;
                 console.log(`Tabela betplayer limpa após o término do jogo.`);
             });
+        });
+
+        // Seleciona as apostas da tabela betteam
+        con.query(`SELECT * FROM betteam WHERE room_id = ?`, [process.env.room_id], (err: any, teamBets: any) => {
+            if (err) throw err;
+
+            teamBets.forEach((bet: any) => {
+                handleTeamBet(bet, winningTeam);
+            });
 
             // Limpa a tabela betteam
             con.query(`DELETE FROM betteam WHERE room_id = ?`, [process.env.room_id], (err: any) => {
                 if (err) throw err;
                 console.log(`Tabela betteam limpa após o término do jogo.`);
             });
+        });
 
-            // Limpa a tabela goals
-            con.query(`DELETE FROM goals WHERE room_id = ?`, [process.env.room_id], (err: any) => {
-                if (err) throw err;
-                console.log(`Tabela goals limpa após o término do jogo.`);
-            });
+        // Limpa a tabela goals
+        con.query(`DELETE FROM goals WHERE room_id = ?`, [process.env.room_id], (err: any) => {
+            if (err) throw err;
+            console.log(`Tabela goals limpa após o término do jogo.`);
         });
 
         function handlePlayerBet(bet: any, playerGoals: number) {
@@ -3951,7 +3957,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 room.sendAnnouncement(message.replace(playerId, playerName), playerId, 0x00FF00, "bold", 2);
             });
         }
-    }    
+    }        
 
     //                                                            //
     //                                                            //

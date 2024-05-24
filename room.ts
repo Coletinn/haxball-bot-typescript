@@ -3877,12 +3877,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         }
     }
 
-    function handleGoal(player: string) {
-        con.query(`INSERT INTO goals (player, goals) VALUES (?, 1) ON DUPLICATE KEY UPDATE goals = goals + 1`, [player], (err: any) => {
+    function handleGoal(player: string, room_id: string) {
+        con.query(`INSERT INTO goals (player, goals, room_id) VALUES (?, 1, ?) ON DUPLICATE KEY UPDATE goals = goals + 1`, [player, room_id], (err: any) => {
             if (err) throw err;
             console.log(`Gol marcado por ${player}`);
         });
-    }
+    } 
     
     function handleEndOfGame(winningTeam: number) {
         // Seleciona as apostas da tabela betplayer

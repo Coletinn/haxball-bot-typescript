@@ -3622,23 +3622,37 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             matchStartTime = new Date();
 
             room.pauseGame(true);
-            room.sendAnnouncement(`💰 Jogo pausado por 5 segundos para as apostas.`, null, 0x10F200, "bold", 2);
+
+            // Obtenha a lista de espectadores
+            const spectatorPlayers = room.getPlayerList().filter((p: any) => p.team === 0);
+
+            // Envie a mensagem para cada espectador
+            spectatorPlayers.forEach((spectator: any) => {
+                room.sendAnnouncement(`💰 Jogo pausado por 5 segundos para as apostas.`, spectator.id, 0x10F200, "bold", 2);
+            });
 
             setTimeout(function () {
                 room.pauseGame(false);
             }, 5000);
-            room.sendAnnouncement("💰 Para apostar em um JOGADOR digite !bet [@jogador] [valor] [quantos gols irá fazer]", null, 0x10F200, "bold", 0);
-            room.sendAnnouncement("💰 Para apostar em um TIME digite !bet [red/blue] [valor]", null, 0x10F200, "bold", 0);
-            room.sendAnnouncement("💰 Após iniciada a partida, você tem 20 segundos para apostar", null, 0x10F200, "bold", 0);
+
+            // Envie a mensagem para cada espectador
+            spectatorPlayers.forEach((spectator: any) => {
+                room.sendAnnouncement("💰 Para apostar em um JOGADOR digite !bet [@jogador] [valor] [quantos gols irá fazer]", spectator.id, 0x10F200, "bold", 0);
+                room.sendAnnouncement("💰 Para apostar em um TIME digite !bet [red/blue] [valor]", spectator.id, 0x10F200, "bold", 0);
+                room.sendAnnouncement("💰 Após iniciada a partida, você tem 20 segundos para apostar", spectator.id, 0x10F200, "bold", 0);
+            });
 
             // Agendar o envio da mensagem após 15 segundos
             setTimeout(() => {
-                room.sendAnnouncement("💰 Apostas encerradas!", null, 0x10F200, 'bold');
+                // Envie a mensagem para cada espectador
+                spectatorPlayers.forEach((spectator: any) => {
+                    room.sendAnnouncement("💰 Apostas encerradas!", spectator.id, 0x10F200, 'bold');
+                });
             }, 20000);  // 15000 milissegundos equivalem a 20 segundos
         }
 
         endGameVariable = false;
-        gameState = State.PLAY
+        gameState = State.PLAY   
 
         // Atividade
         team1Players.forEach((p: Player) => {

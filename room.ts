@@ -3846,59 +3846,6 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         }
     }
 
-    let messageCount: { [key: string]: { count: number, timestamp: number, warned: boolean } } = {};
-
-    // Função para monitorar mensagens e detectar flood
-    function handleFlood(player: Player): boolean {
-        const now = Date.now();
-        const floodLimit = 5; // Número de mensagens permitido
-        const floodInterval = 5000; // Intervalo de tempo em milissegundos (5 segundos)
-
-        if (!messageCount[player.id]) {
-            messageCount[player.id] = { count: 1, timestamp: now, warned: false };
-        } else {
-            const playerData = messageCount[player.id];
-            if (now - playerData.timestamp < floodInterval) {
-                playerData.count += 1;
-            } else {
-                playerData.count = 1;
-                playerData.timestamp = now;
-                playerData.warned = false;
-            }
-
-            if (playerData.count > floodLimit) {
-                if (!playerData.warned) {
-                    room.sendAnnouncement(`🛑 ${player.name}, você está enviando muitas mensagens. Se continuar, será banido.`, player.id, 0xFF0000, "bold", 2);
-                    playerData.warned = true;
-                    return true;
-                } else {
-                    banPlayer(player, "Flood");
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    // Função para banir jogador
-    function banPlayer(player: Player, reason: string) {
-        room.kickPlayer(player.id, `Você foi banido por: ${reason}`, true);
-        con.query(`INSERT INTO bans (name, time, reason, banned_by) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 HOUR), ?, ?)`, [player.name, reason, "Sistema"], (err: any, result: any) => {
-            if (err) {
-                console.log(err);
-                throw err;
-            }
-        });
-        room.sendAnnouncement(`🚫 ${player.name} foi banido por ${reason}.`, null, 0xFF0000, "bold", 2);
-    }
-
-    // Hook na função de recebimento de mensagem
-    room.onPlayerChat = (player: Player, message: string) => {
-        if (handleFlood(player)) {
-            return false;
-        }
-    };
-
     function handleGoal(player: string) {
         // Atualiza a contagem de gols do jogador na tabela de gols
         con.query(`INSERT INTO goals (player, goals) VALUES (?, 1) ON DUPLICATE KEY UPDATE goals = goals + 1`, [player], (err: any) => {

@@ -3881,7 +3881,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
                                 if (err) throw err;
                                 const playerName = result[0].name;
-                                room.sendAnnouncement(`😢 ${playerName}, infelizmente sua aposta que ${bet.bet_on} faria ${bet.goals} gol(s) não foi vencedora.`, bet.player_id, 0x00FF00, "bold", 2);
+                                if (bet && bet.bet_on && bet.goals != null) {
+                                    room.sendAnnouncement(`😢 ${playerName}, infelizmente sua aposta que ${bet.bet_on} faria ${bet.goals} gol(s) não foi vencedora.`, bet.player_id, 0x00FF00, "bold", 2);
+                                } else {
+                                    // Aqui é onde você trata o caso em que bet, bet.bet_on ou bet.goals é undefined ou null
+                                    room.sendAnnouncement(`😢 ${playerName}, parece que houve um problema com a sua aposta. Por favor, tente novamente.`, bet.player_id, 0x00FF00, "bold", 2);
+                                }
+                                
                             });
                         }
                     } else if ((winningTeam === 1 && bet.team === 'red') || (winningTeam === 2 && bet.team === 'blue')) {
@@ -3901,7 +3907,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
                             if (err) throw err;
                             const playerName = result[0].name;
-                            room.sendAnnouncement(`😢 ${playerName}, infelizmente sua aposta no time ${bet.team.toUpperCase()} não foi vencedora.`, bet.player_id, 0x00FF00, "bold", 2);
+                            if (bet && bet.team) {
+                                room.sendAnnouncement(`😢 ${playerName}, infelizmente sua aposta no time ${bet.team.toUpperCase()} não foi vencedora.`, bet.player_id, 0x00FF00, "bold", 2);
+                            } else {
+                                // Aqui é onde você trata o caso em que bet ou bet.team é undefined ou null
+                                room.sendAnnouncement(`😢 ${playerName}, parece que houve um problema com a sua aposta. Por favor, tente novamente.`, bet.player_id, 0x00FF00, "bold", 2);
+                            }
                         });
                     }
                 });

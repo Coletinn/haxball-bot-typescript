@@ -2655,34 +2655,34 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 let matchStartTime = new Date();
                 const currentTime = new Date();
                 const timeDiff = (currentTime.getTime() - matchStartTime.getTime()) / 1000; // diferença de tempo em segundos
-            
+
                 // Verifica se a aposta foi feita nos primeiros 15 segundos da partida
                 if (timeDiff > 15) {
                     room.sendAnnouncement(`🩸 ${player.name} Só é permitido apostar nos primeiros 15 segundos da partida.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-            
+
                 // Verifica se há pelo menos 6 jogadores na sala
                 if (numberOfPlayers < 6) {
                     room.sendAnnouncement(`🩸 ${player.name} Precisa ter 6 jogadores na sala para apostar.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-            
+
                 // Verifica se o jogador está logado e em um time
                 if (!loggedInPlayers[player.id] || (player.team === 1 || player.team === 2)) {
                     room.sendAnnouncement(`💰 ${player.name} Jogadores que estão em um time ou não estão logados não podem apostar.`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-            
+
                 const betTarget = words[1];
                 const betValue = parseInt(words[2]);
                 let betGoals: number | null = parseInt(words[3]);
-            
+
                 // Se a aposta é em um time, ignore o número de gols
                 if (betTarget === "red" || betTarget === "blue") {
                     betGoals = null;
                 }
-            
+
                 // Verifica se a aposta é válida
                 if (!betTarget || isNaN(betValue) || (betTarget !== "red" && betTarget !== "blue" && !betTarget.startsWith("@")) || (betGoals !== null && (betGoals < 1 || betGoals > 3))) {
                     room.sendAnnouncement(`🩸 ${player.name} Formato inválido. Use: !apostar [red/blue] [valor] para apostar em um time ou !apostar [@jogador] [valor] [gols] para apostar em um jogador`, player.id, 0xFF0000, "bold", 2);
@@ -2692,7 +2692,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 if (betTarget.startsWith("@") && (betGoals === null || isNaN(betGoals))) {
                     room.sendAnnouncement(`🩸 ${player.name} Quando apostar em um jogador, você precisa especificar o número de gols. Use: !apostar [@jogador] [valor] [gols]`, player.id, 0xFF0000, "bold", 2);
                     return false;
-                }                
+                }
 
                 let betType: string;
                 let betOn: string | number;
@@ -2766,7 +2766,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                 } else {
                                     announcement = `💰 ${player.name} você apostou ${betValue} atacoins que o jogador ${betOn} vai marcar ${betGoals} gol(s)`;
                                 }
-                                room.sendAnnouncement(announcement, player.id, 0x00FF00, "bold", 2);                                
+                                room.sendAnnouncement(announcement, player.id, 0x00FF00, "bold", 2);
                             });
                         });
                     });
@@ -3522,15 +3522,15 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
     room.onTeamGoal = function (team: any) {
         let OG = Goal.scorer?.team != team; // OG = true if it’s an own goal.
-    
+
         // Se não for um gol contra, atualize a contagem de gols do jogador
         if (!OG && Goal.scorer !== null) {
             handleGoal(Goal.scorer.name);
         }
-    
+
         let activePlayers = room.getPlayerList().filter((p: Player) => {
             return !afkStatus[p.id];
-        });    
+        });
 
         // Random celebration message for goals
         const frasesGOL = [
@@ -3846,8 +3846,61 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         }
     }
 
+    let messageCount: { [key: string]: { count: number, timestamp: number, warned: boolean } } = {};
+
+    // Função para monitorar mensagens e detectar flood
+    function handleFlood(player: Player): boolean {
+        const now = Date.now();
+        const floodLimit = 5; // Número de mensagens permitido
+        const floodInterval = 5000; // Intervalo de tempo em milissegundos (5 segundos)
+
+        if (!messageCount[player.id]) {
+            messageCount[player.id] = { count: 1, timestamp: now, warned: false };
+        } else {
+            const playerData = messageCount[player.id];
+            if (now - playerData.timestamp < floodInterval) {
+                playerData.count += 1;
+            } else {
+                playerData.count = 1;
+                playerData.timestamp = now;
+                playerData.warned = false;
+            }
+
+            if (playerData.count > floodLimit) {
+                if (!playerData.warned) {
+                    room.sendAnnouncement(`🛑 ${player.name}, você está enviando muitas mensagens. Se continuar, será banido.`, player.id, 0xFF0000, "bold", 2);
+                    playerData.warned = true;
+                    return true;
+                } else {
+                    banPlayer(player, "Flood");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Função para banir jogador
+    function banPlayer(player: Player, reason: string) {
+        room.kickPlayer(player.id, `Você foi banido por: ${reason}`, true);
+        con.query(`INSERT INTO bans (name, time, reason, banned_by) VALUES (?, DATE_ADD(NOW(), INTERVAL 1 HOUR), ?, ?)`, [player.name, reason, "Sistema"], (err: any, result: any) => {
+            if (err) {
+                console.log(err);
+                throw err;
+            }
+        });
+        room.sendAnnouncement(`🚫 ${player.name} foi banido por ${reason}.`, null, 0xFF0000, "bold", 2);
+    }
+
+    // Hook na função de recebimento de mensagem
+    room.onPlayerChat = (player: Player, message: string) => {
+        if (handleFlood(player)) {
+            return false;
+        }
+    };
+
     function handleGoal(player: string) {
-        // Atualiza ou insere o jogador na tabela de gols
+        // Atualiza a contagem de gols do jogador na tabela de gols
         con.query(`INSERT INTO goals (player, goals) VALUES (?, 1) ON DUPLICATE KEY UPDATE goals = goals + 1`, [player], (err: any) => {
             if (err) throw err;
             console.log(`Gol marcado por ${player}`);
@@ -3919,8 +3972,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 console.log("As apostas da sala foram limpas.");
             });
         });
-    }     
-    
+    }
+
     //                                                            //
     //                                                            //
     //                Quando equipe ganha                         //

@@ -523,7 +523,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             room.sendAnnouncement(`🔴 Equipe vermelha ganhou por ${room.getScores().red} a ${room.getScores().blue}!`, null, 0xFF0000, "bold");
             console.log(`Equipe vermelha ganhou por ${room.getScores().red} a ${room.getScores().blue}.`);
         } else {
-            room.sendAnnouncement(`🔵 Equipe azul ganhou por ${room.getScores().blue} a ${room.getScores().red}!`, null, 0x035FFF, "bold");
+            room.sendAnnouncement(`🔵 Equipe azul ganhou por ${room.getScores().blue} a ${room.getScores().red}!`, null, 0x3385FF, "bold");
             console.log(`Equipe azul ganhou por ${room.getScores().blue} a ${room.getScores().red}.`);
         }
     }
@@ -3569,7 +3569,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
         if (activePlayers.length >= 2) {
             var ballSpeed = getBallSpeed();
-            let color = team === 1 ? 0xEE3A3A : 0x035FFF; // Red for team 1, blue for team 2
+            let color = team === 1 ? 0xEE3A3A : 0x3385FF; // Red for team 1, blue for team 2
 
             if (OG && Goal.scorer !== null) {
                 updatePlayerStatistic("ag", Goal.scorer.id.toString(), 1);
@@ -3861,90 +3861,76 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     }
 
     function handleGoal(player: string) {
-        // Atualiza a contagem de gols do jogador na tabela de gols
         con.query(`INSERT INTO goals (player, goals) VALUES (?, 1) ON DUPLICATE KEY UPDATE goals = goals + 1`, [player], (err: any) => {
             if (err) throw err;
             console.log(`Gol marcado por ${player}`);
         });
     }
-
+    
     function handleEndOfGame(winningTeam: number) {
         con.query(`SELECT * FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any, bets: any) => {
             if (err) throw err;
-
+    
             bets.forEach((bet: any) => {
                 con.query(`SELECT goals FROM goals WHERE player = ?`, [bet.bet_on], (err: any, result: any) => {
                     if (err) throw err;
                     const playerGoals = result[0]?.goals || 0;
-
+    
                     if (bet.bet_type === "player") {
-                        if (playerGoals === bet.goals) {
-                            const winningAmount = bet.value * 2;
-                            console.log(`Player ID ${bet.player_id} ganhou ${winningAmount}`);
-
-                            con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
-                                if (err) throw err;
-
-                                con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
-                                    if (err) throw err;
-                                    const playerName = result[0].name;
-                                    room.sendAnnouncement(`🎉 Parabéns ${playerName}, você apostou que ${bet.bet_on} faria ${bet.goals} gol(s) e venceu!`, bet.player_id, 0x00FF00, "bold", 2);
-                                });
-                            });
-                        } else {
-                            con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
-                                if (err) throw err;
-                                const playerName = result[0].name;
-                                if (bet && bet.bet_on && bet.goals != null) {
-                                    room.sendAnnouncement(`😢 ${playerName}, infelizmente sua aposta que ${bet.bet_on} faria ${bet.goals} gol(s) não foi vencedora.`, bet.player_id, 0x00FF00, "bold", 2);
-                                } else {
-                                    // Aqui é onde você trata o caso em que bet, bet.bet_on ou bet.goals é undefined ou null
-                                    room.sendAnnouncement(`😢 ${playerName}, parece que houve um problema com a sua aposta. Por favor, tente novamente.`, bet.player_id, 0x00FF00, "bold", 2);
-                                }
-                                
-                            });
-                        }
-                    } else if ((winningTeam === 1 && bet.team === 'red') || (winningTeam === 2 && bet.team === 'blue')) {
-                        const winningAmount = bet.value * 2;
-                        console.log(`Player ID ${bet.player_id} ganhou ${winningAmount}`);
-
-                        con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
-                            if (err) throw err;
-
-                            con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
-                                if (err) throw err;
-                                const playerName = result[0].name;
-                                room.sendAnnouncement(`🎉 Parabéns ${playerName}, você ganhou ${winningAmount} atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, bet.player_id, 0x00FF00, "bold", 2);
-                            });
-                        });
+                        handlePlayerBet(bet, playerGoals);
                     } else {
-                        con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
-                            if (err) throw err;
-                            const playerName = result[0].name;
-                            if (bet && bet.team) {
-                                room.sendAnnouncement(`😢 ${playerName}, infelizmente sua aposta no time ${bet.team.toUpperCase()} não foi vencedora.`, bet.player_id, 0x00FF00, "bold", 2);
-                            } else {
-                                // Aqui é onde você trata o caso em que bet ou bet.team é undefined ou null
-                                room.sendAnnouncement(`😢 ${playerName}, parece que houve um problema com a sua aposta. Por favor, tente novamente.`, bet.player_id, 0x00FF00, "bold", 2);
-                            }
-                        });
+                        handleTeamBet(bet, winningTeam);
                     }
                 });
             });
-
-            // Limpa a tabela de gols
-            con.query(`TRUNCATE TABLE goals`, (err: any) => {
-                if (err) throw err;
-                console.log("A tabela 'gols' foi limpa.");
-            });
-
-            // Limpa a tabela de apostas
-            con.query(`DELETE FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any) => {
-                if (err) throw err;
-                console.log("As apostas da sala foram limpas.");
-            });
+    
+            clearTables();
         });
     }
+    
+    function handlePlayerBet(bet: any, playerGoals: number) {
+        if (playerGoals === bet.goals) {
+            updatePlayerBalance(bet, bet.value * 2);
+            sendAnnouncement(`🎉 Parabéns ${bet.player_id}, você apostou que ${bet.bet_on} faria ${bet.goals} gol(s) e venceu!`, bet.player_id);
+        } else {
+            sendAnnouncement(`😢 ${bet.player_id}, infelizmente sua aposta que ${bet.bet_on} faria ${bet.goals} gol(s) não foi vencedora.`, bet.player_id);
+        }
+    }
+    
+    function handleTeamBet(bet: any, winningTeam: number) {
+        if ((winningTeam === 1 && bet.team === 'red') || (winningTeam === 2 && bet.team === 'blue')) {
+            updatePlayerBalance(bet, bet.value * 2);
+            sendAnnouncement(`🎉 Parabéns ${bet.player_id}, você ganhou ${bet.value * 2} atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, bet.player_id);
+        } else {
+            sendAnnouncement(`😢 ${bet.player_id}, infelizmente sua aposta no time ${bet.team.toUpperCase()} não foi vencedora.`, bet.player_id);
+        }
+    }
+    
+    function updatePlayerBalance(bet: any, winningAmount: number) {
+        con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
+            if (err) throw err;
+        });
+    }
+    
+    function sendAnnouncement(message: string, playerId: string) {
+        con.query(`SELECT name FROM players WHERE id = ?`, [playerId], (err: any, result: any) => {
+            if (err) throw err;
+            const playerName = result[0].name;
+            room.sendAnnouncement(message.replace(playerId, playerName), playerId, 0x00FF00, "bold", 2);
+        });
+    }
+    
+    function clearTables() {
+        con.query(`TRUNCATE TABLE goals`, (err: any) => {
+            if (err) throw err;
+            console.log("A tabela 'gols' foi limpa.");
+        });
+    
+        con.query(`DELETE FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any) => {
+            if (err) throw err;
+            console.log("As apostas da sala foram limpas.");
+        });
+    }    
 
     //                                                            //
     //                                                            //

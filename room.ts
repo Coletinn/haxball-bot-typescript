@@ -1053,7 +1053,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     }
 
     function refundBet(player: Player, reason: string) {
-        con.query(`SELECT * FROM bets WHERE player_id = ? AND room_id = ?`, [player.id, process.env.room_id], (err: any, existingBets: string | any[]) => {
+        // Consulta a tabela betplayer
+        con.query(`SELECT * FROM betplayer WHERE player_id = ? AND room_id = ?`, [player.id, process.env.room_id], (err: any, existingBets: string | any[]) => {
             if (err) throw err;
             if (existingBets.length > 0) {
                 // O jogador que saiu tinha uma aposta nele, então reembolse o apostador
@@ -1061,14 +1062,31 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     if (err) throw err;
                     room.sendAnnouncement(`💰 Sua aposta foi cancelada e seus ${existingBets[0].value} atacoins foram reembolsados ${reason}.`, player.id, 0x00FF00, "bold", 2);
                 });
-
-                // Remove a aposta da tabela de apostas
-                con.query(`DELETE FROM bets WHERE player_id = ? AND room_id = ?`, [player.id, process.env.room_id], (err: any) => {
+    
+                // Remove a aposta da tabela betplayer
+                con.query(`DELETE FROM betplayer WHERE player_id = ? AND room_id = ?`, [player.id, process.env.room_id], (err: any) => {
                     if (err) throw err;
                 });
             }
         });
-    }
+    
+        // Consulta a tabela betteam
+        con.query(`SELECT * FROM betteam WHERE player_id = ? AND room_id = ?`, [player.id, process.env.room_id], (err: any, existingBets: string | any[]) => {
+            if (err) throw err;
+            if (existingBets.length > 0) {
+                // O jogador que saiu tinha uma aposta nele, então reembolse o apostador
+                con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [existingBets[0].value, player.id], (err: any) => {
+                    if (err) throw err;
+                    room.sendAnnouncement(`💰 Sua aposta foi cancelada e seus ${existingBets[0].value} atacoins foram reembolsados ${reason}.`, player.id, 0x00FF00, "bold", 2);
+                });
+    
+                // Remove a aposta da tabela betteam
+                con.query(`DELETE FROM betteam WHERE player_id = ? AND room_id = ?`, [player.id, process.env.room_id], (err: any) => {
+                    if (err) throw err;
+                });
+            }
+        });
+    }    
 
     function topBtn() {
         if (teamS.length == 0) {
@@ -2734,22 +2752,10 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     }
 
                     // Verifica se o jogador já fez duas apostas neste jogo
-                    con.query(`SELECT * FROM bets WHERE player_id = ? AND room_id = ?`, [playerId, process.env.room_id], (err: any, existingBets: any) => {
+                    con.query(`(SELECT * FROM betplayer WHERE player_id = ? AND room_id = ?) UNION ALL (SELECT * FROM betteam WHERE player_id = ? AND room_id = ?)`, [playerId, process.env.room_id, playerId, process.env.room_id], (err: any, existingBets: any) => {
                         if (err) throw err;
                         if (existingBets.length >= 2) {
                             room.sendAnnouncement(`🩸 ${player.name} Você já fez duas apostas nesse jogo.`, player.id, 0xFF0000, "bold", 2);
-                            return false;
-                        }
-
-                        // Verifica se o jogador já apostou em um time
-                        if (betType === "team" && existingBets.some((bet: { bet_type: string; }) => bet.bet_type === "team")) {
-                            room.sendAnnouncement(`🩸 ${player.name} Você já fez uma aposta em um time neste jogo.`, player.id, 0xFF0000, "bold", 2);
-                            return false;
-                        }
-
-                        // Verifica se o jogador já apostou no mesmo jogador
-                        if (betType === "player" && existingBets.some((bet: { bet_type: string; bet_on: string | number; }) => bet.bet_type === "player" && bet.bet_on === betOn)) {
-                            room.sendAnnouncement(`🩸 ${player.name} Você já fez uma aposta neste jogador neste jogo.`, player.id, 0xFF0000, "bold", 2);
                             return false;
                         }
 
@@ -2761,30 +2767,17 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             let query: string;
                             if (betType === "team") {
                                 query = `INSERT INTO betteam (player_id, value, room_id, team) VALUES (?, ?, ?, ?)`;
-                                con.query(query, [playerId, betValue, process.env.room_id, betTarget], (err: any) => {
-                                    if (err) throw err;
-
-                                    let announcement = `💰 ${player.name} você apostou ${betValue} atacoins no time ${betTarget.toUpperCase()}`;
-                                    room.sendAnnouncement(announcement, player.id, 0x00FF00, "bold", 2);
-                                });
                             } else {
-                                con.query(`SELECT id FROM players WHERE name = ?`, [betOn], (err: any, result: any) => {
-                                    if (err) throw err;
-                                    if (result.length === 0) {
-                                        room.sendAnnouncement(`🩸 ${player.name} O jogador em que você quer apostar não existe.`, player.id, 0xFF0000, "bold", 2);
-                                        return false;
-                                    }
-
-                                    const betOnId = result[0].id;
-                                    query = `INSERT INTO betplayer (player_id, value, room_id, bet_type, bet_on, bet_on_id, goals) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-                                    con.query(query, [playerId, betValue, process.env.room_id, betType, betOn, betOnId, betGoals], (err: any) => {
-                                        if (err) throw err;
-
-                                        let announcement = `💰 ${player.name} você apostou ${betValue} atacoins que o jogador ${betOn} vai marcar ${betGoals} gol(s)`;
-                                        room.sendAnnouncement(announcement, player.id, 0x00FF00, "bold", 2);
-                                    });
-                                });
+                                query = `INSERT INTO betplayer (player_id, value, room_id, bet_type, bet_on, goals) VALUES (?, ?, ?, ?, ?, ?)`;
                             }
+                            con.query(query, [playerId, betValue, process.env.room_id, betType, betOn, betGoals], (err: any) => {
+                                if (err) throw err;
+
+                                let announcement = betType === "team"
+                                    ? `💰 ${player.name} você apostou ${betValue} atacoins no time ${betTarget.toUpperCase()}`
+                                    : `💰 ${player.name} você apostou ${betValue} atacoins que o jogador ${betOn} vai marcar ${betGoals} gol(s)`;
+                                room.sendAnnouncement(announcement, player.id, 0x00FF00, "bold", 2);
+                            });
                         });
                     });
                 });
@@ -4211,7 +4204,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         });
 
         // Verifica se o jogador que saiu tinha alguma aposta nele
-        con.query(`SELECT * FROM bets WHERE bet_on = ? AND bet_type = 'player' AND room_id = ?`, [player.name, process.env.room_id], (err: any, existingBets: string | any[]) => {
+        con.query(`SELECT * FROM betplayer WHERE bet_on = ? AND bet_type = 'player' AND room_id = ?`, [player.name, process.env.room_id], (err: any, existingBets: string | any[]) => {
             if (err) throw err;
             if (existingBets.length > 0) {
                 // O jogador que saiu tinha uma aposta nele, então reembolse o apostador
@@ -4220,8 +4213,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     room.sendAnnouncement(`💰 Sua aposta no jogador ${player.name} foi cancelada e seus ${existingBets[0].value} atacoins foram reembolsados.`, existingBets[0].player_id, 0x00FF00, "bold", 2);
                 });
 
-                // Remove a aposta da tabela de apostas
-                con.query(`DELETE FROM bets WHERE bet_on = ? AND bet_type = 'player' AND room_id = ?`, [player.name, process.env.room_id], (err: any) => {
+                // Remove a aposta da tabela betplayer
+                con.query(`DELETE FROM betplayer WHERE bet_on = ? AND bet_type = 'player' AND room_id = ?`, [player.name, process.env.room_id], (err: any) => {
                     if (err) throw err;
                 });
             }

@@ -3540,10 +3540,17 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     room.onTeamGoal = function (team: any) {
         let OG = Goal.scorer?.team != team; // OG = true if it’s an own goal.
 
+       // Se não for um gol contra, atualize a contagem de gols do jogador
         // Se não for um gol contra, atualize a contagem de gols do jogador
         if (!OG && Goal.scorer !== null) {
-            handleGoal(Goal.scorer.name);
+            const roomId = process.env.room_id;
+            if (roomId) {
+                handleGoal(Goal.scorer.name, roomId);
+            } else {
+                console.log('room_id não está definido');
+            }
         }
+
 
         let activePlayers = room.getPlayerList().filter((p: Player) => {
             return !afkStatus[p.id];

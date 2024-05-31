@@ -136,6 +136,7 @@ interface PlayerStatistics {
         goals: number;
         assists: number;
         ag: number;
+        goals_scored_match: number;
     }
 }
 
@@ -163,6 +164,9 @@ var winstreak: any = 0;
 
 // Variável dos GK
 let gk = Array(2); // Array de 2, 1 GK red / 1 GK blue
+
+// Variável Mute
+let muteTimeouts = {};
 
 // Registro pelo Discord
 type UserUnsaved = {
@@ -523,7 +527,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             room.sendAnnouncement(`🔴 Equipe vermelha ganhou por ${room.getScores().red} a ${room.getScores().blue}!`, null, 0xFF0000, "bold");
             console.log(`Equipe vermelha ganhou por ${room.getScores().red} a ${room.getScores().blue}.`);
         } else {
-            room.sendAnnouncement(`🔵 Equipe azul ganhou por ${room.getScores().blue} a ${room.getScores().red}!`, null, 0x035FFF, "bold");
+            room.sendAnnouncement(`🔵 Equipe azul ganhou por ${room.getScores().blue} a ${room.getScores().red}!`, null, 0x179AFF, "bold");
             console.log(`Equipe azul ganhou por ${room.getScores().blue} a ${room.getScores().red}.`);
         }
     }
@@ -1507,8 +1511,9 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     }
                 });
                 // Comando de Login
+
             } else if (words[0] === "!furar") {
-                if (vips[player.id] === 1 || premiums[player.id] === 1 || legends[player.id] === 1) {
+                if (premiums[player.id] === 1 || legends[player.id] === 1) {
                     if (player.team == 0) {
                         if (gameState == State.PLAY) {
                             con.query(`SELECT * FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
@@ -1527,14 +1532,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
                                         var tagFurar: any = "";
 
-                                        if (result[0].vip === 1) tagFurar = "Vip";
                                         if (result[0].vip === 2) tagFurar = "Premium";
                                         if (result[0].vip === 3) tagFurar = "Legend";
 
                                         room.reorderPlayers([player.id], true);
                                         room.sendAnnouncement(`O jogador ${tagFurar} ${player.name} furou a fila!`, null, 0xFFA500, 'bold', 2);
 
-                                        let x = tipoVip == 1 ? 30 : tipoVip == 2 ? 20 : 10
+                                        let x = tipoVip == 2 ? 20 : 10
 
                                         setTimeout(() => {
                                             con.query(`UPDATE players SET furar = 0 WHERE name = ?`, [player.name], (err2: any, result2: any) => {
@@ -1547,7 +1551,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
                                         return false;
                                     } else {
-                                        let msgErro = tipoVip == 1 ? '30' : tipoVip == 2 ? '20' : '10'
+                                        let msgErro = tipoVip == 2 ? '20' : '10'
                                         room.sendAnnouncement(`Você só pode pular a fila a cada ${msgErro} minutos!`,
                                             player.id, cores.vermelho, 'bold', 2);
                                         return false;
@@ -1567,11 +1571,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         return false;
                     }
                 } else {
-                    room.sendAnnouncement(`Você precisa ser um vip para usar esse comando`, player.id, cores.vermelho, "bold", 2);
+                    room.sendAnnouncement(`Você precisa ser um Premium ou Legend para usar esse comando`, player.id, cores.vermelho, "bold", 2);
                     return false;
                 }
+            
+            
             } else if (words[0] === "!p") {
-                if (vips[player.id] === 1 || premiums[player.id] === 1 || legends[player.id] === 1) {
+                if (vips[player.id] === 1 || legends[player.id] === 1) {
                     con.query(`SELECT * FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                         if (err) throw err;
 
@@ -1583,7 +1589,6 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         var tagPause: any = "";
 
                                         if (result[0].vip === 1) tagPause = "Vip";
-                                        if (result[0].vip === 2) tagPause = "Premium";
                                         if (result[0].vip === 3) tagPause = "Legend";
 
                                         vipPausou.push(player.name)
@@ -1602,7 +1607,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                                 room.sendAnnouncement(`Jogo despausado!`, null, 0xFF0000, 'bold', 2);
                                             }
                                             vipPausou.splice(vipPausou.indexOf(player.name), 1)
-                                        }, tipoVip == 1 ? 10000 : (tipoVip == 2 ? 15000 : 30000));
+                                        }, tipoVip == 1 ? 10000 : 30000);
 
                                         setTimeout(() => {
                                             con.query(`UPDATE players SET pause = 0 WHERE name = ?`, [player.name], (err2: any, result2: any) => {
@@ -1623,9 +1628,6 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                     } else {
                                         if (tipoVip == 1) {
                                             room.sendAnnouncement(`Você só pode usar o comando pause a cada 30 minutos. Aguarde...`, player.id, cores.vermelho, 'bold', 2);
-                                            return false;
-                                        } else if (tipoVip == 2) {
-                                            room.sendAnnouncement(`Você só pode usar o comando pause a cada 15 minutos. Aguarde...`, player.id, cores.vermelho, 'bold', 2);
                                             return false;
                                         } else {
                                             room.sendAnnouncement(`Você só pode usar o comando pause a cada 5 minutos. Aguarde...`, player.id, cores.vermelho, 'bold', 2);
@@ -1654,11 +1656,13 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         }
                     });
                 } else {
-                    room.sendAnnouncement(`Você precisa ser um vip para usar esse comando`, player.id, cores.vermelho, "bold", 2);
+                    room.sendAnnouncement(`Você precisa ser um VIP ou Legend para usar esse comando`, player.id, cores.vermelho, "bold", 2);
                     return false;
                 }
+            
+            
             } else if (words[0] === "!pp") {
-                if (vips[player.id] === 1 || premiums[player.id] === 1 || legends[player.id] === 1) {
+                if (vips[player.id] === 1 || legends[player.id] === 1) {
                     con.query(`SELECT * FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                         if (err) throw err;
 
@@ -1668,18 +1672,14 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                     var tagUnPause: any = "";
 
                                     if (result[0].vip === 1) tagUnPause = "Vip";
-                                    if (result[0].vip === 2) tagUnPause = "Premium";
                                     if (result[0].vip === 3) tagUnPause = "Legend";
 
-
-                                    //if (pausarJogoOFF) {
                                     vipPausou.splice(vipPausou.indexOf(player.name), 1);
 
                                     room.pauseGame(false);
                                     room.sendAnnouncement(`Jogo despausado pelo ${tagUnPause}: ${player.name}`, null, 0xFF0000, 'bold', 2);
 
                                     return false;
-                                    //}
                                 } else if (gameState == State.STOP) {
                                     room.sendAnnouncement(`Você só pode despausar quando o jogo estiver em andamento.`, player.id, cores.vermelho, 'bold', 2);
                                     return false;
@@ -1690,7 +1690,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                             }
                         }
                     });
+                } else {
+                    room.sendAnnouncement(`Você precisa ser um VIP ou Legend para usar esse comando`, player.id, cores.vermelho, "bold", 2);
+                    return false;
                 }
+
+            
             } else if (words[0] === "!login") {
                 if (loggedInPlayers[player.id]) { //Não tem porque executar selects se a variável indica que ele esta logado é porque tem registro.
                     room.sendAnnouncement(`🩸 ${player.name} Você já está logado.`, player.id, 0xFF0000, "bold", 2);
@@ -1747,12 +1752,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                         }
                                         if (result[0].admin === 1) {
                                             room.setPlayerAdmin(player.id, true);
-                                            room.sendAnnouncement(`🚧 ${player.name} você recebeu o cargo de administrador automaticamente.`, player.id, 0xFFA500, "bold");
+                                            room.sendAnnouncement(`🚧 ${player.name} você recebeu o cargo de Administrador automaticamente.`, player.id, 0xFFA500, "bold");
                                             admins[player.id] = 1;
                                         }
                                         if (result[0].mod === 1) {
                                             room.setPlayerAdmin(player.id, true);
-                                            room.sendAnnouncement(`🚧 ${player.name} você recebeu o cargo de moderador automaticamente.`, player.id, 0xFFA500, "bold");
+                                            room.sendAnnouncement(`🚧 ${player.name} você recebeu o cargo de Moderador automaticamente.`, player.id, 0xFFA500, "bold");
                                             mods[player.id] = 1;
                                         }
 
@@ -1778,40 +1783,71 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         room.sendAnnouncement(`🩸 ${player.name} Você ainda não se registrou. Por favor, digite: !registrar seguido pela sua senha.`, player.id, 0xFF0000, "bold", 2);
                     }
                 });
-                // CallAdmin:
-            } else if (words[0] === "!calladmin") {
-                calladmin(player, message);
-                return false;
-                // Fundador:
+    
+
             } else if (words[0] === "!rr2") {
-                if (superadmin[player.id] === 1 || gerentes[player.id] === 1 || admins[player.id] === 1 || mods[player.id] === 1) {
-                    room.pauseGame(true);
+                if (superadmin[player.id] === 1 || gerentes[player.id] === 1 || admins[player.id] === 1 || mods[player.id] === 1 || legends[player.id] === 1) {
+                    con.query(`SELECT * FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
+                        if (err) throw err;
 
-                    for (let i = 0; i < teamR.length; i++) {
-                        let playerId = teamR[i].id;
-                        let newPosition = { x: -350, y: 0 };
+                        if (result.length > 0) {
+                            if (player.team != 0) {
+                                if (gameState == State.PAUSE) {
+                                    var tipoVip: any = result[0].vip;
+                                    var tagUnPause: any = "";
 
-                        room.setPlayerDiscProperties(playerId, newPosition);
-                    }
+                                    if (result[0].vip === 3) tagUnPause = "Legend";
 
-                    room.setDiscProperties(0, { x: 0, y: 0 });
+                                    if (result[0].reset === 0 || tipoVip != 3) {
+                                        vipPausou.splice(vipPausou.indexOf(player.name), 1);
 
-                    for (let i = 0; i < teamB.length; i++) {
-                        let playerId = teamB[i].id;
-                        let newPosition = { x: 350, y: 0 };
+                                        con.query(`UPDATE players SET reset = 1 WHERE name = ?`, [player.name], (err2: any, result2: any) => {
+                                            if (err2) {
+                                                console.error(err2);
+                                                return false;
+                                            }
+                                        });
 
-                        room.setPlayerDiscProperties(playerId, newPosition);
-                    }
+                                        room.pauseGame(false);
+                                        room.sendAnnouncement(`Jogo despausado pelo ${tagUnPause}: ${player.name}`, null, 0xFF0000, 'bold', 2);
 
+                                        if (tipoVip == 3) {
+                                            setTimeout(() => {
+                                                con.query(`UPDATE players SET reset = 0 WHERE name = ?`, [player.name], (err2: any, result2: any) => {
+                                                    if (err2) {
+                                                        console.error(err2);
+                                                        return false;
+                                                    }
+                                                });
+                                            }, 30 * 60 * 1000);
+                                        }
 
-                    room.pauseGame(false);
-                    room.sendAnnouncement(`🚧 ${player.name} resetou a localização da bola!`, null, 0xFFA500, 'bold', 2);
-
+                                        return false;
+                                    } else {
+                                        room.sendAnnouncement(`Você só pode usar o comando reset a cada 30 minutos. Aguarde...`, player.id, cores.vermelho, 'bold', 2);
+                                        return false;
+                                    }
+                                } else if (gameState == State.STOP) {
+                                    room.sendAnnouncement(`Você só pode despausar quando o jogo estiver em andamento.`, player.id, cores.vermelho, 'bold', 2);
+                                    return false;
+                                }
+                            } else {
+                                room.sendAnnouncement(`Você precisa estar jogando para despausar o jogo`, player.id, cores.vermelho, 'bold', 2);
+                                return false
+                            }
+                        }
+                    });
+                } else {
+                    room.sendAnnouncement(`Você precisa ser um Superadmin, Gerente, Admin, Mod ou Legend para usar esse comando`, player.id, cores.vermelho, "bold", 2);
                     return false;
-                }
+                }           
+
+
             } else if (words[0] === "!uni" || words[0] === "!uniforme" || words[0] === "!camisetas") {
                 chooseUni(player, words);
                 return false;
+
+
             } else if (words[0] == "!uniformes" || words[0] == "!unis") {
                 if (words[1]) {
                     // Listar uniformes de um país específico
@@ -1824,7 +1860,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         room.sendAnnouncement(`${listaUniformes}`, player.id, 0xFFFFFF, "bold");
                         room.sendAnnouncement(`Para usar um uniforme digite !uni [codigo]`, player.id, 0xFF0000, "bold");
                     } else {
-                        room.sendAnnouncement(`Não foram encontrados uniformes ${country}.`, player.id, cores.vermelho, "bold", 2);
+                        room.sendAnnouncement(`Não foram encontrados uniformes ${country}`, player.id, cores.vermelho, "bold", 2);
                     }
                 } else {
                     // Listar todos os países
@@ -1834,98 +1870,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     room.sendAnnouncement(`Para ver os uniformes do país digite !uniformes [pais]`, player.id, 0xFF0000, "bold");
                 }
                 return false;
-            } else if (words[0] === "!ceo") {
-                const input = words;
-                const password = input[1];
+            
 
-                if (!password) {
-                    room.sendAnnouncement(`🩸 ${player.name} Você precisa colocar uma senha.`, player.id, 0xFF0000, "bold", 2);
-                    return false;
-                }
-
-                if (password.length < 3) {
-                    room.sendAnnouncement(`🩸 ${player.name} A senha deve conter mais de 3 caracteres.`, player.id, 0xFF0000, "bold", 2);
-                    return false;
-                }
-
-                con.query(`SELECT * FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
-                    if (err) throw err;
-
-                    if (result.length > 0) {
-                        if (result[0].ceo === 0) {
-                            if (password === ceoPassword) {
-                                con.query(`UPDATE players SET ceo = 1 WHERE name = ?`, [player.name], (err2: any, result2: any) => {
-                                    if (err2) {
-                                        console.error(err2);
-                                        return false;
-                                    }
-
-                                    if (result2.affectedRows > 0) {
-                                        room.sendAnnouncement(`👑 ${player.name} logou como CEO!`, null, 0xFFA500, "bold", 2);
-                                        superadmin[player.id] = 1;
-                                    } else {
-                                        return false;
-                                    }
-                                }
-                                );
-                            } else {
-                                return false;
-                            }
-                        } else {
-                            room.sendAnnouncement(`🩸 ${player.name} você já é um CEO!`, player.id, 0xFF0000, "bold", 2);
-                            return false;
-                        }
-                    } else {
-                        room.sendAnnouncement(`🩸 ${player.name} a sua conta não está registrada.`, player.id, 0xFF0000, "bold", 2);
-                        return false;
-                    }
-                });
-            } else if (words[0] === "!gerente") {
-                const input = words;
-                const password = input[1];
-
-                if (!password) {
-                    room.sendAnnouncement(`🩸 ${player.name} você precisa colocar uma senha.`, player.id, 0xFF0000, "bold", 2);
-                    return false;
-                }
-
-                if (password.length < 3) {
-                    room.sendAnnouncement(`🩸 ${player.name} a senha deve conter mais de 3 caracteres.`, player.id, 0xFF0000, "bold", 2);
-                    return false;
-                }
-
-                con.query(`SELECT * FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
-                    if (err) throw err;
-
-                    if (result.length > 0) {
-                        if (result[0].gerente === 0) {
-                            if (password === gerentePassword) {
-                                con.query(`UPDATE players SET gerente = 1 WHERE name = ?`, [player.name], (err2: any, result2: any) => {
-                                    if (err2) {
-                                        console.error(err2);
-                                        return false;
-                                    }
-
-                                    if (result2.affectedRows > 0) {
-                                        room.sendAnnouncement(`🔥 ${player.name} agora é um Gerente!`, null, 0xFFA500, "bold", 2);
-                                        gerentes[player.id] = 1;
-                                    } else {
-                                        return false;
-                                    }
-                                }
-                                );
-                            } else {
-                                return false;
-                            }
-                        } else {
-                            room.sendAnnouncement(`🩸 ${player.name} você já é um gerente!`, player.id, 0xFF0000, "bold", 2);
-                            return false;
-                        }
-                    } else {
-                        room.sendAnnouncement(`🩸 ${player.name} a sua conta não está registrada.`, player.id, 0xFF0000, "bold", 2);
-                        return false;
-                    }
-                });
             } else if (words[0] === "!setvip") {
                 if (superadmin[player.id] === 1 || gerentes[player.id] === 1) {
                     var input = words;
@@ -2034,16 +1980,23 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         }
                     });
                 }
+
+
             } else if (words[0] === "!setadmin") {
+                if (words.length < 3) {
+                    room.sendAnnouncement(`🩸 ${player.name} Você não digitou o comando corretamente. (Ex: !setadmin #id 1-4)`, player.id, 0xFF0000, "bold", 2);
+                    return false;
+                }
+            
                 const input = words;
                 const jogador: any = input[1];
                 const adminType: any = input[2];
                 var userId: any;
                 var userName: any;
-
+            
                 if (jogador.startsWith("#")) {
-                    var id = jogador.substring(1);
-                    var playerSet = room.getPlayerList().filter((p: any) => p.id === parseInt(id));
+                    id = parseInt(jogador.substring(1), 10); // Aqui está a correção
+                    var playerSet = room.getPlayer(id);
                     if (playerSet) {
                         userId = playerSet.id;
                         userName = playerSet.name;
@@ -2052,49 +2005,61 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         return false;
                     }
                 } else {
-                    room.sendAnnouncement(`🩸 ${player.name} Você não digitou o comando corretamente. (Ex: !setadmin #id 1-4)`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-
+            
                 if (!userId || !userName) {
                     room.sendAnnouncement(`🩸 Não consegui encontrar nenhum jogador com esse ID!`, player.id, cores.vermelho, "bold", 2);
                     return false;
                 }
-
+            
+                if (userId === player.id) {
+                    room.sendAnnouncement(`🩸 ${player.name} você não pode se auto-promover.`, player.id, 0xFF0000, "bold", 2);
+                    return false;
+                }
+            
                 if (!adminType || isNaN(adminType)) {
                     room.sendAnnouncement(`🩸 Você não digitou o cargo corretamente. (Ex: !setadmin #id 1-4)`, player.id, cores.vermelho, "bold", 2);
                     return false;
                 }
-
-                con.query(`SELECT * FROM players WHERE name = ?`, [userName], (err: any, result: any) => {
+            
+                // Verifica se o jogador que está tentando usar o comando é um CEO
+                con.query(`SELECT * FROM players WHERE name = ? AND ceo = 1`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
-
+            
                     if (result.length > 0) {
-                        if (adminType === 1) {
-                            if (result[0].ceo === 0) {
-                                con.query(`UPDATE players SET ceo = 1 WHERE name = ?`, [userName], (err: any, result: any) => {
-                                    if (err) {
-                                        console.error(err);
-                                        return false;
-                                    }
-
-                                    if (result.affectedRows > 0) {
-                                        room.sendAnnouncement(`👑 ${userName} Agora é um CEO!`, null, 0xFFA500, "bold", 2);
-                                        superadmin[userId] = 1;
-                                    } else {
-                                        return false;
-                                    }
-                                });
+                        var adminColumn = '';
+                        if (adminType === '1') {
+                            adminColumn = '`ceo`';
+                        } else if (adminType === '2') {
+                            adminColumn = '`gerente`';
+                        } else if (adminType === '3') {
+                            adminColumn = '`admin`';
+                        } else if (adminType === '4') {
+                            adminColumn = '`mod`';
+                        } else {
+                            room.sendAnnouncement(`🩸 Você não digitou o cargo corretamente. (Ex: !setadmin #id 1-4)`, player.id, cores.vermelho, "bold", 2);
+                            return false;
+                        }
+            
+                        con.query(`UPDATE players SET ${adminColumn} = 1 WHERE name = ?`, [userName], (err: any, result: any) => {
+                            if (err) throw err;
+            
+                            if (result.affectedRows > 0) {
+                                room.sendAnnouncement(`👑 ${userName} Agora é um ${adminColumn.replace(/`/g, '')}!`, null, 0xFFA500, "bold", 2);
+                                room.sendAnnouncement(`👑 ${userName} Por favor, saia e entre na sala novamente para que o cargo seja atualizado.`, userId, 0xFFA500, "bold", 2);
+                                superadmin[userId] = parseInt(adminType);
                             } else {
-                                room.sendAnnouncement(`O ${userName} já é um CEO!`, player.id, cores.vermelho, "bold", 2);
                                 return false;
                             }
-                        }
+                        });
                     } else {
-                        room.sendAnnouncement(`🩸 ${player.name} não encontrei um jogador com esse nome/id.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`🩸 ${userName} você não tem permissão para usar este comando.`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
-                });
+                });  
+
+
             } else if (words[0] === "!mudarsenha") {
                 const input = words;
                 if (input.length < 3) {
@@ -2359,22 +2324,79 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             }
 
 
+            else if (words[0] === "!ricos" || words[0] === "!rich") {
+                // Retrieve the top 10 richest players
+                const sql = `SELECT p.name, p.balance FROM players p ORDER BY p.balance DESC LIMIT 10`;
+                con.query(sql, (err: Error | null, result: any[]) => {
+                    if (err) throw err;
+                    if (result.length === 0) {
+                        room.sendAnnouncement(`🩸 Não há dados suficientes para exibir os jogadores mais ricos.`, player.id, 0xFF0000, "bold", 2);
+                    } else {
+                        // Displaying the top richest players on one line
+                        let announcement = `💰🏆 Top 10 Jogadores Mais Ricos: `;
+                        result.forEach((player, index) => {
+                            // Format the balance to remove decimals and add thousand separators
+                            const formattedBalance = Number(player.balance).toLocaleString('pt-BR');
+                            announcement += `#${index + 1} ${player.name}: ${formattedBalance}; `;
+                        });
+                        // Remove the last semicolon
+                        announcement = announcement.slice(0, -2);
+                        room.sendAnnouncement(announcement.trim(), player.id, 0xFFFFFF, "bold");
+                    }
+                });
+            }
+
+
+            else if (words[0] === "!golscontra" || words[0] === "!owngoals") {
+                // Retrieve the top 10 players with most own goals in the room
+                const sql = `SELECT p.name, s.ag FROM stats s JOIN players p ON s.player_id = p.id WHERE s.room_id = ? ORDER BY s.ag DESC LIMIT 10`;
+                const values = [process.env.room_id];
+                con.query(sql, values, (err: Error | null, result: any[]) => {
+                    if (err) throw err;
+                    if (result.length === 0) {
+                        room.sendAnnouncement(`🩸 Não há dados suficientes para exibir os jogadores com mais gols contra.`, player.id, 0xFF0000, "bold", 2);
+                    } else {
+                        // Displaying the top players with most own goals on one line
+                        let announcement = `🥅🏆 Top 10 Jogadores com Mais Gols Contra: `;
+                        result.forEach((player, index) => {
+                            announcement += `#${index + 1} ${player.name}: ${player.ag}; `;
+                        });
+                        room.sendAnnouncement(announcement, player.id, 0xFFFFFF, "bold");
+                    }
+                });
+            }
+
+
             else if (words[0] === "!gk") {
                 // Coloca status de GK no jogador que digitou o comando
                 if (player.team === 1) {  // Equipe RED
                     gk[0] = player;  // Atualiza o GK do Red
-                    room.sendAnnouncement(`🔴 ${player.name} é agora o GK do Red!`, null, 0xFFFFFF, "bold", 0);
+            
+                    // Obter a lista de jogadores da equipe RED
+                    let redTeamPlayers = room.getPlayerList().filter((p: Player) => p.team === 1);
+            
+                    // Enviar a mensagem apenas para os jogadores da equipe RED
+                    for (let redPlayer of redTeamPlayers) {
+                        room.sendAnnouncement(`🔴 ${player.name} é agora o GK do Red!`, redPlayer.id, 0xFFFFFF, "bold", 0);
+                    }
                 }
                 else if (player.team === 2) {  // Equipe BLUE
                     gk[1] = player;  // Atualiza o GK do Blue
-                    room.sendAnnouncement(`🔵 ${player.name} é agora o GK do Blue!`, null, 0xFFFFFF, "bold", 0);
+            
+                    // Obter a lista de jogadores da equipe BLUE
+                    let blueTeamPlayers = room.getPlayerList().filter((p: Player) => p.team === 2);
+            
+                    // Enviar a mensagem apenas para os jogadores da equipe BLUE
+                    for (let bluePlayer of blueTeamPlayers) {
+                        room.sendAnnouncement(`🔵 ${player.name} é agora o GK do Blue!`, bluePlayer.id, 0xFFFFFF, "bold", 0);
+                    }
                 }
                 else {
                     // Se o jogador não está em uma equipe, envia uma mensagem de erro
                     room.sendAnnouncement(`Você precisa estar em uma equipe para ser o GK.`, player.id, 0xFF0000, "bold", 0);
                 }
                 return false;
-            }
+            }            
 
 
             else if (words[0] === "!unmute") {
@@ -2552,7 +2574,6 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             }
 
 
-
             else if (words[0] === "!mute") {
                 const sql = `SELECT * FROM players WHERE LOWER(name) = LOWER(?)`;
                 const values = [player.name];
@@ -2621,7 +2642,8 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         room.sendAnnouncement("🩸 Jogador não encontrado.", null, 0xFF0000, "bold", 2);
                     }
                 });
-            }
+            }     
+
 
             else if (words[0] === "!clearmutes") {
                 const sql = `SELECT * FROM players WHERE LOWER(name) = LOWER(?)`;
@@ -2641,6 +2663,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 });
             }
 
+
             else if (words[0] === "!clearbans") {
                 const sql = `SELECT * FROM players WHERE LOWER(name) = LOWER(?)`;
                 const values = [player.name];
@@ -2659,45 +2682,45 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 });
             }
 
+
             else if (words[0] === "!bet" || words[0] === "!apostar") {
                 const currentTime = new Date();
                 const timeDiff = (currentTime.getTime() - matchStartTime.getTime()) / 1000; // time difference in seconds
             
                 if (player.team === 1 || player.team === 2) {
-                    room.sendAnnouncement(`💰 ${player.name} Jogadores que estão em um time não podem apostar.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`💰 ${player.name} jogadores que estão em um time não podem apostar`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
             
                 if (timeDiff > 15) {
-                    room.sendAnnouncement(`💰 ${player.name} Só é permitido apostar nos primeiros 15 segundos da partida.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`💰 ${player.name} só é permitido apostar nos primeiros 15 segundos da partida`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
             
                 if (numberOfPlayers < 6) {
-                    room.sendAnnouncement(`💰 ${player.name} Precisa ter 6 jogadores na sala para apostar.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`💰 ${player.name} precisa ter 6 jogadores na sala para apostar`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
             
-                const betTeam = words[1];
+                const betTarget = words[1].startsWith('@') ? words[1].substring(1).replace(/_/g, ' ') : words[1]; // playerName or team (red/blue)
                 const betValue = parseInt(words[2]);
+                const goalsMade = words[3] ? parseInt(words[3]) : null;
             
                 // Verificação do valor mínimo e máximo da aposta
-                if (betValue < 5 || betValue > 1000) {
-                    room.sendAnnouncement(`💰 ${player.name} O valor da aposta deve estar entre 5 e 1000 Atacoins.`, player.id, 0xFF0000, "bold", 2);
+                if (betValue < 5 || betValue > 2500) {
+                    room.sendAnnouncement(`💰 ${player.name} O valor da aposta deve estar entre 5 e 2500 Atacoins`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
             
-                if (!betTeam || isNaN(betValue) || (betTeam !== "red" && betTeam !== "blue")) {
-                    room.sendAnnouncement(`💰 ${player.name} Formato inválido. Use: !bet [red/blue] [valor] ou !apostar [red/blue] [valor]`, player.id, 0xFF0000, "bold", 2);
+                if (!betTarget || isNaN(betValue) || (betTarget !== "red" && betTarget !== "blue" && (goalsMade === null || isNaN(goalsMade) || !words[3]))) {
+                    room.sendAnnouncement(`💰 ${player.name} Formato inválido. Use: !apostar <@playerName> <valor> <gols> ou !apostar <red/blue> <valor>`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
-            
-                const teamValue = betTeam === "red" ? 1 : 2;
             
                 con.query(`SELECT id, balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
                     if (result.length === 0) {
-                        room.sendAnnouncement(`💰 ${player.name} Você precisa se registrar para poder apostar.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`💰 ${player.name} Você precisa se registrar para poder apostar`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
             
@@ -2705,7 +2728,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     const playerBalance = result[0].balance;
             
                     if (playerBalance < betValue) {
-                        room.sendAnnouncement(`💰 ${player.name} Você não tem Atacoins suficiente para apostar.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`💰 ${player.name} Você não tem Atacoins suficiente para apostar`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
             
@@ -2713,7 +2736,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     con.query(`SELECT * FROM bets WHERE player_id = ? AND room_id = ?`, [playerId, process.env.room_id], (err: any, existingBets: any) => {
                         if (err) throw err;
                         if (existingBets.length > 0) {
-                            room.sendAnnouncement(`💰 ${player.name} Você já fez uma aposta nesse jogo.`, player.id, 0xFF0000, "bold", 2);
+                            room.sendAnnouncement(`💰 ${player.name} Você já fez uma aposta nesse jogo`, player.id, 0xFF0000, "bold", 2);
                             return false;
                         }
             
@@ -2721,37 +2744,65 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                         con.query(`UPDATE players SET balance = balance - ? WHERE id = ?`, [betValue, playerId], (err: any) => {
                             if (err) throw err;
             
-                            // Add the bet to the bets table
-                            con.query(`INSERT INTO bets (player_id, team, value, room_id) VALUES (?, ?, ?, ?)`, [playerId, teamValue, betValue, process.env.room_id], (err: any) => {
-                                if (err) throw err;
+                            if (betTarget === "red" || betTarget === "blue") {
+                                // Team bet
+                                con.query(`INSERT INTO bets (player_id, team, value, room_id) VALUES (?, ?, ?, ?)`, [playerId, betTarget, betValue, process.env.room_id], (err: any) => {
+                                    if (err) throw err;
             
-                                room.sendAnnouncement(`💰 ${player.name} apostou ${betValue} atacoins no time ${betTeam.toUpperCase()}.`, null, 0x10F200, "bold", 2);
-                            });
+                                    room.sendAnnouncement(`💰 ${player.name}, você apostou ${betValue} atacoins no time ${betTarget.toUpperCase()}`, player.id, 0x10F200, "bold", 2);
+                                });
+                            } else {
+                                // Player bet
+                                const goals = goalsMade ?? 0; // Default to 0 if goalsMade is null
+                                con.query(`INSERT INTO bets (player_id, player_name, value, goals, room_id) VALUES (?, ?, ?, ?, ?)`, [playerId, betTarget, betValue, goals, process.env.room_id], (err: any) => {
+                                    if (err) throw err;
+            
+                                    room.sendAnnouncement(`💰 ${player.name}, você apostou ${betValue} atacoins que ${betTarget} fará ${goals} gol(s)`, player.id, 0x10F200, "bold", 2);
+                                });
+                            }
                         });
                     });
                 });
             
                 return false;
             }
+            
 
-            else if (words[0] === "!doar") {
+            else if (words[0] === "!doarcoins") {
                 if (words.length < 3) {
-                    room.sendAnnouncement(`💰 ${player.name} Formato inválido. Use: !doar [nome do jogador] [valor]`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`💰 ${player.name}, formato inválido. Use: !doar #id [valor]`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
             
-                const nomeJogador = words[1];
+                var jogador: any = words[1];
                 const valorDoado = parseInt(words[2]);
+                var userId: any;
+                var userName: any;
+            
+                if (jogador.startsWith("#")) {
+                    var id = jogador.substring(1);
+                    var playerSet = room.getPlayerList().filter((p: any) => p.id === parseInt(id));
+                    if (playerSet) {
+                        userId = playerSet[0].id;
+                        userName = playerSet[0].name;
+                    } else {
+                        room.sendAnnouncement(`🩸 Não consegui encontrar nenhum jogador com o ID ${id}!`, player.id, cores.vermelho, "bold", 2);
+                        return false;
+                    }
+                } else {
+                    room.sendAnnouncement(`🩸 ${player.name} você não digitou o comando corretamente. (Ex: !doar #id [valor])`, player.id, 0xFF0000, "bold", 2);
+                    return false;
+                }
             
                 if (isNaN(valorDoado) || valorDoado <= 0) {
-                    room.sendAnnouncement(`💰 ${player.name} O valor da doação deve ser um número positivo.`, player.id, 0xFF0000, "bold", 2);
+                    room.sendAnnouncement(`💰 ${player.name}, o valor da doação deve ser um número positivo`, player.id, 0xFF0000, "bold", 2);
                     return false;
                 }
             
-                con.query(`SELECT id, balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
+                con.query(`SELECT id, balance FROM players WHERE id = ?`, [userId], (err: any, result: any) => {
                     if (err) throw err;
                     if (result.length === 0) {
-                        room.sendAnnouncement(`💰 ${player.name} Você precisa se registrar para poder doar.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`💰 ${player.name}, você precisa se registrar para poder doar`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
             
@@ -2759,52 +2810,102 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     const saldoJogador = result[0].balance;
             
                     if (saldoJogador < valorDoado) {
-                        room.sendAnnouncement(`💰 ${player.name} Você não tem Atacoins suficientes para doar.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`💰 ${player.name}, você não tem Atacoins suficientes para doar`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
             
-                    // Checa se o jogador destinatário está registrado
-                    con.query(`SELECT id FROM players WHERE name = ?`, [nomeJogador], (err: any, recipientResult: any) => {
+                    // Procede com a doação
+                    con.query(`UPDATE players SET balance = balance - ? WHERE id = ?`, [valorDoado, playerId], (err: any) => {
                         if (err) throw err;
-                        if (recipientResult.length === 0) {
-                            room.sendAnnouncement(`💰 ${player.name} O jogador "${nomeJogador}" não está registrado.`, player.id, 0xFF0000, "bold", 2);
-                            return false;
-                        }
             
-                        const recipientId = recipientResult[0].id;
-            
-                        // Procede com a doação
-                        con.query(`UPDATE players SET balance = balance - ? WHERE id = ?`, [valorDoado, playerId], (err: any) => {
+                        con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [valorDoado, userId], (err: any) => {
                             if (err) throw err;
             
-                            con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [valorDoado, recipientId], (err: any) => {
-                                if (err) throw err;
-            
-                                room.sendAnnouncement(`💰 ${player.name} doou ${valorDoado} Atacoins para ${nomeJogador}.`, null, 0x10F200, "bold", 2);
-                                room.sendAnnouncement(`🎁 Você recebeu ${valorDoado} Atacoins de ${player.name}.`, recipientId, 0x10F200, "bold", 2);
-                            });
+                            room.sendAnnouncement(`💰 ${player.name} doou ${valorDoado} Atacoins para ${userName}`, player.id, 0x10F200, "bold", 2);
+                            room.sendAnnouncement(`🎁 Você recebeu ${valorDoado} Atacoins de ${player.name}`, userId, 0x10F200, "bold", 2);
                         });
                     });
                 });
             
                 return false;
-            }
+            }            
             
             
             else if (words[0] === "!atacoins" || words[0] === "!saldo") {
                 con.query(`SELECT balance FROM players WHERE name = ?`, [player.name], (err: any, result: any) => {
                     if (err) throw err;
                     if (result.length === 0) {
-                        room.sendAnnouncement(`💰 ${player.name} Você precisa se registrar para ter um saldo.`, player.id, 0xFF0000, "bold", 2);
+                        room.sendAnnouncement(`💰 ${player.name}, você precisa se registrar para ter um saldo`, player.id, 0xFF0000, "bold", 2);
                         return false;
                     }
-
-                    const playerBalance = result[0].balance;
-                    room.sendAnnouncement(`💰 ${player.name}, seu saldo é de ${playerBalance} atacoins.`, player.id, 0x00FF00, "bold", 2);
+            
+                    const playerBalance = Math.floor(result[0].balance).toLocaleString('pt-BR');
+                    room.sendAnnouncement(`💰 ${player.name}, seu saldo é de ${playerBalance} atacoins`, player.id, 0x00FF00, "bold", 2);
                 });
                 return false;
             }
+            
+            
+            if (words[0] === "!loja") {
+                var input = words;
+                var action = input[1];
+                var itemNumber = parseInt(input[2]); // Convert to integer
+                var userId = player.id;
+                var userName = player.name;
 
+                var storeItems: { [key: number]: { name: string, cost: number } } = {
+                    1: { name: 'VIP', cost: 350000 },
+                    2: { name: 'PREMIUM', cost: 450000 },
+                    3: { name: 'LEGEND', cost: 550000 }
+                };
+
+                if (action === 'comprar' && !isNaN(itemNumber)) {
+                    var item = storeItems[itemNumber];
+                    if (item) {
+                        con.query(`SELECT balance FROM players WHERE name = ?`, [userName], (err: Error, result: any[]) => {
+                            if (err) {
+                                console.error(err);
+                                room.sendAnnouncement(`🩸 Desculpe ${userName}, ocorreu um erro ao verificar seu saldo`, userId, 0xFF0000, "bold", 2);
+                                return;
+                            }
+
+                            if (result[0]) {
+                                if (result[0].balance >= item.cost) {
+                                    con.query(`UPDATE players SET balance = balance - ?, vip = ? WHERE name = ?`, [item.cost, itemNumber, userName], (err: Error, result: any) => {
+                                        if (err) {
+                                            console.error(err);
+                                            room.sendAnnouncement(`🩸 Desculpe ${userName}, ocorreu um erro ao atualizar seu saldo e status VIP`, userId, 0xFF0000, "bold", 2);
+                                            return;
+                                        }
+
+                                        if (result.affectedRows > 0) {
+                                            room.sendAnnouncement(`🎉 ${userName} acabou de comprar o cargo "${item.name}" na loja!`, null, 0xFFA500, "bold", 2);
+                                            room.sendAnnouncement(`🩸 Para atualizar sua nova tag, por favor, saia e entre na sala novamente`, userId, 0xFF0000, "bold", 2);
+                                        } else {
+                                            return false;
+                                        }
+                                    });
+                                } else {
+                                    room.sendAnnouncement(`🩸 Desculpe ${userName}, você não tem atacoins suficientes para comprar este item`, userId, 0xFF0000, "bold", 2);
+                                }
+                            } else {
+                                room.sendAnnouncement(`🩸 Desculpe ${userName}, não foi possível encontrar suas informações de jogador`, userId, 0xFF0000, "bold", 2);
+                            }
+                        });
+                    } else {
+                        room.sendAnnouncement(`🩸 Desculpe ${userName}, este item não está disponível na loja`, userId, 0xFF0000, "bold", 2);
+                    }
+                } else {
+                    var storeMessage = '🛒 Loja de Itens: ';
+                    for (var i in storeItems) {
+                        storeMessage += `${i}. ${storeItems[i].name} - ${storeItems[i].cost} atacoins, `;
+                    }
+                    // Remove the trailing comma and space
+                    storeMessage = storeMessage.slice(0, -2);
+                    room.sendAnnouncement(storeMessage, userId, 0xFFFFFF, "bold", 2);
+                    room.sendAnnouncement(`💰 Para comprar um item, digite "!loja comprar <número do item>".`, userId, 0xFF0000, "bold", 2);
+                }
+            }
 
 
             else if (words[0] == "!provocacoes" || words[0] === "!provos" || words[0] === "!prov") {
@@ -2895,25 +2996,40 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 // Comando help
             } else if (words[0] === "!help" || words[0] === "!ajuda" || words[0] === "!comandos" || words[0] === "!commands") {
                 if (words.length === 1) {
-                    const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!sequencia", "!topsequencia", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!cs", "!assists", "!provos", "!apostar", "!atacoins"];
-                    const adminCommands = ["!ban", "!mute", "!rr2", "!setvip <1, 2 ou 3>"]
-
-                    room.sendAnnouncement(`📃 Comandos: ${commands.join(", ")}`, player.id, 0xFF0000, "bold");
-
+                    const commands = ["!mudarsenha", "!afk", "!listafks", "!discord", "!stats", "t", "!sequencia", "!topsequencia", "!prev", "#", "!uniformes", "!jogos", "!vitorias", "!gols", "!golscontra", "!cs", "!assists", "!ricos", "!provos", "!apostar", "!saldo", "!doarcoins", "!loja"];
+                    const adminCommands = ["!ban", "!mute", "!rr2", "!setvip <1, 2 ou 3>", "!setadmin <1, 2, 3 ou 4>"];
+                    const vipCommands = ["!p", "!pp"]; // Comandos específicos para VIPs
+                    const premiumCommands = ["!furar"]; // Comandos específicos para Premium
+                    const legendCommands = ["!p", "!pp", "!furar", "!rr2"]; // Comandos específicos para Legends
+            
+                    room.sendAnnouncement(`📃 Comandos: ${commands.join(", ")}`, player.id, 0xFF0000, 'bold');
+            
                     if (superadmin[player.id] === 1 || gerentes[player.id] === 1 || admins[player.id] === 1 || mods[player.id] === 1) {
-                        room.sendAnnouncement(`🚧 Comandos Staff: ${adminCommands.join(", ")}`, player.id, 0xFFA500, "bold");
+                        room.sendAnnouncement(`🚧 Comandos Staff: ${adminCommands.join(", ")}`, player.id, 0xFFA500, 'bold');
+                    }
+            
+                    if (vips[player.id] === 1) {
+                        room.sendAnnouncement(`💎 Comandos VIP: ${vipCommands.join(", ")}`, player.id, 0xFFA500, 'bold');
+                    }
+            
+                    if (premiums[player.id] === 1) {
+                        room.sendAnnouncement(`🔰 Comandos Premium: ${premiumCommands.join(", ")}`, player.id, 0xFFA500, 'bold');
+                    }
+            
+                    if (legends[player.id] === 1) {
+                        room.sendAnnouncement(`🌋 Comandos Legend: ${legendCommands.join(", ")}`, player.id, 0xFFA500, 'bold');
                     }
                 } else {
                     // Exibe explicação de comando
                     const command = words[1];
                     if (commandExplanations.hasOwnProperty(command)) {
-                        room.sendAnnouncement(`🩸 ${command}: ${commandExplanations[command]}`, player.id, 0xFFFFFF, "bold");
+                    //    room.sendAnnouncement(`🩸 ${command}: ${commandExplanations[command]}`, player.id, 0xFFFFFF, "bold");
                     } else {
-                        room.sendAnnouncement(`🩸 Comando "${command}" não encontrado.`, player.id, 0xFF0000, "bold", 2);
+                    //    room.sendAnnouncement(`🩸 Comando "${command}" não encontrado.`, player.id, 0xFF0000, "bold", 2);
                     }
                 }
             } else {
-                room.sendAnnouncement(`🩸 ${player.name} esse comando não existe, digite !help para ver a lista de comandos disponíveis.`, player.id, 0xFF0000, "bold", 2);
+            //    room.sendAnnouncement(`🩸 ${player.name} esse comando não existe, digite !help para ver a lista de comandos disponíveis.`, player.id, 0xFF0000, "bold", 2);
             }
             return false; // Não enviar comandos para o chat geral.
         }
@@ -3329,7 +3445,14 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     room.sendAnnouncement(`📊 Previsão de Vitória: 🔴 ${team1Chance.toFixed(2)}% chance de vencer contra 🔵 ${team2Chance.toFixed(2)}% chance de vencer.`, null, 0xFFFFFF, "bold", 0);
                     if (redTeam.length >= 2 && blueTeam.length >= 2) {
                         gk = isGk();
-                        room.sendAnnouncement("🔴 GK do red: " + gk[0].name + ", 🔵 GK do blue: " + gk[1].name + ", se for necessário trocar digite !gk", null, 0xFFFFFF, "bold", 0);
+                        // Envia o anúncio apenas para os jogadores da equipe RED
+                        redTeam.forEach((p: { id: any; }) => {
+                            room.sendAnnouncement("🔴 GK do red: " + gk[0].name + ", se for necessário trocar digite !gk", p.id, 0xFFFFFF, "bold", 0);
+                        });
+                        // Envia o anúncio apenas para os jogadores da equipe BLUE
+                        blueTeam.forEach((p: { id: any; }) => {
+                            room.sendAnnouncement("🔵 GK do blue: " + gk[1].name + ", se for necessário trocar digite !gk", p.id, 0xFFFFFF, "bold", 0);
+                        });
                     }
                 }
             }
@@ -3382,16 +3505,42 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     }
 
 
-    function updatePlayerStatistic(statName: keyof PlayerStatistics[string], playerId: string, value: number) {
-        if (!playerStatistics[playerId]) {
-            playerStatistics[playerId] = {
-                goals: 0,
-                assists: 0,
-                ag: 0
+    function updatePlayerStatistic(statName: keyof PlayerStatistics[string], gameId: string, value: number) {
+        con.query(`SELECT id FROM players WHERE game_id = ?`, [gameId], (err: any, results: any) => {
+            if (err) {
+                console.error(`Error fetching database ID for game ID ${gameId}: ${err}`);
+                return;
             }
-        }
-        playerStatistics[playerId][statName] += value;
+            if (results.length > 0) {
+                const playerId = results[0].id;
+                if (!playerStatistics[playerId]) {
+                    playerStatistics[playerId] = {
+                        goals: 0,
+                        assists: 0,
+                        ag: 0,
+                        goals_scored_match: 0
+                    };
+                }
+                playerStatistics[playerId][statName] += value;
+    
+                // Log current statistics
+                console.log(`Updated ${statName} for player ID ${playerId}. New value: ${playerStatistics[playerId][statName]}`);
+    
+                // Update the stats in the database
+                const query = `UPDATE stats SET ${statName} = ${statName} + ? WHERE player_id = ? AND room_id = ?`;
+                con.query(query, [value, playerId, process.env.room_id], (err: any) => {
+                    if (err) {
+                        console.error(`Error updating ${statName} for player ID ${playerId}: ${err}`);
+                    } else {
+                        console.log(`Updated ${statName} for player ID ${playerId} in the database.`);
+                    }
+                });
+            } else {
+                console.error(`No database ID found for game ID ${gameId}`);
+            }
+        });
     }
+    
 
     room.onTeamGoal = function (team: any) {
         let OG = Goal.scorer?.team != team; // OG = true if it’s an own goal.
@@ -3399,7 +3548,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         let activePlayers = room.getPlayerList().filter((p: Player) => {
             return !afkStatus[p.id];
         });
-
+    
         // Random celebration message for goals
         const frasesGOL = [
             "BALAÇO COSMICO! De que planeta veio? Gol de",
@@ -3413,7 +3562,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             "IMPRESSIONANTE O CHUTE DO",
             "🔥🔥🔥 TÁ ON FIRE O"
         ];
-
+    
         // Random celebration message for assists
         const frasesASS = [
             "E QUEM BOTOU A BOLA NO PÉ DELE FOI O",
@@ -3421,30 +3570,33 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
             "PASSE COM A MÃO DE",
             "Assistência fenomenal de"
         ];
-
+    
         const golcontra = [
             "TROLA Y TROLLA",
             "Pette faz pior...",
             "Animal demais o",
             "INCRIVEL O QUE ESSA LENDA FAZ, MAS SERIA MELHOR SE FOSSE PARA O OUTRO LADO NÉ",
             "PARABÉNS!! AGORA TENTA DO OUTRO LADO...",
-            "ERROU O LADO! RUIM DEMAIS,"
-        ]
-
+            "ERROU O LADO! RUIM DEMAIS,",
+            "Você é um filha da puta burro do caralho"
+        ];
+    
         let randomPhraseGol = frasesGOL[Math.floor(Math.random() * frasesGOL.length)];
         let randomPhraseAss = frasesASS[Math.floor(Math.random() * frasesASS.length)];
         let randomOwnGoalPhrase = golcontra[Math.floor(Math.random() * golcontra.length)];
-
+    
         if (activePlayers.length >= 2) {
             var ballSpeed = getBallSpeed();
-            let color = team === 1 ? 0xEE3A3A : 0x035FFF; // Red for team 1, blue for team 2
-
+            let color = team === 1 ? 0xEE3A3A : 0x179AFF; // Red for team 1, blue for team 2
+    
             if (OG && Goal.scorer !== null) {
                 updatePlayerStatistic("ag", Goal.scorer.id.toString(), 1);
                 room.sendAnnouncement(`⚽ ${randomOwnGoalPhrase} ${Goal.scorer.name}!!`, null, color, "bold");
                 console.log(`${Goal.scorer.name}, scored an own goal.`);
             } else if (Goal.scorer !== null) {
                 updatePlayerStatistic("goals", Goal.scorer.id.toString(), 1);
+                updatePlayerStatistic("goals_scored_match", Goal.scorer.id.toString(), 1); // Update goals_scored_match
+    
                 if (Goal.assist !== null && Goal.assist.team == team) {
                     updatePlayerStatistic("assists", Goal.assist.id.toString(), 1);
                     room.sendAnnouncement(`⚽ ${randomPhraseGol} ${Goal.scorer.name}!! ${randomPhraseAss} ${Goal.assist.name}!`, null, color, "bold");
@@ -3455,14 +3607,12 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 }
             }
         }
-
+    
         // Additional game logic here
         // Reset goals
         Goal.reset();
-    }
-
-
-
+    }    
+    
 
     function getBallSpeed() {
         var ballProp = room.getDiscProperties(0);
@@ -3483,30 +3633,43 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
 
     room.onGameStart = () => {
         matchStartTime = new Date();
-
-        room.pauseGame(true);
-        room.sendAnnouncement(`💰 Jogo pausado por 5 segundos para as apostas.`, null, 0x10F200, "bold", 2);
-
-        setTimeout(function () {
-            room.pauseGame(false);
-        }, 5000);
-
-        room.sendAnnouncement("💰 Façam suas apostas!", null, 0x10F200, "bold", 0);
-        room.sendAnnouncement("💰 Para apostar digite !bet [red/blue] [valor]", null, 0x10F200, "bold", 0);
-        room.sendAnnouncement("💰 Após iniciada a partida, você tem 15 segundos para apostar", null, 0x10F200, "bold", 0);
-
-        endGameVariable = false;
-        gameState = State.PLAY;
-
-        // Agendar o envio da mensagem após 15 segundos
-        setTimeout(() => {
-            room.sendAnnouncement("💰 Apostas encerradas!", null, 0x10F200, 'bold');
-        }, 15000);  // 15000 milissegundos equivalem a 15 segundos
-
+    
         // Definir constantes
         const team1Players = room.getPlayerList().filter((p: any) => p.team === 1);
         const team2Players = room.getPlayerList().filter((p: any) => p.team === 2);
-
+    
+        // Obter a lista de espectadores
+        let spectators = room.getPlayerList().filter((p: Player) => p.team === 0);
+    
+        // Verificar se o jogo é 3x3 ou 4x4
+        if ((team1Players.length === 3 && team2Players.length === 3) || (team1Players.length === 4 && team2Players.length === 4)) {
+            room.pauseGame(true);
+    
+            // Enviar as mensagens apenas para os espectadores
+            for (let spectator of spectators) {
+                room.sendAnnouncement(`💰 Jogo pausado por 5 segundos para as apostas.`, spectator.id, 0x10F200, "bold", 2);
+                room.sendAnnouncement("💰 Façam suas apostas!", spectator.id, 0x10F200, "bold", 0);
+                room.sendAnnouncement("💰 Para apostas em TIME use: !apostar [red/blue] [valor]", spectator.id, 0x10F200, "bold", 0);
+                room.sendAnnouncement("💰 Para apostas em JOGADOR use: !apostar [@jogador] [valor] [gols]", spectator.id, 0x10F200, "bold", 0);
+                room.sendAnnouncement("💰 Após iniciada a partida, você tem 15 segundos para apostar", spectator.id, 0x10F200, "bold", 0);
+            }
+    
+            setTimeout(function () {
+                room.pauseGame(false);
+            }, 5000);
+        }
+    
+        endGameVariable = false;
+        gameState = State.PLAY;
+    
+        // Agendar o envio da mensagem após 15 segundos
+        setTimeout(() => {
+            // Enviar a mensagem apenas para os espectadores
+            for (let spectator of spectators) {
+                room.sendAnnouncement("💰 Apostas encerradas!", spectator.id, 0x10F200, 'bold');
+            }
+        }, 15000);  // 15000 milissegundos equivalem a 15 segundos
+    
         // Atividade
         team1Players.forEach((p: Player) => {
             activities[p.id] = Date.now();
@@ -3514,20 +3677,20 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         team2Players.forEach((p: Player) => {
             activities[p.id] = Date.now();
         });
-
+    
         // Se estiverem 6 jogadores em jogo (3 em cada equipe mandar esta mensagem)
         if (team1Players.length === getMaxTeamSize() && team2Players.length === getMaxTeamSize()) {
-            // room.sendAnnouncement(`📊 Tem ${getMaxTeamSize() * 2} jogadores em campo, o resultado irá contar para as estatísticas/status!`, null, 0x00FF00, "bold", 0);
             room.pauseGame(true);
             setTimeout(() => { //Só pra garantir
                 room.pauseGame(false);
             }, 10);
         }
-
+    
         room.startRecording();
         atualizaElosTimes();
     }
-
+    
+    
     function consultaElo(player: any) {
         return new Promise((resolve, reject) => {
             con.query(`SELECT elo FROM stats WHERE player_id = (SELECT id FROM players WHERE LOWER(name) = LOWER(?)) AND room_id = ?`,
@@ -3713,46 +3876,150 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
         }
     }
 
-    // Função para atualizar o saldo do jogador caso tenha apostado no time vencedor.
     function handleEndOfGame(winningTeam: number) {
-        // Jogador que ganhar a partida ganha 100 atacoins
         room.getPlayerList().forEach((player: Player) => {
-            if (player.team === winningTeam) {
-                con.query(`UPDATE players SET balance = balance + 100 WHERE id = ?`, [player.id], (err: any) => {
-                    if (err) throw err;
-                    room.sendAnnouncement(`🎉 Você ganhou 100 Atacoins por ganhar o jogo!`, player.id, 0x10F200, "bold", 2);
-                });
-            }
-        });
-
-        con.query(`SELECT * FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any, bets: any) => {
-            if (err) throw err;
-
-            bets.forEach((bet: any) => {
-                if ((winningTeam === 1 && bet.team === 'red') || (winningTeam === 2 && bet.team === 'blue')) {
-                    // Jogador ganhou a bet
-                    const winningAmount = bet.value * 2; // Ganha o dobro do que apostou
-                    console.log(`Player ID ${bet.player_id} ganhou ${winningAmount}`);
-
-                    con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
-                        if (err) throw err;
-
-                        // Notify the player
-                        con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
-                            if (err) throw err;
-                            const playerName = result[0].name;
-                            room.sendAnnouncement(`🎉 ${playerName} ganhou ${winningAmount} Atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, null, 0x10F200, "bold", 2);
+            console.log(`Processando jogador com ID: ${player.id}`); // Log the player ID from the room
+    
+            con.query(`SELECT id FROM players WHERE game_id = ?`, [player.id], (err: any, results: any) => {
+                if (err) {
+                    console.error(`Error fetching database ID for game ID ${player.id}: ${err}`);
+                    return;
+                }
+                if (results.length > 0) {
+                    const dbId = results[0].id;
+                    console.log(`DB ID para a room ID ${player.id} é ${dbId}`);
+    
+                    if (player.team === winningTeam) {
+                        con.query(`UPDATE players SET balance = balance + 100 WHERE id = ?`, [dbId], (err: any, updateResults: any) => {
+                            if (err) {
+                                console.error(`Erro ao atualizar o saldo ${dbId}: ${err}`);
+                                throw err;
+                            }
+                            if (updateResults.affectedRows > 0) {
+                                room.sendAnnouncement(`🎉 Você ganhou 100 Atacoins por ganhar o jogo!`, player.id, 0x10F200, "bold", 2);
+                                console.log(`Saldo atualizado para o jogador ${player.name}, ID ${dbId}`);
+                            } else {
+                                console.log(`Nenhuma linha foi atualizada com o ID ${dbId}, checar se o ID está correto.`);
+                            }
                         });
+                    }
+                } else {
+                    console.log(`No database ID found for game ID ${player.id}`);
+                }
+            });
+        });
+    
+        // Handle bets
+        con.query(`SELECT * FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any, bets: any) => {
+            if (err) {
+                console.error(`Error retrieving bets: ${err}`);
+                throw err;
+            }
+    
+            bets.forEach((bet: any) => {
+                if (bet.team !== null) {
+                    if ((winningTeam === 1 && bet.team === 'red') || (winningTeam === 2 && bet.team === 'blue')) {
+                        const winningAmount = bet.value * 2;
+                        console.log(`Player ID ${bet.player_id} won ${winningAmount} for betting on team`);
+    
+                        con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
+                            if (err) {
+                                console.error(`Erro ao atualizar saldo para o player ${bet.player_id}: ${err}`);
+                                throw err;
+                            }
+    
+                            con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
+                                if (err) {
+                                    console.error(`Erro ao pegar o nome do jogador com ID ${bet.player_id}: ${err}`);
+                                    throw err;
+                                }
+                                const playerName = result[0].name;
+                                room.sendAnnouncement(`🎉 ${playerName} ganhou ${winningAmount} Atacoins por apostar no time ${winningTeam === 1 ? "RED" : "BLUE"}!`, null, 0x10F200, "bold", 2);
+                                console.log(`Mensagem enviada para ${playerName}`);
+                            });
+                        });
+                    } else {
+                        // Bet on team lost
+                        con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
+                            if (err) {
+                                console.error(`Erro ao pegar o ID do player ${bet.player_id}: ${err}`);
+                                throw err;
+                            }
+                            const playerName = result[0].name;
+                            room.sendAnnouncement(`💔 ${playerName}, sua aposta no time ${bet.team.toUpperCase()} não foi bem-sucedida`, null, 0xFF0000, "bold", 2);
+                            console.log(`Mensagem enviada para ${playerName} por perder a aposta no time`);
+                        });
+                    }
+                } else if (bet.player_name !== null) {
+                    con.query(`SELECT p.id, s.goals_scored_match FROM players p JOIN stats s ON p.id = s.player_id WHERE p.name = ? AND s.room_id = ?`, [bet.player_name, process.env.room_id], (err: any, result: any) => {
+                        if (err) {
+                            console.error(`Error retrieving player stats for ${bet.player_name}: ${err}`);
+                            return;
+                        }
+                        if (result.length > 0) {
+                            const betPlayerGoals = result[0].goals_scored_match;
+                            console.log(`Checking bet for player: ${bet.player_name}, goals required: ${bet.goals}, goals scored: ${betPlayerGoals}`);
+    
+                            if (betPlayerGoals >= bet.goals) {
+                                const winningAmount = bet.value * 3;
+                                console.log(`Player ID ${bet.player_id} won ${winningAmount} for betting on ${bet.player_name} scoring ${bet.goals} goals`);
+    
+                                con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
+                                    if (err) {
+                                        console.error(`Error updating balance for winner ${bet.player_id}: ${err}`);
+                                        throw err;
+                                    }
+    
+                                    con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
+                                        if (err) {
+                                            console.error(`Error retrieving player name for ID ${bet.player_id}: ${err}`);
+                                            throw err;
+                                        }
+                                        const playerName = result[0].name;
+                                        room.sendAnnouncement(`🎉 ${playerName} ganhou ${winningAmount} Atacoins por apostar que ${bet.player_name} faria ${bet.goals} gols!`, null, 0x10F200, "bold", 2);
+                                        console.log(`Announcement sent to ${playerName}`);
+                                    });
+                                });
+                            } else {
+                                // Bet on player goals lost
+                                con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
+                                    if (err) {
+                                        console.error(`Error retrieving player name for ID ${bet.player_id}: ${err}`);
+                                        throw err;
+                                    }
+                                    const playerName = result[0].name;
+                                    room.sendAnnouncement(`💔 ${playerName}, sua aposta que ${bet.player_name} faria ${bet.goals} gol(s) não foi bem-sucedida`, null, 0xFF0000, "bold", 2);
+                                    console.log(`Announcement sent to ${playerName} for losing bet on player goals`);
+                                });
+                            }
+                        } else {
+                            console.log(`No stats found for player: ${bet.player_name}`);
+                        }
                     });
                 }
             });
-
-            // Limpa a tabela de bets
+    
+            // Clear the bets table
             con.query(`DELETE FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any) => {
-                if (err) throw err;
+                if (err) {
+                    console.error(`Error clearing bets table: ${err}`);
+                    throw err;
+                }
+                console.log("Bets table cleared");
+    
+                // Reset goals_scored_match for all players in the room
+                con.query(`UPDATE stats SET goals_scored_match = 0 WHERE room_id = ?`, [process.env.room_id], (err: any) => {
+                    if (err) {
+                        console.error(`Error resetting goals_scored_match: ${err}`);
+                        throw err;
+                    }
+                    console.log("Goals scored in the match reset for all players in the room");
+                });
             });
         });
     }
+    
+      
 
     //                                                            //
     //                                                            //

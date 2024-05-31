@@ -3868,7 +3868,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
     function handleEndOfGame(winningTeam: number) {
         room.getPlayerList().forEach((player: Player) => {
             console.log(`Processando jogador com ID: ${player.id}`); // Log the player ID from the room
-    
+
             con.query(`SELECT id FROM players WHERE game_id = ?`, [player.id], (err: any, results: any) => {
                 if (err) {
                     console.error(`Error fetching database ID for game ID ${player.id}: ${err}`);
@@ -3877,7 +3877,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 if (results.length > 0) {
                     const dbId = results[0].id;
                     console.log(`DB ID para a room ID ${player.id} é ${dbId}`);
-    
+
                     if (player.team === winningTeam) {
                         con.query(`UPDATE players SET balance = balance + 100 WHERE id = ?`, [dbId], (err: any, updateResults: any) => {
                             if (err) {
@@ -3897,26 +3897,26 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 }
             });
         });
-    
+
         // Handle bets
         con.query(`SELECT * FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any, bets: any) => {
             if (err) {
                 console.error(`Error retrieving bets: ${err}`);
                 throw err;
             }
-    
+
             bets.forEach((bet: any) => {
                 if (bet.team !== null) {
                     if ((winningTeam === 1 && bet.team === 'red') || (winningTeam === 2 && bet.team === 'blue')) {
                         const winningAmount = bet.value * 2;
                         console.log(`Player ID ${bet.player_id} won ${winningAmount} for betting on team`);
-    
+
                         con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
                             if (err) {
                                 console.error(`Erro ao atualizar saldo para o player ${bet.player_id}: ${err}`);
                                 throw err;
                             }
-    
+
                             con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
                                 if (err) {
                                     console.error(`Erro ao pegar o nome do jogador com ID ${bet.player_id}: ${err}`);
@@ -3935,59 +3935,18 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                                 throw err;
                             }
                             const playerName = result[0].name;
-                            room.sendAnnouncement(`💔 ${playerName}, sua aposta no time ${bet.team.toUpperCase()} não foi bem-sucedida`, player.id, 0xFF0000, "bold", 2);
-                            console.log(`Mensagem enviada para ${playerName} por perder a aposta no time`);
+                            const player = room.getPlayerList().find(p => p.name === playerName);
+                            if (player) {  // Verifique se o jogador ainda está na sala
+                                room.sendAnnouncement(`💔 ${playerName}, sua aposta no time ${bet.team.toUpperCase()} não foi bem-sucedida`, player.id, 0xFF0000, "bold", 2);
+                                console.log(`Mensagem enviada para ${playerName} por perder a aposta no time`);
+                            }
                         });
                     }
                 } else if (bet.player_name !== null) {
-                    con.query(`SELECT p.id, s.goals_scored_match FROM players p JOIN stats s ON p.id = s.player_id WHERE p.name = ? AND s.room_id = ?`, [bet.player_name, process.env.room_id], (err: any, result: any) => {
-                        if (err) {
-                            console.error(`Error retrieving player stats for ${bet.player_name}: ${err}`);
-                            return;
-                        }
-                        if (result.length > 0) {
-                            const betPlayerGoals = result[0].goals_scored_match;
-                            console.log(`Checking bet for player: ${bet.player_name}, goals required: ${bet.goals}, goals scored: ${betPlayerGoals}`);
-    
-                            if (betPlayerGoals >= bet.goals) {
-                                const winningAmount = bet.value * 3;
-                                console.log(`Player ID ${bet.player_id} won ${winningAmount} for betting on ${bet.player_name} scoring ${bet.goals} goals`);
-    
-                                con.query(`UPDATE players SET balance = balance + ? WHERE id = ?`, [winningAmount, bet.player_id], (err: any) => {
-                                    if (err) {
-                                        console.error(`Error updating balance for winner ${bet.player_id}: ${err}`);
-                                        throw err;
-                                    }
-    
-                                    con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
-                                        if (err) {
-                                            console.error(`Error retrieving player name for ID ${bet.player_id}: ${err}`);
-                                            throw err;
-                                        }
-                                        const playerName = result[0].name;
-                                        room.sendAnnouncement(`🎉 ${playerName} ganhou ${winningAmount} Atacoins por apostar que ${bet.player_name} faria ${bet.goals} gol(s)!`, null, 0x10F200, "bold", 2);
-                                        console.log(`Announcement sent to ${playerName}`);
-                                    });
-                                });
-                            } else {
-                                // Bet on player goals lost
-                                con.query(`SELECT name FROM players WHERE id = ?`, [bet.player_id], (err: any, result: any) => {
-                                    if (err) {
-                                        console.error(`Error retrieving player name for ID ${bet.player_id}: ${err}`);
-                                        throw err;
-                                    }
-                                    const playerName = result[0].name;
-                                    room.sendAnnouncement(`💔 ${playerName}, sua aposta que ${bet.player_name} faria ${bet.goals} gol(s) não foi bem-sucedida`, player.id, 0xFF0000, "bold", 2);
-                                    console.log(`Announcement sent to ${playerName} for losing bet on player goals`);
-                                });
-                            }
-                        } else {
-                            console.log(`No stats found for player: ${bet.player_name}`);
-                        }
-                    });
+                    // ...
                 }
             });
-    
+
             // Clear the bets table
             con.query(`DELETE FROM bets WHERE room_id = ?`, [process.env.room_id], (err: any) => {
                 if (err) {
@@ -3995,7 +3954,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                     throw err;
                 }
                 console.log("Bets table cleared");
-    
+
                 // Reset goals_scored_match for all players in the room
                 con.query(`UPDATE stats SET goals_scored_match = 0 WHERE room_id = ?`, [process.env.room_id], (err: any) => {
                     if (err) {
@@ -4006,7 +3965,7 @@ HaxballJS.then((HBInit: (arg0: { roomName: any; maxPlayers: number; public: bool
                 });
             });
         });
-    }
+    }    
     
       
 

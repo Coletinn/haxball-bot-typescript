@@ -144,6 +144,20 @@ VALUES
 
 -- Exportação de dados não seleccionada.
 
+-- haxball.bets definition
+CREATE TABLE `bets` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `player_id` int DEFAULT NULL,
+  `team` enum('red','blue') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `value` decimal(10,2) DEFAULT NULL,
+  `room_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `player_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `goals` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `player_id` (`player_id`),
+  CONSTRAINT `bets_ibfk_1` FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=13117 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Aqui todas as bets são armazenadas';
+
 -- A despejar estrutura para tabela haxball.streak
 CREATE TABLE IF NOT EXISTS `streak` (
   `games` int DEFAULT NULL,

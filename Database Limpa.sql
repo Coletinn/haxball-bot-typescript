@@ -145,7 +145,7 @@ VALUES
 -- Exportação de dados não seleccionada.
 
 -- haxball.bets definition
-CREATE TABLE `bets` (
+CREATE TABLE IF NOT EXISTS `bets` (
   `id` int NOT NULL AUTO_INCREMENT,
   `player_id` int DEFAULT NULL,
   `team` enum('red','blue') COLLATE utf8mb4_unicode_ci DEFAULT NULL,

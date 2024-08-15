@@ -129,34 +129,20 @@ VALUES
 (6, 'member', 'sgrz', 'SK Sturm Graz', 'Austria', '[{\"angle\":0,\"mainColor\":[16777215,0,16777215],\"avatarColor\":49152},{\"angle\":0,\"mainColor\":[0],\"avatarColor\":49152}]'),
 (7, 'member', 'bate', 'FK BATE Borisov', 'Belarus', '[{\"angle\":0,\"mainColor\":[16776960,33023,16776960],\"avatarColor\":0},{\"angle\":0,\"mainColor\":[16776960],\"avatarColor\":33023}]'),
 (8, 'member', 'gml', 'FK Gomel', 'Belarus', '[{\"angle\":0,\"mainColor\":[16777215,49152,16777215],\"avatarColor\":0},{\"angle\":0,\"mainColor\":[0,65280,0],\"avatarColor\":16777215}]'),
-(9, 'member', 'clb', 'Club Brugge KV', 'Bélgica', '[{\"angle\":0,\"mainColor\":[0,255,0],\"avatarColor\":16777215},{\"angle\":45,\"mainColor\":[16777215,12632256,16777215],\"avatarColor\":255}]'),
-(10, 'member', 'gnt', 'KAA Gent', 'Bélgica', '[{\"angle\":0,\"mainColor\":[255],\"avatarColor\":16777215},{\"angle\":0,\"mainColor\":[16776960],\"avatarColor\":255}]'),
-(11, 'member', 'gnk', 'KRC Genk', 'Bélgica', '[{\"angle\":0,\"mainColor\":[128,255,128],\"avatarColor\":16777215},{\"angle\":90,\"mainColor\":[0,16777215,0],\"avatarColor\":255}]'),
-(12, 'member', 'ant', 'Royal Antwerp FC', 'Bélgica', '[{\"angle\":90,\"mainColor\":[12582912,16711680,12582912],\"avatarColor\":16777215},{\"angle\":0,\"mainColor\":[16776960,16776960,0],\"avatarColor\":16711680}]'),
-(13, 'member', 'and', 'RSC Anderlecht', 'Bélgica', '[{\"angle\":0,\"mainColor\":[8388863,4194432,8388863],\"avatarColor\":16777215},{\"angle\":0,\"mainColor\":[16777215,12632256,16777215],\"avatarColor\":8388863}]'),
-(14, 'member', 'fla', 'CR Flamengo', 'Brasil', '[{\"angle\":90,\"mainColor\":[0,16711680,0],\"avatarColor\":16777215},{\"angle\":90,\"mainColor\":[16777215,0,16777215],\"avatarColor\":16711680}]'),
-(15, 'member', 'san', 'Santos FC', 'Brasil', '[{\"angle\":0,\"mainColor\":[12582912,16728064,12582912],\"avatarColor\":0},{\"angle\":0,\"mainColor\":[16728064,12582912],\"avatarColor\":0}]'),
-(16, 'member', 'sao', 'São Paulo FC', 'Brasil', '[{\"angle\":0,\"mainColor\":[16777215,14737632,16777215],\"avatarColor\":0},{\"angle\":0,\"mainColor\":[0,16777215,0],\"avatarColor\":16776960}]'),
-(17, 'member', 'cor', 'SC Corinthians Paulista', 'Brasil', '[{\"angle\":90,\"mainColor\":[16777215,0,16777215],\"avatarColor\":8421504},{\"angle\":90,\"mainColor\":[0,16777215,0],\"avatarColor\":32768}]'),
-(18, 'member', 'pal', 'SE Palmeiras', 'Brasil', '[{\"angle\":90,\"mainColor\":[32768,16777215,32768],\"avatarColor\":16777152},{\"angle\":0,\"mainColor\":[16777215,32768,16777215],\"avatarColor\":16777152}]'),
+(9, 'member', 'clb', 'Club Brugge KV', 'Belgium', '[{\"angle\":0,\"mainColor\":[0,255,0],\"avatarColor\":16777215},{\"angle\":45,\"mainColor\":[16777215,12632256,16777215],\"avatarColor\":255}]'),
+(10, 'member', 'gnt', 'KAA Gent', 'Belgium', '[{\"angle\":0,\"mainColor\":[255],\"avatarColor\":16777215},{\"angle\":0,\"mainColor\":[16776960],\"avatarColor\":255}]'),
+(11, 'member', 'gnk', 'KRC Genk', 'Belgium', '[{\"angle\":0,\"mainColor\":[128,255,128],\"avatarColor\":16777215},{\"angle\":90,\"mainColor\":[0,16777215,0],\"avatarColor\":255}]'),
+(12, 'member', 'ant', 'Royal Antwerp FC', 'Belgium', '[{\"angle\":90,\"mainColor\":[12582912,16711680,12582912],\"avatarColor\":16777215},{\"angle\":0,\"mainColor\":[16776960,16776960,0],\"avatarColor\":16711680}]'),
+(13, 'member', 'and', 'RSC Anderlecht', 'Belgium', '[{\"angle\":0,\"mainColor\":[8388863,4194432,8388863],\"avatarColor\":16777215},{\"angle\":0,\"mainColor\":[16777215,12632256,16777215],\"avatarColor\":8388863}]'),
+(14, 'member', 'fla', 'CR Flamengo', 'Brazil', '[{\"angle\":90,\"mainColor\":[0,16711680,0],\"avatarColor\":16777215},{\"angle\":90,\"mainColor\":[16777215,0,16777215],\"avatarColor\":16711680}]'),
+(15, 'member', 'san', 'Santos FC', 'Brazil', '[{\"angle\":0,\"mainColor\":[12582912,16728064,12582912],\"avatarColor\":0},{\"angle\":0,\"mainColor\":[16728064,12582912],\"avatarColor\":0}]'),
+(16, 'member', 'sao', 'São Paulo FC', 'Brazil', '[{\"angle\":0,\"mainColor\":[16777215,14737632,16777215],\"avatarColor\":0},{\"angle\":0,\"mainColor\":[0,16777215,0],\"avatarColor\":16776960}]'),
+(17, 'member', 'cor', 'SC Corinthians Paulista', 'Brazil', '[{\"angle\":90,\"mainColor\":[16777215,0,16777215],\"avatarColor\":8421504},{\"angle\":90,\"mainColor\":[0,16777215,0],\"avatarColor\":32768}]'),
+(18, 'member', 'pal', 'SE Palmeiras', 'Brazil', '[{\"angle\":90,\"mainColor\":[32768,16777215,32768],\"avatarColor\":16777152},{\"angle\":0,\"mainColor\":[16777215,32768,16777215],\"avatarColor\":16777152}]'),
 (19, 'member', 'lud', 'PFK Ludogorets Razgrad', 'Bulgaria', '[{\"angle\":75,\"mainColor\":[32768,16777215,32768],\"avatarColor\":0},{\"angle\":0,\"mainColor\":[32768],\"avatarColor\":16777215}]'),
 (20, 'member', 'bei', 'Beijing Guoan FC', 'China', '[{\"angle\":0,\"mainColor\":[49152,32768,49152],\"avatarColor\":16776960},{\"angle\":0,\"mainColor\":[8453888,16777215,8453888],\"avatarColor\":16776960}]')
 
 -- Exportação de dados não seleccionada.
-
--- haxball.bets definition
-CREATE TABLE IF NOT EXISTS `bets` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `player_id` int DEFAULT NULL,
-  `team` enum('red','blue') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `value` decimal(10,2) DEFAULT NULL,
-  `room_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `player_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `goals` int DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `player_id` (`player_id`),
-  CONSTRAINT `bets_ibfk_1` FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=13117 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Aqui todas as bets são armazenadas';
 
 -- A despejar estrutura para tabela haxball.streak
 CREATE TABLE IF NOT EXISTS `streak` (

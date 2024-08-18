@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS `players` (
   `conn` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `ipv4` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `auth` text COLLATE utf8mb4_unicode_ci,
+  `balance` int DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3174 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Onde todos os dados dos jogadores são guardados.';
 
@@ -105,6 +106,7 @@ CREATE TABLE IF NOT EXISTS `stats` (
   `cs` int DEFAULT '0',
   `wins` int DEFAULT '0',
   `losses` int DEFAULT '0',
+  `goals_scored_match` int DEFAULT '0',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`),
   FOREIGN KEY (`player_id`) REFERENCES `players` (`id`)

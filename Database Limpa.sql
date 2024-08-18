@@ -112,6 +112,21 @@ CREATE TABLE IF NOT EXISTS `stats` (
   FOREIGN KEY (`player_id`) REFERENCES `players` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- haxball.bets definition
+
+CREATE TABLE IF NOT EXISTS `bets` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `player_id` int DEFAULT NULL,
+  `team` enum('red','blue') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `value` decimal(10,2) DEFAULT NULL,
+  `room_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `player_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `goals` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `player_id` (`player_id`),
+  CONSTRAINT `bets_ibfk_1` FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=13262 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Aqui todos os bans são armazenados';
+
 CREATE TABLE IF NOT EXISTS `uniformes` (
   `IDUNI` int DEFAULT '0',
   `shortName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
